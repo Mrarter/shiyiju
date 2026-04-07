@@ -32,4 +32,11 @@ public interface AdminMapper {
     List<AdminUserEntity> findUsers();
 
     List<AdminOrderEntity> findOrders();
+
+    int updateOrderShipment(@Param("orderId") Long orderId,
+                            @Param("company") String company,
+                            @Param("trackingNo") String trackingNo,
+                            @Param("logisticsCode") String logisticsCode);
+
+    int updateOrderRemark(@Param("orderId") Long orderId, @Param("remark") String remark);
 }

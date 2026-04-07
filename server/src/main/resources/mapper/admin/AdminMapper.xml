@@ -4,6 +4,40 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.shiyiju.modules.admin.mapper.AdminMapper">
 
+    <select id="findOperations" resultType="com.shiyiju.modules.admin.entity.AdminOperationEntity">
+        SELECT
+            id,
+            title,
+            type,
+            target,
+            CASE WHEN status = 'ENABLED' THEN '启用' WHEN status = 'DRAFT' THEN '草稿' ELSE '停用' END AS status,
+            sort_no,
+            DATE_FORMAT(updated_at, '%Y-%m-%d %H:%i') AS updated_at
+        FROM admin_operation_config
+        ORDER BY sort_no ASC, id DESC
+    </select>
+
+    <insert id="insertOperation" parameterType="com.shiyiju.modules.admin.entity.AdminOperationEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO admin_operation_config (title, type, target, status, sort_no)
+        VALUES (#{title}, #{type}, #{target}, #{status}, #{sortNo})
+    </insert>
+
+    <update id="updateOperation" parameterType="com.shiyiju.modules.admin.entity.AdminOperationEntity">
+        UPDATE admin_operation_config
+        SET title = #{title},
+            type = #{type},
+            target = #{target},
+            status = #{status},
+            sort_no = #{sortNo}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateOperationStatus">
+        UPDATE admin_operation_config
+        SET status = #{status}
+        WHERE id = #{id}
+    </update>
+
     <select id="findArtists" resultType="com.shiyiju.modules.admin.entity.AdminArtistEntity">
         SELECT
             artist_name AS name,
@@ -16,6 +50,12 @@
         ORDER BY is_signed DESC, id DESC
         LIMIT 100
     </select>
+
+    <update id="updateArtistStatus">
+        UPDATE artist_profile
+        SET status = #{status}
+        WHERE id = #{id}
+    </update>
 
     <select id="findArtworks" resultType="com.shiyiju.modules.admin.entity.AdminArtworkEntity">
         SELECT
@@ -35,6 +75,29 @@
         ORDER BY a.created_at DESC
         LIMIT 100
     </select>
+
+    <update id="updateArtworkStatus">
+        UPDATE artwork
+        SET status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateOrderShipment">
+        INSERT INTO shipment_order (order_id, shipment_no, shipment_type, logistics_company, logistics_code, tracking_no, shipment_status, consigned_at)
+        VALUES (#{orderId}, CONCAT('SHIP', #{orderId}), 'ARTWORK', #{company}, #{logisticsCode}, #{trackingNo}, 'SHIPPED', NOW())
+        ON DUPLICATE KEY UPDATE
+            logistics_company = #{company},
+            logistics_code = #{logisticsCode},
+            tracking_no = #{trackingNo},
+            shipment_status = 'SHIPPED',
+            consigned_at = NOW();
+    </update>
+
+    <update id="updateOrderRemark">
+        UPDATE trade_order
+        SET remark = #{remark}
+        WHERE id = #{orderId}
+    </update>
 
     <select id="findUsers" resultType="com.shiyiju.modules.admin.entity.AdminUserEntity">
         SELECT

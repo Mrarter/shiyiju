@@ -8,8 +8,11 @@ import {
   getOrders,
   getUsers,
   getCurrentMiniappCapabilities,
+  updateArtistStatus,
   updateArtworkStatus,
-  updateOperationConfig
+  updateOperationConfig,
+  updateOrderRemark,
+  updateOrderShipment
 } from '../api/admin'
 
 export const useAdminStore = defineStore('admin', {
@@ -55,6 +58,18 @@ export const useAdminStore = defineStore('admin', {
     async changeArtworkStatus(id, status) {
       await updateArtworkStatus(id, status)
       await this.loadArtworks()
+    },
+    async changeArtistStatus(id, status) {
+      await updateArtistStatus(id, status)
+      await this.loadArtists()
+    },
+    async saveOrderShipment(id, payload) {
+      await updateOrderShipment(id, payload)
+      await this.loadOrders()
+    },
+    async saveOrderRemark(id, payload) {
+      await updateOrderRemark(id, payload)
+      await this.loadOrders()
     }
   }
 })

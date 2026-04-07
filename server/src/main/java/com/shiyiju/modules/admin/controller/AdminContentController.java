@@ -2,6 +2,8 @@ package com.shiyiju.modules.admin.controller;
 
 import com.shiyiju.common.api.ApiResponse;
 import com.shiyiju.modules.admin.dto.AdminOperationSaveDTO;
+import com.shiyiju.modules.admin.dto.AdminRemarkUpdateDTO;
+import com.shiyiju.modules.admin.dto.AdminShipmentUpdateDTO;
 import com.shiyiju.modules.admin.dto.AdminStatusUpdateDTO;
 import com.shiyiju.modules.admin.service.AdminContentService;
 import com.shiyiju.modules.admin.vo.AdminArtistVO;
@@ -81,5 +83,17 @@ public class AdminContentController {
     @GetMapping("/orders")
     public ApiResponse<List<AdminOrderVO>> orders() {
         return ApiResponse.success(adminContentService.listOrders());
+    }
+
+    @PutMapping("/orders/{id}/shipment")
+    public ApiResponse<Void> updateOrderShipment(@PathVariable Long id, @Valid @RequestBody AdminShipmentUpdateDTO request) {
+        adminContentService.updateOrderShipment(id, request);
+        return ApiResponse.success("更新成功", null);
+    }
+
+    @PutMapping("/orders/{id}/remark")
+    public ApiResponse<Void> updateOrderRemark(@PathVariable Long id, @Valid @RequestBody AdminRemarkUpdateDTO request) {
+        adminContentService.updateOrderRemark(id, request);
+        return ApiResponse.success("更新成功", null);
     }
 }

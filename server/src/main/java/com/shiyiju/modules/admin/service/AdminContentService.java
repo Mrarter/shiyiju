@@ -2,6 +2,8 @@ package com.shiyiju.modules.admin.service;
 
 import com.shiyiju.common.exception.BusinessException;
 import com.shiyiju.modules.admin.dto.AdminOperationSaveDTO;
+import com.shiyiju.modules.admin.dto.AdminRemarkUpdateDTO;
+import com.shiyiju.modules.admin.dto.AdminShipmentUpdateDTO;
 import com.shiyiju.modules.admin.entity.AdminArtistEntity;
 import com.shiyiju.modules.admin.entity.AdminArtworkEntity;
 import com.shiyiju.modules.admin.entity.AdminOperationEntity;
@@ -104,6 +106,18 @@ public class AdminContentService {
         String targetStatus = "ONLINE".equalsIgnoreCase(status) ? "PUBLISHED" : "DRAFT";
         if (adminMapper.updateArtworkStatus(id, targetStatus) <= 0) {
             throw new BusinessException(40404, "作品不存在");
+        }
+    }
+
+    public void updateOrderShipment(Long orderId, AdminShipmentUpdateDTO request) {
+        if (adminMapper.updateOrderShipment(orderId, request.getCompany(), request.getTrackingNo(), request.getCompany()) <= 0) {
+            throw new BusinessException(40404, "订单不存在");
+        }
+    }
+
+    public void updateOrderRemark(Long orderId, AdminRemarkUpdateDTO request) {
+        if (adminMapper.updateOrderRemark(orderId, request.getRemark()) <= 0) {
+            throw new BusinessException(40404, "订单不存在");
         }
     }
 

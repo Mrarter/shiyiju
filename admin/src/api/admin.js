@@ -38,6 +38,21 @@ export async function updateArtworkStatus(id, status) {
   return http.put(`${ADMIN_API_PREFIX}/artworks/${id}/status`, { status })
 }
 
+export async function updateArtistStatus(id, status) {
+  if (useMock) return { success: true }
+  return http.put(`${ADMIN_API_PREFIX}/artists/${id}/status`, { status })
+}
+
+export async function updateOrderShipment(id, payload) {
+  if (useMock) return { success: true }
+  return http.put(`${ADMIN_API_PREFIX}/orders/${id}/shipment`, payload)
+}
+
+export async function updateOrderRemark(id, payload) {
+  if (useMock) return { success: true }
+  return http.put(`${ADMIN_API_PREFIX}/orders/${id}/remark`, payload)
+}
+
 export async function getArtists() {
   if (useMock) return artists
   return http.get(`${ADMIN_API_PREFIX}/artists`)
