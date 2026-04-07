@@ -1,0 +1,78 @@
+<view class="app-shell">
+  <view class="safe-top"></view>
+  <view class="page-body" wx:if="{{!loading && detail}}">
+    <view class="section">
+      <view class="surface-card">
+        <swiper indicator-dots="{{images.length > 1}}" autoplay="{{false}}" class="detail-swiper">
+          <block wx:for="{{images}}" wx:key="mediaUrl">
+            <swiper-item>
+              <view class="detail-image" bindtap="previewImage" data-url="{{item.mediaUrl}}">
+                <image src="{{item.mediaUrl}}" mode="aspectFill" class="detail-image-tag"></image>
+              </view>
+            </swiper-item>
+          </block>
+        </swiper>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="surface-card detail-card">
+        <view class="tag-row">
+          <view class="tag" wx:for="{{tags}}" wx:key="*this">{{item}}</view>
+        </view>
+        <view class="hero-title">{{detail.title}}</view>
+        <view class="page-subtitle">{{detail.artistName}} · {{detail.category || '未分类'}}</view>
+        <view class="metric-value rise">{{formatPrice(detail.currentPrice)}}</view>
+        <view class="page-subtitle">编号：{{detail.artworkNo}}</view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-head">
+        <view class="section-title">作品信息</view>
+      </view>
+      <view class="surface-card detail-card">
+        <view class="page-subtitle">材质：{{detail.material || '待补充'}}</view>
+        <view class="page-subtitle">创作年份：{{detail.creationYear || '待补充'}}</view>
+        <view class="page-subtitle">尺寸：{{detail.widthCm || '-'}} × {{detail.heightCm || '-'}} × {{detail.depthCm || '-'}} cm</view>
+        <view class="page-subtitle">状态：{{detail.saleStatus || '待补充'}}</view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-head">
+        <view class="section-title">作品说明</view>
+      </view>
+      <view class="surface-card detail-card">
+        <view class="page-subtitle">{{detail.description || '暂无作品说明'}}</view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-head">
+        <view class="section-title">作品数据</view>
+      </view>
+      <view class="grid-two">
+        <view class="surface-card value-card" wx:for="{{stats}}" wx:key="label">
+          <view class="value-title">{{item.label}}</view>
+          <view class="metric-value">{{item.value}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="page-body" wx:elif="{{loading}}">
+    <view class="section">
+      <view class="surface-card page-subtitle">作品详情加载中...</view>
+    </view>
+  </view>
+
+  <view class="page-body" wx:elif="{{error}}">
+    <view class="section">
+      <view class="surface-card page-subtitle">{{error}}</view>
+      <view class="gold-button" bindtap="handleRetry">重试</view>
+    </view>
+  </view>
+
+  <view class="bottom-bar-spacer"></view>
+</view>
