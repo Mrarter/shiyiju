@@ -1,0 +1,15 @@
+<view class="app-shell">
+  <view class="safe-top"></view>
+  <view class="page-body">
+    <view class="page-title">发布</view>
+    <view class="page-subtitle">默认展示艺术家发布与藏家转售双态入口。</view>
+    <view class="section">
+      <view class="action-card agent-action" wx:for="{{cards}}" wx:key="title">
+        <view class="section-title">{{item.title}}</view>
+        <view class="page-subtitle">{{item.desc}}</view>
+        <view class="gold-button" data-action="{{item.action}}" bindtap="handleAction">{{item.buttonText}}</view>
+      </view>
+    </view>
+  </view>
+  <view class="bottom-bar-spacer"></view>
+</view>

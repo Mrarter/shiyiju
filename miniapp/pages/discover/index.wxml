@@ -1,0 +1,53 @@
+<view class="app-shell">
+  <view class="safe-top"></view>
+  <view class="page-body">
+    <view class="page-title">发现</view>
+    <view class="page-subtitle">分类筛选、签约艺术家、独家发行与流通市场入口。</view>
+
+    <view class="tabs section">
+      <view class="tab {{activeIndex === index ? 'tab-active' : ''}}" wx:for="{{filters}}" wx:key="*this" data-index="{{index}}" bindtap="handleTabTap">{{item}}</view>
+    </view>
+
+    <view class="section" wx:if="{{loading}}">
+      <view class="surface-card page-subtitle">发现页加载中...</view>
+    </view>
+
+    <view class="section" wx:elif="{{error}}">
+      <view class="surface-card page-subtitle">{{error}}</view>
+      <view class="gold-button" bindtap="handleRetry">重试</view>
+    </view>
+
+    <block wx:else>
+      <view class="section">
+        <view class="section-head">
+          <view class="section-title">签约艺术家</view>
+        </view>
+        <view class="menu-list">
+          <view class="surface-card menu-item" wx:for="{{artists}}" wx:key="artistId" data-artist-id="{{item.artistId}}" bindtap="goArtistProfile">
+            <view>
+              <view class="menu-title">{{item.artistName}}</view>
+              <view class="page-subtitle">{{item.levelName || '签约艺术家'}} · {{item.slogan || '持续创作中'}}</view>
+            </view>
+            <view class="menu-arrow">›</view>
+          </view>
+        </view>
+      </view>
+
+      <view class="section">
+        <view class="section-head">
+          <view class="section-title">流通市场</view>
+        </view>
+        <view class="menu-list">
+          <view class="surface-card menu-item" wx:for="{{artworks}}" wx:key="artworkId" data-artwork-id="{{item.artworkId}}" bindtap="goArtworkDetail">
+            <view>
+              <view class="menu-title">{{item.title}}</view>
+              <view class="page-subtitle">{{item.artistName}} · {{item.currentPrice ? ('¥' + item.currentPrice) : '价格待定'}}</view>
+            </view>
+            <view class="menu-arrow">›</view>
+          </view>
+        </view>
+      </view>
+    </block>
+  </view>
+  <view class="bottom-bar-spacer"></view>
+</view>
