@@ -49,5 +49,15 @@
 </template>
 
 <script setup>
-import { operationItems } from '../../mock/data'
+import { computed, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useAdminStore } from '../../stores/admin'
+
+const adminStore = useAdminStore()
+const { operations } = storeToRefs(adminStore)
+const operationItems = computed(() => operations.value)
+
+onMounted(async () => {
+  if (!operations.value.length) await adminStore.loadOperations()
+})
 </script>

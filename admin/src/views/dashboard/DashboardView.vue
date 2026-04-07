@@ -9,7 +9,7 @@
     </div>
 
     <div class="metric-grid">
-      <div v-for="item in dashboardMetrics" :key="item.label" class="section-card metric-card">
+      <div v-for="item in metrics" :key="item.label" class="section-card metric-card">
         <div class="metric-label">{{ item.label }}</div>
         <div class="metric-value">{{ item.value }}</div>
         <div class="page-subtitle">{{ item.delta }}</div>
@@ -21,20 +21,18 @@
         <div class="section-card" style="padding: 20px;">
           <div class="page-title" style="font-size: 18px;">待处理事项</div>
           <el-timeline style="margin-top: 16px;">
-            <el-timeline-item timestamp="高优先级">补齐首页推荐与艺术家展示数据</el-timeline-item>
-            <el-timeline-item timestamp="中优先级">修正首页空数据误显示为加载失败</el-timeline-item>
-            <el-timeline-item timestamp="中优先级">补齐订单联调后的后台处理动作</el-timeline-item>
+            <el-timeline-item v-for="item in todos" :key="item" timestamp="待处理">{{ item }}</el-timeline-item>
           </el-timeline>
         </div>
       </el-col>
       <el-col :span="10">
         <div class="section-card" style="padding: 20px;">
-          <div class="page-title" style="font-size: 18px;">快捷入口</div>
-          <div style="display: grid; gap: 12px; margin-top: 16px;">
-            <el-button plain>新建艺术家</el-button>
-            <el-button plain>新建作品</el-button>
-            <el-button plain>配置首页推荐</el-button>
-            <el-button plain>查看待发货订单</el-button>
+          <div class="page-title" style="font-size: 18px;">当前接口能力</div>
+          <div style="display: grid; gap: 10px; margin-top: 16px; font-size: 13px; color: #646a73;">
+            <div v-for="(value, key) in capabilities" :key="key">
+              <strong style="color:#1f2329;">{{ key }}</strong>
+              <div>{{ value }}</div>
+            </div>
           </div>
         </div>
       </el-col>
@@ -43,5 +41,18 @@
 </template>
 
 <script setup>
-import { dashboardMetrics } from '../../mock/data'
+import { computed, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useAdminStore } from '../../stores/admin'
+
+const adminStore = useAdminStore()
+const { dashboard, capabilities } = storeToRefs(adminStore)
+
+const metrics = computed(() => dashboard.value?.metrics || [])
+const todos = computed(() => dashboard.value?.todos || [])
+
+onMounted(async () => {
+  if (!dashboard.value) await adminStore.loadDashboard()
+  if (!capabilities.value) await adminStore.loadCapabilities()
+})
 </script>

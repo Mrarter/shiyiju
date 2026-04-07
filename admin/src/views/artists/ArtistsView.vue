@@ -32,5 +32,15 @@
 </template>
 
 <script setup>
-import { artists } from '../../mock/data'
+import { computed, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useAdminStore } from '../../stores/admin'
+
+const adminStore = useAdminStore()
+const { artists: artistsState } = storeToRefs(adminStore)
+const artists = computed(() => artistsState.value)
+
+onMounted(async () => {
+  if (!artistsState.value.length) await adminStore.loadArtists()
+})
 </script>
