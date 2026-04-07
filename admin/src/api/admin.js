@@ -2,7 +2,7 @@ import { ADMIN_API_PREFIX, API_PREFIX } from '../config/env'
 import { http } from './http'
 import { artists, artworks, operationItems, orders, users, dashboardMetrics } from '../mock/data'
 
-const useMock = import.meta.env.VITE_USE_MOCK !== 'false'
+const useMock = import.meta.env.VITE_USE_MOCK === 'true'
 
 export async function getDashboard() {
   if (useMock) {

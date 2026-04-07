@@ -9,19 +9,49 @@
     </div>
     <div class="login-panel section-card">
       <h2>欢迎登录</h2>
-      <el-form label-position="top">
+      <el-form label-position="top" @submit.prevent>
         <el-form-item label="账号">
-          <el-input placeholder="请输入账号" />
+          <el-input v-model="form.username" placeholder="请输入账号" />
         </el-form-item>
         <el-form-item label="密码">
-          <el-input type="password" placeholder="请输入密码" show-password />
+          <el-input v-model="form.password" type="password" placeholder="请输入密码" show-password @keyup.enter="handleLogin" />
         </el-form-item>
+        <el-alert v-if="errorMessage" :title="errorMessage" type="error" :closable="false" style="margin-bottom: 16px;" />
         <el-checkbox>记住登录状态</el-checkbox>
-        <el-button type="primary" size="large" class="login-btn" @click="$router.push('/dashboard')">登录</el-button>
+        <el-button type="primary" size="large" class="login-btn" :loading="loading" @click="handleLogin">登录</el-button>
+        <div class="hint">默认演示账号：admin / 123456</div>
       </el-form>
     </div>
   </div>
 </template>
+
+<script setup>
+import { reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
+
+const router = useRouter()
+const authStore = useAuthStore()
+const loading = ref(false)
+const errorMessage = ref('')
+const form = reactive({
+  username: 'admin',
+  password: '123456'
+})
+
+async function handleLogin() {
+  loading.value = true
+  errorMessage.value = ''
+  try {
+    await authStore.login(form)
+    await router.push('/dashboard')
+  } catch (error) {
+    errorMessage.value = error.message || '登录失败'
+  } finally {
+    loading.value = false
+  }
+}
+</script>
 
 <style scoped>
 .login-page {
@@ -63,5 +93,11 @@ p {
 .login-btn {
   width: 100%;
   margin-top: 20px;
+}
+
+.hint {
+  margin-top: 14px;
+  color: #8b949e;
+  font-size: 12px;
 }
 </style>

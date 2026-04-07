@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shiyiju.modules.artwork.mapper.ArtworkMapper">
+
+    <select id="findWorks" parameterType="com.shiyiju.modules.artwork.dto.ArtworkQueryDTO"
+            resultType="com.shiyiju.modules.artwork.entity.ArtworkListItemEntity">
+        SELECT
+            a.id AS artwork_id,
+            a.artwork_no,
+            a.artist_id,
+            ap.artist_name,
+            COALESCE(al.level_name, '签约艺术家') AS artist_level_name,
+            a.title,
+            a.category,
+            a.sale_mode,
+            a.status,
+            (
+                SELECT am.media_url
+                FROM artwork_media am
+                WHERE am.artwork_id = a.id
+                ORDER BY am.is_main DESC, am.sort_no ASC, am.id ASC
+                LIMIT 1
+            ) AS cover_url,
+            a.current_price,
+            a.favorite_count,
+            a.view_count
+        FROM artwork a
+        INNER JOIN artist_profile ap ON ap.id = a.artist_id
+        LEFT JOIN artist_level al ON al.id = ap.level_id
+        <where>
+            <if test="status != null and status != ''">
+                a.status = #{status}
+            </if>
+            <if test="category != null and category != ''">
+                AND a.category = #{category}
+            </if>
+            <if test="artistId != null">
+                AND a.artist_id = #{artistId}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (a.title LIKE CONCAT('%', #{keyword}, '%') OR ap.artist_name LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        ORDER BY a.created_at DESC
+    </select>
+
+    <select id="findWorkDetail" resultType="com.shiyiju.modules.artwork.entity.ArtworkDetailEntity">
+        SELECT
+            a.id AS artwork_id,
+            a.artwork_no,
+            a.artist_id,
+            ap.artist_name,
+            COALESCE(al.level_name, '签约艺术家') AS artist_level_name,
+            a.title,
+            a.category,
+            a.style,
+            a.width_cm,
+            a.height_cm,
+            a.depth_cm,
+            a.material,
+            a.creation_year,
+            a.description,
+            a.base_price,
+            a.current_price,
+            a.price_status,
+            a.online_days,
+            a.favorite_count,
+            a.view_count,
+            a.sale_mode,
+            a.support_group_buy,
+            a.support_resale,
+            a.status,
+            (
+                SELECT am.media_url
+                FROM artwork_media am
+                WHERE am.artwork_id = a.id
+                ORDER BY am.is_main DESC, am.sort_no ASC, am.id ASC
+                LIMIT 1
+            ) AS cover_url,
+            apr.online_days_weight,
+            apr.follow_count_weight,
+            apr.artist_float_min,
+            apr.artist_float_max,
+            apr.platform_max_growth_rate,
+            apr.manual_adjust_rate
+        FROM artwork a
+        INNER JOIN artist_profile ap ON ap.id = a.artist_id
+        LEFT JOIN artist_level al ON al.id = ap.level_id
+        LEFT JOIN artwork_price_rule apr ON apr.artwork_id = a.id
+        WHERE a.id = #{artworkId}
+        LIMIT 1
+    </select>
+
+    <select id="findArtworkMedia" resultType="com.shiyiju.modules.artwork.entity.ArtworkMediaEntity">
+        SELECT media_type, media_url, sort_no, is_main
+        FROM artwork_media
+        WHERE artwork_id = #{artworkId}
+        ORDER BY is_main DESC, sort_no ASC, id ASC
+    </select>
+</mapper>

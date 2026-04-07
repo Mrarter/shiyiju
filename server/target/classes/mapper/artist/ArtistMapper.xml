@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shiyiju.modules.artist.mapper.ArtistMapper">
+
+    <resultMap id="ArtistHomeMap" type="com.shiyiju.modules.artist.entity.ArtistHomeEntity">
+        <id property="artistId" column="artist_id"/>
+        <result property="artistName" column="artist_name"/>
+        <result property="avatar" column="avatar"/>
+        <result property="backgroundImageUrl" column="background_image_url"/>
+        <result property="levelName" column="level_name"/>
+        <result property="slogan" column="slogan"/>
+        <result property="bio" column="bio"/>
+        <result property="styleTags" column="style_tags"/>
+        <result property="fanCount" column="fan_count"/>
+        <result property="workCount" column="work_count"/>
+        <result property="soldCount" column="sold_count"/>
+        <result property="totalSaleAmount" column="total_sale_amount"/>
+        <result property="signedFlag" column="signed_flag"/>
+    </resultMap>
+
+    <resultMap id="ArtistWorkMap" type="com.shiyiju.modules.artist.entity.ArtistWorkEntity">
+        <id property="artworkId" column="artwork_id"/>
+        <result property="artworkNo" column="artwork_no"/>
+        <result property="title" column="title"/>
+        <result property="coverUrl" column="cover_url"/>
+        <result property="currentPrice" column="current_price"/>
+        <result property="saleStatus" column="sale_status"/>
+    </resultMap>
+
+    <select id="findArtistHome" resultMap="ArtistHomeMap">
+        SELECT ap.id AS artist_id,
+               ap.artist_name,
+               ap.avatar_url AS avatar,
+               ap.background_image_url,
+               COALESCE(al.level_name, '签约艺术家') AS level_name,
+               COALESCE(ap.slogan, ap.bio, '签约艺术家，作品持续上新中') AS slogan,
+               ap.bio,
+               ap.style_tags,
+               ap.follower_count AS fan_count,
+               ap.work_count,
+               ap.sale_count AS sold_count,
+               CAST(ap.total_sale_amount AS CHAR) AS total_sale_amount,
+               ap.is_signed AS signed_flag
+        FROM artist_profile ap
+        LEFT JOIN artist_level al ON al.id = ap.level_id
+        WHERE ap.id = #{artistId}
+          AND ap.status = 'ACTIVE'
+        LIMIT 1
+    </select>
+
+    <select id="findArtistWorks" resultMap="ArtistWorkMap">
+        SELECT id AS artwork_id,
+               artwork_no,
+               title,
+               (
+                   SELECT media_url
+                   FROM artwork_media am
+                   WHERE am.artwork_id = artwork.id
+                   ORDER BY am.is_main DESC, am.sort_no ASC, am.id ASC
+                   LIMIT 1
+               ) AS cover_url,
+               current_price,
+               status AS sale_status
+        FROM artwork
+        WHERE artist_id = #{artistId}
+          AND status IN ('PUBLISHED', 'COLLECTED', 'SOLD_OUT')
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="findRecommendedArtists" resultMap="ArtistHomeMap">
+        SELECT ap.id AS artist_id,
+               ap.artist_name,
+               ap.avatar_url AS avatar,
+               ap.background_image_url,
+               COALESCE(al.level_name, '签约艺术家') AS level_name,
+               COALESCE(ap.slogan, ap.bio, '签约艺术家，作品持续上新中') AS slogan,
+               ap.bio,
+               ap.style_tags,
+               ap.follower_count AS fan_count,
+               ap.work_count,
+               ap.sale_count AS sold_count,
+               CAST(ap.total_sale_amount AS CHAR) AS total_sale_amount,
+               ap.is_signed AS signed_flag
+        FROM artist_profile ap
+        LEFT JOIN artist_level al ON al.id = ap.level_id
+        WHERE ap.status = 'ACTIVE'
+        ORDER BY ap.is_signed DESC, ap.follower_count DESC, ap.id DESC
+        LIMIT #{limit}
+    </select>
+</mapper>

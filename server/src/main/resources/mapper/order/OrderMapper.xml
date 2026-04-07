@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shiyiju.modules.order.mapper.OrderMapper">
+
+    <select id="findArtworkSnapshot" resultType="com.shiyiju.modules.order.entity.ArtworkSnapshotEntity">
+        SELECT
+            a.id AS artwork_id,
+            a.artist_id,
+            a.title,
+            a.artwork_no,
+            a.current_price,
+            a.inventory_available,
+            a.status,
+            (
+                SELECT am.media_url
+                FROM artwork_media am
+                WHERE am.artwork_id = a.id
+                ORDER BY am.is_main DESC, am.sort_no ASC, am.id ASC
+                LIMIT 1
+            ) AS cover_url
+        FROM artwork a
+        WHERE a.id = #{artworkId}
+        LIMIT 1
+    </select>
+
+    <select id="findAddress" resultType="com.shiyiju.modules.order.entity.ShippingAddressEntity">
+        SELECT
+            id,
+            user_id,
+            receiver_name,
+            receiver_mobile,
+            province,
+            city,
+            district,
+            detail_address
+        FROM shipping_address
+        WHERE id = #{addressId} AND user_id = #{userId}
+        LIMIT 1
+    </select>
+
+    <insert id="insertOrder" parameterType="com.shiyiju.modules.order.entity.OrderEntity" useGeneratedKeys="true" keyProperty="orderId" keyColumn="id">
+        INSERT INTO trade_order (
+            order_no,
+            buyer_user_id,
+            order_type,
+            order_status,
+            payment_status,
+            delivery_type,
+            address_id,
+            goods_amount,
+            freight_amount,
+            discount_amount,
+            pay_amount,
+            remark
+        ) VALUES (
+            #{orderNo},
+            #{buyerUserId},
+            #{orderType},
+            #{orderStatus},
+            #{paymentStatus},
+            #{deliveryType},
+            #{addressId},
+            #{goodsAmount},
+            #{freightAmount},
+            #{discountAmount},
+            #{payAmount},
+            #{remark}
+        )
+    </insert>
+
+    <insert id="insertOrderItem">
+        INSERT INTO trade_order_item (
+            order_id,
+            artwork_id,
+            artist_id,
+            item_type,
+            sku_no,
+            item_title,
+            cover_url,
+            unit_price,
+            quantity,
+            subtotal_amount
+        ) VALUES (
+            #{orderId},
+            #{artwork.artworkId},
+            #{artwork.artistId},
+            'ARTWORK',
+            #{artwork.artworkNo},
+            #{artwork.title},
+            #{coverUrl},
+            #{artwork.currentPrice},
+            1,
+            #{artwork.currentPrice}
+        )
+    </insert>
+
+    <insert id="insertCertificate">
+        INSERT INTO collection_certificate (
+            certificate_no,
+            certificate_type,
+            artwork_id,
+            owner_user_id,
+            order_id,
+            share_ratio,
+            owner_display_mode,
+            certificate_status,
+            issued_at
+        ) VALUES (
+            #{certificateNo},
+            'ELECTRONIC',
+            #{artworkId},
+            #{ownerUserId},
+            #{orderId},
+            1.0000,
+            'PRIVATE',
+            'VALID',
+            NOW()
+        )
+    </insert>
+
+    <insert id="insertOwnershipFlow">
+        INSERT INTO artwork_ownership_flow (
+            artwork_id,
+            from_user_id,
+            to_user_id,
+            flow_type,
+            order_id,
+            flow_remark
+        ) VALUES (
+            #{artworkId},
+            NULL,
+            #{toUserId},
+            'PRIMARY_BUY',
+            #{orderId},
+            '首次购买生成持有记录'
+        )
+    </insert>
+
+    <update id="decreaseArtworkInventory">
+        UPDATE artwork
+        SET inventory_available = inventory_available - 1,
+            status = CASE WHEN inventory_available - 1 &lt;= 0 THEN 'COLLECTED' ELSE status END,
+            updated_at = NOW()
+        WHERE id = #{artworkId}
+          AND status = 'PUBLISHED'
+          AND inventory_available &gt; 0
+    </update>
+
+    <select id="findOrderDetail" resultType="com.shiyiju.modules.order.entity.OrderEntity">
+        SELECT
+            o.id AS order_id,
+            o.order_no,
+            o.buyer_user_id,
+            o.order_type,
+            o.order_status,
+            o.payment_status,
+            o.delivery_type,
+            o.address_id,
+            o.goods_amount,
+            o.freight_amount,
+            o.discount_amount,
+            o.pay_amount,
+            o.remark,
+            o.paid_at,
+            o.completed_at,
+            o.created_at,
+            oi.item_title,
+            oi.cover_url,
+            oi.unit_price,
+            oi.quantity,
+            oi.subtotal_amount,
+            oi.artwork_id,
+            oi.artist_id
+        FROM trade_order o
+        INNER JOIN trade_order_item oi ON oi.order_id = o.id
+        WHERE o.id = #{orderId}
+          AND o.buyer_user_id = #{buyerUserId}
+        LIMIT 1
+    </select>
+
+    <select id="findOrderAddress" resultType="com.shiyiju.modules.order.entity.ShippingAddressEntity">
+        SELECT
+            id,
+            user_id,
+            receiver_name,
+            receiver_mobile,
+            province,
+            city,
+            district,
+            detail_address
+        FROM shipping_address
+        WHERE id = #{addressId}
+        LIMIT 1
+    </select>
+
+    <select id="findShipmentByOrderId" resultType="com.shiyiju.modules.order.entity.ShipmentEntity">
+        SELECT
+            shipment_no,
+            logistics_company,
+            logistics_code,
+            tracking_no,
+            shipment_status,
+            consigned_at,
+            signed_at
+        FROM shipment_order
+        WHERE order_id = #{orderId}
+        LIMIT 1
+    </select>
+</mapper>

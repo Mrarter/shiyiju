@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shiyiju.modules.user.mapper.UserAccountMapper">
+
+    <resultMap id="UserAccountMap" type="com.shiyiju.modules.user.entity.UserAccountEntity">
+        <id property="id" column="id"/>
+        <result property="userNo" column="user_no"/>
+        <result property="nickname" column="nickname"/>
+        <result property="avatarUrl" column="avatar_url"/>
+        <result property="mobile" column="mobile"/>
+        <result property="gender" column="gender"/>
+        <result property="status" column="status"/>
+        <result property="registerSource" column="register_source"/>
+        <result property="invitationCodeUsed" column="invitation_code_used"/>
+        <result property="lastLoginAt" column="last_login_at"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="roleCodes" column="role_codes"/>
+    </resultMap>
+
+    <select id="findByOpenid" resultMap="UserAccountMap">
+        SELECT ua.id, ua.user_no, ua.nickname, ua.avatar_url, ua.mobile, ua.gender, ua.status,
+               ua.register_source, ua.invitation_code_used, ua.last_login_at, ua.created_at, ua.updated_at,
+               GROUP_CONCAT(urr.role_code ORDER BY urr.role_code SEPARATOR ',') AS role_codes
+        FROM user_account ua
+        JOIN user_wechat_auth uwa ON uwa.user_id = ua.id
+        LEFT JOIN user_role_relation urr ON urr.user_id = ua.id AND urr.status = 'ACTIVE'
+        WHERE uwa.openid = #{openid}
+        GROUP BY ua.id
+        LIMIT 1
+    </select>
+
+    <select id="findCurrentUser" resultMap="UserAccountMap">
+        SELECT ua.id, ua.user_no, ua.nickname, ua.avatar_url, ua.mobile, ua.gender, ua.status,
+               ua.register_source, ua.invitation_code_used, ua.last_login_at, ua.created_at, ua.updated_at,
+               GROUP_CONCAT(urr.role_code ORDER BY urr.role_code SEPARATOR ',') AS role_codes
+        FROM user_account ua
+        LEFT JOIN user_role_relation urr ON urr.user_id = ua.id AND urr.status = 'ACTIVE'
+        WHERE ua.id = #{userId}
+        GROUP BY ua.id
+        LIMIT 1
+    </select>
+
+    <select id="findArtistIdByUserId" resultType="java.lang.Long">
+        SELECT id
+        FROM artist_profile
+        WHERE user_id = #{userId}
+          AND status = 'ACTIVE'
+        LIMIT 1
+    </select>
+
+    <select id="findDistributorIdByUserId" resultType="java.lang.Long">
+        SELECT id
+        FROM distributor_profile
+        WHERE user_id = #{userId}
+          AND status = 'ACTIVE'
+        LIMIT 1
+    </select>
+
+    <insert id="insertUserAccount" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_account
+        (user_no, nickname, avatar_url, gender, status, register_source, invitation_code_used, last_login_at)
+        VALUES
+        (#{userNo}, #{nickname}, #{avatarUrl}, #{gender}, #{status}, #{registerSource}, #{invitationCodeUsed}, #{lastLoginAt})
+    </insert>
+
+    <insert id="insertWechatAuth">
+        INSERT INTO user_wechat_auth (user_id, openid, unionid, session_key, app_id)
+        VALUES (#{userId}, #{openid}, #{unionid}, #{sessionKey}, #{appId})
+    </insert>
+
+    <insert id="insertUserRole">
+        INSERT IGNORE INTO user_role_relation (user_id, role_code, is_default, status)
+        VALUES (#{userId}, #{roleCode}, 1, 'ACTIVE')
+    </insert>
+
+    <update id="updateLoginProfile">
+        UPDATE user_account
+        SET nickname = #{nickname},
+            avatar_url = #{avatarUrl},
+            gender = COALESCE(#{gender}, gender),
+            last_login_at = NOW()
+        WHERE id = #{userId}
+    </update>
+
+    <update id="updateWechatAuth">
+        UPDATE user_wechat_auth
+        SET session_key = #{sessionKey},
+            unionid = #{unionid},
+            updated_at = NOW()
+        WHERE user_id = #{userId}
+    </update>
+
+    <update id="updateProfile">
+        UPDATE user_account
+        SET nickname = #{nickname},
+            avatar_url = #{avatarUrl},
+            mobile = #{mobile},
+            gender = #{gender}
+        WHERE id = #{userId}
+    </update>
+</mapper>

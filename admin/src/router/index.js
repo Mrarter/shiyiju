@@ -8,6 +8,7 @@ import ArtworksView from '../views/artworks/ArtworksView.vue'
 import UsersView from '../views/users/UsersView.vue'
 import OrdersView from '../views/orders/OrdersView.vue'
 import SettingsView from '../views/settings/SettingsView.vue'
+import { useAuthStore } from '../stores/auth'
 
 const routes = [
   { path: '/login', component: LoginView },
@@ -27,7 +28,27 @@ const routes = [
   }
 ]
 
-export default createRouter({
+const router = createRouter({
   history: createWebHistory(),
   routes
 })
+
+router.beforeEach(async (to) => {
+  const authStore = useAuthStore()
+  if (to.path === '/login') {
+    if (authStore.isLoggedIn) return '/dashboard'
+    return true
+  }
+  if (!authStore.isLoggedIn) return '/login'
+  if (!authStore.user) {
+    try {
+      await authStore.fetchMe()
+    } catch {
+      authStore.clearAuth()
+      return '/login'
+    }
+  }
+  return true
+})
+
+export default router

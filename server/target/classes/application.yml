@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: shiyiju-server
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:shiyiju}?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:root}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+mybatis:
+  mapper-locations: classpath:mapper/**/*.xml
+  type-aliases-package: com.shiyiju.modules.user.entity,com.shiyiju.modules.artist.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
+server:
+  port: ${SERVER_PORT:8080}
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:shiyiju-official-backend-secret-2026}
+    expiration-seconds: ${JWT_EXPIRE_SECONDS:604800}
+  wechat:
+    miniapp-app-id: ${WECHAT_MINIAPP_APP_ID:wx-miniapp-demo}
+    miniapp-app-secret: ${WECHAT_MINIAPP_APP_SECRET:}
+    code2-session-url: ${WECHAT_CODE2SESSION_URL:https://api.weixin.qq.com/sns/jscode2session}
+    mock-enabled: ${WECHAT_MOCK_ENABLED:true}

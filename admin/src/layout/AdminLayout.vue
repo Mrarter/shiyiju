@@ -27,11 +27,11 @@
         <div class="topbar-actions">
           <el-button>消息</el-button>
           <el-dropdown>
-            <el-button type="primary">管理员</el-button>
+            <el-button type="primary">{{ authStore.user?.displayName || '管理员' }}</el-button>
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item>个人设置</el-dropdown-item>
-                <el-dropdown-item>退出登录</el-dropdown-item>
+                <el-dropdown-item @click="handleLogout">退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -45,10 +45,13 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
 
 const route = useRoute()
+const router = useRouter()
+const authStore = useAuthStore()
 const pageTitle = computed(() => {
   const map = {
     '/dashboard': '控制台',
@@ -60,6 +63,22 @@ const pageTitle = computed(() => {
     '/settings': '系统设置'
   }
   return map[route.path] || '拾艺局运营后台'
+})
+
+async function handleLogout() {
+  authStore.clearAuth()
+  await router.push('/login')
+}
+
+onMounted(async () => {
+  if (!authStore.user && authStore.isLoggedIn) {
+    try {
+      await authStore.fetchMe()
+    } catch {
+      authStore.clearAuth()
+      await router.push('/login')
+    }
+  }
 })
 </script>
 
