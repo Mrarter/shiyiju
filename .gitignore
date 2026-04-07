@@ -1,4 +1,13 @@
 .DS_Store
-admin/node_modules
-admin/dist
-admin/.DS_Store
+node_modules/
+dist/
+coverage/
+.vite/
+.env
+.env.*
+!.env.example
+admin/node_modules/
+admin/dist/
+server/target/
+server/.env.local-run
+*.log
