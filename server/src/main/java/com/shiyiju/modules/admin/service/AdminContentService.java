@@ -1,7 +1,10 @@
 package com.shiyiju.modules.admin.service;
 
+import com.shiyiju.common.exception.BusinessException;
+import com.shiyiju.modules.admin.dto.AdminOperationSaveDTO;
 import com.shiyiju.modules.admin.entity.AdminArtistEntity;
 import com.shiyiju.modules.admin.entity.AdminArtworkEntity;
+import com.shiyiju.modules.admin.entity.AdminOperationEntity;
 import com.shiyiju.modules.admin.entity.AdminOrderEntity;
 import com.shiyiju.modules.admin.entity.AdminUserEntity;
 import com.shiyiju.modules.admin.mapper.AdminMapper;
@@ -24,11 +27,46 @@ public class AdminContentService {
     }
 
     public List<AdminOperationVO> listOperations() {
-        return List.of(
-            operation(1L, "春季主视觉 Banner", "Banner", "首页主视觉", "启用", "2026-04-07 14:20"),
-            operation(2L, "热门藏品推荐", "热门藏品", "作品 8 个", "启用", "2026-04-07 13:45"),
-            operation(3L, "推荐艺术家", "推荐艺术家", "艺术家 6 位", "草稿", "2026-04-07 12:15")
-        );
+        List<AdminOperationEntity> entities = adminMapper.findOperations();
+        if (entities == null || entities.isEmpty()) {
+            return List.of(
+                operation(1L, "春季主视觉 Banner", "Banner", "首页主视觉", "启用", "2026-04-07 14:20"),
+                operation(2L, "热门藏品推荐", "热门藏品", "作品 8 个", "启用", "2026-04-07 13:45"),
+                operation(3L, "推荐艺术家", "推荐艺术家", "艺术家 6 位", "草稿", "2026-04-07 12:15")
+            );
+        }
+        return entities.stream().map(this::toOperationVO).toList();
+    }
+
+    public AdminOperationVO createOperation(AdminOperationSaveDTO request) {
+        AdminOperationEntity entity = new AdminOperationEntity();
+        entity.setTitle(request.getTitle());
+        entity.setType(request.getType());
+        entity.setTarget(request.getTarget());
+        entity.setStatus(request.getStatus());
+        entity.setSortNo(request.getSortNo());
+        adminMapper.insertOperation(entity);
+        return operation(entity.getId(), request.getTitle(), request.getType(), request.getTarget(), displayOperationStatus(request.getStatus()), "刚刚");
+    }
+
+    public AdminOperationVO updateOperation(Long id, AdminOperationSaveDTO request) {
+        AdminOperationEntity entity = new AdminOperationEntity();
+        entity.setId(id);
+        entity.setTitle(request.getTitle());
+        entity.setType(request.getType());
+        entity.setTarget(request.getTarget());
+        entity.setStatus(request.getStatus());
+        entity.setSortNo(request.getSortNo());
+        if (adminMapper.updateOperation(entity) <= 0) {
+            throw new BusinessException(40404, "运营配置不存在");
+        }
+        return operation(id, request.getTitle(), request.getType(), request.getTarget(), displayOperationStatus(request.getStatus()), "刚刚");
+    }
+
+    public void updateOperationStatus(Long id, String status) {
+        if (adminMapper.updateOperationStatus(id, status) <= 0) {
+            throw new BusinessException(40404, "运营配置不存在");
+        }
     }
 
     public List<AdminArtistVO> listArtists() {
@@ -43,6 +81,13 @@ public class AdminContentService {
         return entities.stream().map(this::toArtistVO).toList();
     }
 
+    public void updateArtistStatus(Long id, String status) {
+        String targetStatus = "ONLINE".equalsIgnoreCase(status) ? "ACTIVE" : "INACTIVE";
+        if (adminMapper.updateArtistStatus(id, targetStatus) <= 0) {
+            throw new BusinessException(40404, "艺术家不存在");
+        }
+    }
+
     public List<AdminArtworkVO> listArtworks() {
         List<AdminArtworkEntity> entities = adminMapper.findArtworks();
         if (entities == null || entities.isEmpty()) {
@@ -53,6 +98,13 @@ public class AdminContentService {
             );
         }
         return entities.stream().map(this::toArtworkVO).toList();
+    }
+
+    public void updateArtworkStatus(Long id, String status) {
+        String targetStatus = "ONLINE".equalsIgnoreCase(status) ? "PUBLISHED" : "DRAFT";
+        if (adminMapper.updateArtworkStatus(id, targetStatus) <= 0) {
+            throw new BusinessException(40404, "作品不存在");
+        }
     }
 
     public List<AdminUserVO> listUsers() {
@@ -77,6 +129,18 @@ public class AdminContentService {
             );
         }
         return entities.stream().map(this::toOrderVO).toList();
+    }
+
+    private AdminOperationVO toOperationVO(AdminOperationEntity entity) {
+        return operation(entity.getId(), entity.getTitle(), entity.getType(), entity.getTarget(), entity.getStatus(), entity.getUpdatedAt());
+    }
+
+    private String displayOperationStatus(String status) {
+        return switch (status) {
+            case "ENABLED" -> "启用";
+            case "DRAFT" -> "草稿";
+            default -> "停用";
+        };
     }
 
     private AdminArtistVO toArtistVO(AdminArtistEntity entity) {
