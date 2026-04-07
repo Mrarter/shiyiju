@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shiyiju.modules.admin.mapper.AdminMapper">
+
+    <select id="findArtists" resultType="com.shiyiju.modules.admin.entity.AdminArtistEntity">
+        SELECT
+            artist_name AS name,
+            '' AS city,
+            COALESCE(style_tags, '') AS tags,
+            COALESCE(work_count, 0) AS works,
+            CASE WHEN status = 'ACTIVE' THEN '上线' ELSE '下线' END AS status,
+            id AS sort
+        FROM artist_profile
+        ORDER BY is_signed DESC, id DESC
+        LIMIT 100
+    </select>
+
+    <select id="findArtworks" resultType="com.shiyiju.modules.admin.entity.AdminArtworkEntity">
+        SELECT
+            a.title AS name,
+            ap.artist_name AS artist,
+            CONCAT('¥', FORMAT(a.current_price, 2)) AS price,
+            COALESCE(a.inventory_available, 0) AS stock,
+            CASE
+                WHEN a.status = 'PUBLISHED' THEN '上架'
+                WHEN a.status = 'COLLECTED' THEN '已收藏'
+                WHEN a.status = 'SOLD_OUT' THEN '售罄'
+                ELSE '下架'
+            END AS status,
+            '无' AS tag
+        FROM artwork a
+        LEFT JOIN artist_profile ap ON ap.id = a.artist_id
+        ORDER BY a.created_at DESC
+        LIMIT 100
+    </select>
+
+    <select id="findUsers" resultType="com.shiyiju.modules.admin.entity.AdminUserEntity">
+        SELECT
+            nickname,
+            user_no AS userNo,
+            CASE gender
+                WHEN 1 THEN '男'
+                WHEN 2 THEN '女'
+                ELSE '未知'
+            END AS gender,
+            CASE WHEN status = 'ENABLED' THEN '正常' ELSE '禁用' END AS status,
+            DATE_FORMAT(last_login_at, '%Y-%m-%d %H:%i') AS lastLogin
+        FROM user_account
+        ORDER BY id DESC
+        LIMIT 100
+    </select>
+
+    <select id="findOrders" resultType="com.shiyiju.modules.admin.entity.AdminOrderEntity">
+        SELECT
+            o.order_no AS orderNo,
+            COALESCE(u.nickname, CONCAT('用户#', o.buyer_user_id)) AS user,
+            COALESCE(oi.item_title, '-') AS artwork,
+            CONCAT('¥', FORMAT(o.pay_amount, 2)) AS amount,
+            o.order_status AS status,
+            o.payment_status AS payStatus,
+            COALESCE(so.shipment_status, '未发货') AS shipStatus
+        FROM trade_order o
+        LEFT JOIN user_account u ON u.id = o.buyer_user_id
+        LEFT JOIN trade_order_item oi ON oi.order_id = o.id
+        LEFT JOIN shipment_order so ON so.order_id = o.id
+        ORDER BY o.created_at DESC
+        LIMIT 100
+    </select>
+</mapper>
