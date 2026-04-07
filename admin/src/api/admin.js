@@ -23,6 +23,21 @@ export async function getOperationConfigs() {
   return http.get(`${ADMIN_API_PREFIX}/operations`)
 }
 
+export async function createOperationConfig(payload) {
+  if (useMock) return { id: Date.now(), ...payload }
+  return http.post(`${ADMIN_API_PREFIX}/operations`, payload)
+}
+
+export async function updateOperationConfig(id, payload) {
+  if (useMock) return { id, ...payload }
+  return http.put(`${ADMIN_API_PREFIX}/operations/${id}`, payload)
+}
+
+export async function updateArtworkStatus(id, status) {
+  if (useMock) return { success: true }
+  return http.put(`${ADMIN_API_PREFIX}/artworks/${id}/status`, { status })
+}
+
 export async function getArtists() {
   if (useMock) return artists
   return http.get(`${ADMIN_API_PREFIX}/artists`)

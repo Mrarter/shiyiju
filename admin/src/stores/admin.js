@@ -1,12 +1,15 @@
 import { defineStore } from 'pinia'
 import {
+  createOperationConfig,
   getArtists,
   getArtworks,
   getDashboard,
   getOperationConfigs,
   getOrders,
   getUsers,
-  getCurrentMiniappCapabilities
+  getCurrentMiniappCapabilities,
+  updateArtworkStatus,
+  updateOperationConfig
 } from '../api/admin'
 
 export const useAdminStore = defineStore('admin', {
@@ -40,6 +43,18 @@ export const useAdminStore = defineStore('admin', {
     },
     async loadCapabilities() {
       this.capabilities = await getCurrentMiniappCapabilities()
+    },
+    async createOperation(payload) {
+      await createOperationConfig(payload)
+      await this.loadOperations()
+    },
+    async updateOperation(id, payload) {
+      await updateOperationConfig(id, payload)
+      await this.loadOperations()
+    },
+    async changeArtworkStatus(id, status) {
+      await updateArtworkStatus(id, status)
+      await this.loadArtworks()
     }
   }
 })
