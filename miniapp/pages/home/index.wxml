@@ -1,50 +1,29 @@
 <view class="app-shell">
   <view class="safe-top"></view>
-  <view class="page-body">
-    <view class="home-nav">
-      <view>
-        <view class="brand">拾艺局</view>
-        <view class="brand-sub">新一代艺术品流通平台</view>
-      </view>
-      <view class="nav-actions">
-        <view class="nav-btn">搜</view>
-        <view class="nav-btn">讯</view>
+  <view class="page-body" wx:if="{{!loading && !error}}">
+    <view class="section">
+      <view class="surface-card hero-card">
+        <view class="eyebrow">拾艺局</view>
+        <view class="hero-title">艺术品流通与收藏</view>
+        <view class="page-subtitle">先把首页、艺术家、作品详情这些主链路做实。</view>
       </view>
     </view>
 
-    <view class="hero-card hero">
-      <view class="tag-row">
-        <view class="tag">首页成交页</view>
-        <view class="tag tag-dark">可开发版</view>
-      </view>
-      <view class="hero-title">每一件艺术品<br/>都值得被收藏，也值得被传承</view>
-      <view class="hero-desc">先看见价值，再建立信任，最后完成入藏转化。</view>
-      <view class="hero-actions">
-        <view class="gold-button">立即入藏</view>
-        <view class="secondary-button">查看详情</view>
-      </view>
-    </view>
-
-    <view class="section" wx:if="{{error}}">
-      <view class="surface-card page-subtitle">{{error}}</view>
+    <view class="section" wx:if="{{emptyState}}">
+      <view class="surface-card page-subtitle">当前还没有足够的首页推荐数据，正在持续补充。</view>
     </view>
 
     <view class="section">
       <view class="section-head">
         <view class="section-title">热门藏品</view>
-        <view class="section-link">更多</view>
       </view>
-      <view class="grid-two">
-        <view class="work-card work" wx:for="{{hotWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
-          <view class="work-cover work-cover-lg">
-            <view class="tag">{{item.badge}}</view>
+      <view class="menu-list">
+        <view class="surface-card menu-item" wx:for="{{hotWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
+          <view>
+            <view class="menu-title">{{item.title}}</view>
+            <view class="page-subtitle">{{item.artistName}} · {{item.priceText}}</view>
           </view>
-          <view class="work-title">{{item.title}}</view>
-          <view class="work-artist">{{item.artist}}</view>
-          <view class="work-footer">
-            <view class="work-price">{{item.price}}</view>
-            <view class="rise">{{item.rise}}</view>
-          </view>
+          <view class="menu-arrow">›</view>
         </view>
       </view>
     </view>
@@ -52,13 +31,13 @@
     <view class="section">
       <view class="section-head">
         <view class="section-title">正在升值</view>
-        <view class="section-link">算法推荐</view>
       </view>
       <view class="grid-two">
         <view class="surface-card value-card" wx:for="{{risingWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
           <view class="value-title">{{item.title}}</view>
-          <view class="metric-value rise">{{item.price}}</view>
-          <view class="page-subtitle">{{item.stats}}</view>
+          <view class="page-subtitle">{{item.artistName}}</view>
+          <view class="metric-value rise">{{item.priceText}}</view>
+          <view class="page-subtitle">{{item.trendText}}</view>
         </view>
       </view>
     </view>
@@ -66,26 +45,31 @@
     <view class="section">
       <view class="section-head">
         <view class="section-title">推荐艺术家</view>
-        <view class="section-link">查看全部</view>
       </view>
-      <view class="artist-list">
-        <view class="profile-card artist-card" wx:for="{{artists}}" wx:key="id" bindtap="goArtistProfile" data-artist-id="{{item.id}}">
-          <view class="avatar"></view>
-          <view class="artist-meta">
-            <view class="artist-name-row">
-              <view class="artist-name">{{item.name}}</view>
-              <view class="tag">{{item.level}}</view>
-            </view>
-            <view class="page-subtitle">{{item.desc}}</view>
+      <view class="menu-list">
+        <view class="surface-card menu-item" wx:for="{{recommendedArtists}}" wx:key="id" bindtap="goArtistProfile" data-artist-id="{{item.id}}">
+          <view>
+            <view class="menu-title">{{item.artistName}}</view>
+            <view class="page-subtitle">{{item.levelName || '艺术家'}} · {{item.slogan || '持续上新中'}}</view>
           </view>
-          <view class="secondary-button follow-btn">关注</view>
+          <view class="menu-arrow">›</view>
         </view>
       </view>
     </view>
+  </view>
 
-    <view class="section" wx:if="{{loading}}">
-      <view class="surface-card page-subtitle">数据加载中...</view>
+  <view class="page-body" wx:elif="{{loading}}">
+    <view class="section">
+      <view class="surface-card page-subtitle">首页加载中...</view>
     </view>
   </view>
+
+  <view class="page-body" wx:elif="{{error}}">
+    <view class="section">
+      <view class="surface-card page-subtitle">{{error}}</view>
+      <view class="gold-button" bindtap="handleRetry">重试</view>
+    </view>
+  </view>
+
   <view class="bottom-bar-spacer"></view>
 </view>

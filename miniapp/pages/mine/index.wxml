@@ -1,0 +1,53 @@
+<view class="app-shell">
+  <view class="safe-top"></view>
+  <view class="page-body" wx:if="{{!loading && user}}">
+    <view class="section">
+      <view class="surface-card hero-card">
+        <view class="hero-top">
+          <view>
+            <view class="eyebrow">我的</view>
+            <view class="hero-title">{{user.nickname || '微信用户'}}</view>
+            <view class="page-subtitle">{{user.status || 'ENABLED'}} · {{user.registerSource || 'WECHAT_MINIAPP'}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="grid-two">
+        <view class="surface-card value-card" wx:for="{{stats}}" wx:key="label">
+          <view class="value-title">{{item.label}}</view>
+          <view class="metric-value">{{item.value}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-head">
+        <view class="section-title">功能入口</view>
+      </view>
+      <view class="menu-list">
+        <view class="surface-card menu-item" wx:for="{{menus}}" wx:key="key" bindtap="handleMenuTap" data-key="{{item.key}}">
+          <view>
+            <view class="menu-title">{{item.label}}</view>
+            <view class="page-subtitle">{{item.desc}}</view>
+          </view>
+          <view class="menu-arrow">›</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="page-body" wx:elif="{{loading}}">
+    <view class="section">
+      <view class="surface-card page-subtitle">我的页面加载中...</view>
+    </view>
+  </view>
+
+  <view class="page-body" wx:elif="{{error}}">
+    <view class="section">
+      <view class="surface-card page-subtitle">{{error}}</view>
+      <view class="gold-button" bindtap="handleRetry">重试</view>
+    </view>
+  </view>
+</view>
