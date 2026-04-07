@@ -1,1 +1,4 @@
 .DS_Store
+admin/node_modules
+admin/dist
+admin/.DS_Store

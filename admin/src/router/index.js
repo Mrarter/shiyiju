@@ -1,0 +1,33 @@
+import { createRouter, createWebHistory } from 'vue-router'
+import AdminLayout from '../layout/AdminLayout.vue'
+import LoginView from '../views/LoginView.vue'
+import DashboardView from '../views/dashboard/DashboardView.vue'
+import OperationsView from '../views/operations/OperationsView.vue'
+import ArtistsView from '../views/artists/ArtistsView.vue'
+import ArtworksView from '../views/artworks/ArtworksView.vue'
+import UsersView from '../views/users/UsersView.vue'
+import OrdersView from '../views/orders/OrdersView.vue'
+import SettingsView from '../views/settings/SettingsView.vue'
+
+const routes = [
+  { path: '/login', component: LoginView },
+  {
+    path: '/',
+    component: AdminLayout,
+    redirect: '/dashboard',
+    children: [
+      { path: 'dashboard', component: DashboardView },
+      { path: 'operations', component: OperationsView },
+      { path: 'artists', component: ArtistsView },
+      { path: 'artworks', component: ArtworksView },
+      { path: 'users', component: UsersView },
+      { path: 'orders', component: OrdersView },
+      { path: 'settings', component: SettingsView }
+    ]
+  }
+]
+
+export default createRouter({
+  history: createWebHistory(),
+  routes
+})
