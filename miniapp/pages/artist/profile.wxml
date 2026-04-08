@@ -34,14 +34,14 @@
         <view class="section-title">在售作品</view>
       </view>
       <view class="menu-list">
-        <view class="surface-card menu-item" wx:for="{{works}}" wx:key="artworkId">
+        <view class="surface-card menu-item" wx:for="{{works}}" wx:key="artworkId" bindtap="goArtworkDetail" data-artwork-id="{{item.artworkId}}">
           <view>
             <view class="tag-row">
               <view class="tag">{{item.saleStatusText}}</view>
             </view>
             <view class="menu-title">{{item.title}}</view>
             <view class="metric-value rise">{{item.currentPriceText}}</view>
-            <view class="gold-button" bindtap="goArtworkDetail" data-artwork-id="{{item.artworkId}}">详情</view>
+            <view class="gold-button">详情</view>
           </view>
         </view>
       </view>

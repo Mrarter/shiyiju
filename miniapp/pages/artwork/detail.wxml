@@ -29,7 +29,7 @@
       <view class="surface-card detail-card">
         <view class="page-subtitle">材质：{{detail.material || '待补充'}}</view>
         <view class="page-subtitle">创作年份：{{detail.creationYear || '待补充'}}</view>
-        <view class="page-subtitle">尺寸：{{detail.widthCm || '-'}} × {{detail.heightCm || '-'}} × {{detail.depthCm || '-'}} cm</view>
+        <view class="page-subtitle">尺寸：{{detail.widthCm || '-'}} × {{detail.heightCm || '-'}}{{detail.depthCm ? (' × ' + detail.depthCm) : ''}} cm</view>
         <view class="page-subtitle">状态：{{detail.saleStatusText || '持续更新'}}</view>
       </view>
     </view>
