@@ -7,6 +7,26 @@ function formatPrice(value) {
   return `¥${value}`
 }
 
+function mapSaleStatus(status) {
+  const map = {
+    ON_SALE: "在售中",
+    PUBLISHED: "在售中",
+    COLLECTED: "已收藏",
+    SOLD_OUT: "已售罄",
+    DRAFT: "待上架"
+  }
+  return map[status] || "持续更新"
+}
+
+function mapSaleMode(mode) {
+  const map = {
+    NORMAL: "常规发售",
+    AUCTION: "竞价收藏",
+    LIMITED: "限量发售"
+  }
+  return map[mode] || "官方推荐"
+}
+
 Page({
   data: {
     artworkId: null,
@@ -14,6 +34,7 @@ Page({
     error: "",
     detail: null,
     images: [],
+    coverImage: "",
     tags: [],
     stats: []
   },
@@ -39,9 +60,17 @@ Page({
         method: "GET"
       })
 
+      const images = detail.mediaList || []
+      const coverImage = images.length ? images[0].mediaUrl : detail.coverUrl || ""
+
       this.setData({
-        detail,
-        images: detail.mediaList || [],
+        detail: {
+          ...detail,
+          saleStatusText: mapSaleStatus(detail.saleStatus),
+          saleModeText: mapSaleMode(detail.saleMode)
+        },
+        images,
+        coverImage,
         tags: this.buildTags(detail),
         stats: this.buildStats(detail),
         loading: false,
@@ -59,7 +88,7 @@ Page({
     const tags = []
     if (detail.artistLevelName) tags.push(detail.artistLevelName)
     if (detail.supportResale) tags.push("可转售")
-    if (detail.saleMode) tags.push(detail.saleMode)
+    tags.push(mapSaleMode(detail.saleMode))
     return tags
   },
 
@@ -72,10 +101,10 @@ Page({
   },
 
   previewImage(event) {
-    const url = event.currentTarget.dataset.url
-    const urls = this.data.images.map((item) => item.mediaUrl)
-    if (!url || !urls.length) return
-    wx.previewImage({ current: url, urls })
+    const url = event.currentTarget.dataset.url || this.data.coverImage
+    const urls = (this.data.images || []).map((item) => item.mediaUrl).filter(Boolean)
+    if (!url) return
+    wx.previewImage({ current: url, urls: urls.length ? urls : [url] })
   },
 
   handleRetry() {
