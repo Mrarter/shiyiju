@@ -60,8 +60,8 @@ Page({
         method: "GET"
       })
 
-      const images = detail.mediaList || []
-      const coverImage = images.length ? images[0].mediaUrl : detail.coverUrl || ""
+      const imageUrls = (detail.mediaUrls || []).filter(Boolean)
+      const coverImage = imageUrls[0] || detail.coverUrl || ""
 
       this.setData({
         detail: {
@@ -69,7 +69,7 @@ Page({
           saleStatusText: mapSaleStatus(detail.saleStatus),
           saleModeText: mapSaleMode(detail.saleMode)
         },
-        images,
+        images: imageUrls,
         coverImage,
         tags: this.buildTags(detail),
         stats: this.buildStats(detail),
@@ -87,7 +87,7 @@ Page({
   buildTags(detail) {
     const tags = []
     if (detail.artistLevelName) tags.push(detail.artistLevelName)
-    if (detail.supportResale) tags.push("可转售")
+    if (detail.resaleEnabled) tags.push("可转售")
     tags.push(mapSaleMode(detail.saleMode))
     return tags
   },
@@ -102,7 +102,7 @@ Page({
 
   previewImage(event) {
     const url = event.currentTarget.dataset.url || this.data.coverImage
-    const urls = (this.data.images || []).map((item) => item.mediaUrl).filter(Boolean)
+    const urls = (this.data.images || []).filter(Boolean)
     if (!url) return
     wx.previewImage({ current: url, urls: urls.length ? urls : [url] })
   },

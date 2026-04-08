@@ -15,24 +15,45 @@ function formatSaleStatus(status) {
   return map[status] || "持续更新"
 }
 
-function normalizeWork(item) {
+function normalizeWork(item, index) {
   return {
     id: item.artworkId,
     title: item.title,
     artistName: item.artistName,
+    artistLevelName: item.artistLevelName || "签约艺术家",
     coverUrl: item.coverUrl || "",
     priceText: formatPrice(item.currentPrice),
     statusText: formatSaleStatus(item.saleStatus),
-    coverFallback: (item.title || "作品").slice(0, 2)
+    coverFallback: (item.title || "作品").slice(0, 2),
+    badge: index < 3 ? ["TOP 1", "TOP 2", "TOP 3"][index] : "推荐"
   }
 }
 
-function normalizeArtist(item) {
+function normalizeArtist(item, index) {
   return {
     id: item.artistId,
     artistName: item.artistName,
     levelName: item.levelName || "艺术家",
-    slogan: item.slogan || "持续上新中"
+    slogan: item.slogan || "持续上新中",
+    avatar: item.avatar || "",
+    avatarFallback: (item.artistName || "艺术家").slice(0, 1),
+    rankText: `0${index + 1}`.slice(-2)
+  }
+}
+
+function buildEmptyState() {
+  return {
+    loading: false,
+    error: "",
+    allWorks: [],
+    featuredWorks: [],
+    hotWorks: [],
+    risingWorks: [],
+    recommendedArtists: [],
+    artistPool: [],
+    artistVisibleCount: 4,
+    allArtistsLoaded: true,
+    hasAnyContent: false
   }
 }
 
@@ -48,7 +69,8 @@ Page({
     artistPool: [],
     artistVisibleCount: 4,
     artistStep: 4,
-    allArtistsLoaded: false
+    allArtistsLoaded: false,
+    hasAnyContent: false
   },
 
   onShow() {
@@ -69,23 +91,31 @@ Page({
 
       const workPool = (works || []).map(normalizeWork)
       const artistPool = (artists || []).map(normalizeArtist)
+      const hasAnyContent = workPool.length > 0 || artistPool.length > 0
+
+      if (!hasAnyContent) {
+        this.setData(buildEmptyState())
+        return
+      }
 
       this.setData({
         loading: false,
         error: "",
         allWorks: workPool,
         artistPool,
-        featuredWorks: workPool.slice(0, 6),
-        hotWorks: workPool.slice(0, 4),
+        featuredWorks: workPool.slice(0, 4),
+        hotWorks: workPool.slice(0, 6),
         risingWorks: workPool.slice(0, 3),
         recommendedArtists: artistPool.slice(0, 4),
         artistVisibleCount: 4,
-        allArtistsLoaded: artistPool.length <= 4
+        allArtistsLoaded: artistPool.length <= 4,
+        hasAnyContent
       })
     } catch (error) {
       this.setData({
         loading: false,
-        error: error.message || "首页加载失败"
+        error: error.message || "首页加载失败",
+        hasAnyContent: false
       })
     }
   },
@@ -111,6 +141,14 @@ Page({
     const artistId = event.currentTarget.dataset.artistId
     if (!artistId) return
     wx.navigateTo({ url: `/pages/artist/profile?id=${artistId}` })
+  },
+
+  goDiscover() {
+    wx.switchTab({ url: "/pages/discover/index" })
+  },
+
+  goPublish() {
+    wx.switchTab({ url: "/pages/publish/index" })
   },
 
   handleRetry() {

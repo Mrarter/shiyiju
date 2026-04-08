@@ -2,69 +2,114 @@
   <view class="safe-top"></view>
 
   <view class="home-wrap" wx:if="{{!loading && !error}}">
-    <view class="home-header">
-      <view class="brand">拾艺局</view>
-      <view class="subtitle">艺术品流通与收藏</view>
-      <view class="desc">精选作品、热门藏品、升值标的与推荐艺术家。</view>
-    </view>
-
-    <view class="module">
-      <view class="module-title">本期推荐</view>
-      <view class="featured-grid">
-        <view class="featured-card" wx:for="{{featuredWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
-          <image wx:if="{{item.coverUrl}}" src="{{item.coverUrl}}" mode="aspectFill" class="card-cover"></image>
-          <view wx:else class="card-cover fallback">{{item.coverFallback}}</view>
-          <view class="card-body">
-            <view class="card-tag">{{item.statusText}}</view>
-            <view class="card-title">{{item.title}}</view>
-            <view class="card-meta">{{item.artistName}}</view>
-            <view class="card-price">{{item.priceText}}</view>
-          </view>
+    <view class="hero-card">
+      <view class="hero-top">
+        <view>
+          <view class="brand">拾艺局</view>
+          <view class="subtitle">让艺术作品真正流通起来</view>
         </view>
+        <view class="hero-badge">精选推荐</view>
+      </view>
+      <view class="desc">签约艺术家、官方推荐作品、流通收藏与升值参考，都放在首页一眼看清。</view>
+      <view class="hero-actions">
+        <view class="hero-action primary" bindtap="goDiscover">去发现</view>
+        <view class="hero-action" bindtap="goPublish">发布作品</view>
       </view>
     </view>
 
-    <view class="module">
-      <view class="module-title">热门藏品</view>
-      <view class="hot-grid">
-        <view class="hot-card" wx:for="{{hotWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
-          <view class="hot-title">{{item.title}}</view>
-          <view class="hot-meta">{{item.artistName}}</view>
-          <view class="hot-status">{{item.statusText}}</view>
-          <view class="hot-price">{{item.priceText}}</view>
+    <view wx:if="{{hasAnyContent}}">
+      <view class="module" wx:if="{{featuredWorks.length}}">
+        <view class="module-head">
+          <view class="module-title">本期推荐</view>
+          <view class="module-desc">精选首屏展示作品</view>
         </view>
+        <scroll-view scroll-x="true" enhanced="true" show-scrollbar="false" class="featured-scroll">
+          <view class="featured-row">
+            <view class="featured-card" wx:for="{{featuredWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
+              <view class="featured-cover-wrap">
+                <image wx:if="{{item.coverUrl}}" src="{{item.coverUrl}}" mode="aspectFill" class="card-cover"></image>
+                <view wx:else class="card-cover fallback">{{item.coverFallback}}</view>
+                <view class="featured-badge">{{item.badge}}</view>
+              </view>
+              <view class="card-body">
+                <view class="card-tag">{{item.statusText}}</view>
+                <view class="card-title">{{item.title}}</view>
+                <view class="card-meta">{{item.artistName}} · {{item.artistLevelName}}</view>
+                <view class="card-price">{{item.priceText}}</view>
+              </view>
+            </view>
+          </view>
+        </scroll-view>
+      </view>
+
+      <view class="module" wx:if="{{hotWorks.length}}">
+        <view class="module-head">
+          <view class="module-title">热门藏品</view>
+          <view class="module-desc">近期更受关注的在售作品</view>
+        </view>
+        <view class="hot-grid">
+          <view class="hot-card" wx:for="{{hotWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
+            <view class="hot-tag">{{item.statusText}}</view>
+            <view class="hot-title">{{item.title}}</view>
+            <view class="hot-meta">{{item.artistName}}</view>
+            <view class="hot-price">{{item.priceText}}</view>
+          </view>
+        </view>
+      </view>
+
+      <view class="module" wx:if="{{risingWorks.length}}">
+        <view class="module-head">
+          <view class="module-title">正在升值</view>
+          <view class="module-desc">适合持续关注的作品标的</view>
+        </view>
+        <view class="rise-list">
+          <view class="rise-card" wx:for="{{risingWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
+            <view class="rise-main">
+              <view class="rise-title">{{item.title}}</view>
+              <view class="rise-meta">{{item.artistName}}</view>
+            </view>
+            <view class="rise-side">
+              <view class="rise-price">{{item.priceText}}</view>
+              <view class="rise-status">{{item.statusText}}</view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="module" wx:if="{{recommendedArtists.length}}">
+        <view class="module-head">
+          <view class="module-title">推荐艺术家</view>
+          <view class="module-desc">优先展示活跃签约艺术家</view>
+        </view>
+        <view class="artist-list">
+          <view class="artist-card" wx:for="{{recommendedArtists}}" wx:key="id" bindtap="goArtistProfile" data-artist-id="{{item.id}}">
+            <view class="artist-left">
+              <view class="artist-avatar">
+                <image wx:if="{{item.avatar}}" src="{{item.avatar}}" mode="aspectFill" class="artist-avatar-img"></image>
+                <view wx:else class="artist-avatar-fallback">{{item.avatarFallback}}</view>
+              </view>
+              <view class="artist-info">
+                <view class="artist-name-row">
+                  <view class="artist-name">{{item.artistName}}</view>
+                  <view class="artist-rank">{{item.rankText}}</view>
+                </view>
+                <view class="artist-level">{{item.levelName}}</view>
+                <view class="artist-slogan">{{item.slogan}}</view>
+              </view>
+            </view>
+            <view class="arrow">›</view>
+          </view>
+        </view>
+        <view class="load-more-tip" wx:if="{{!allArtistsLoaded}}">上拉继续加载更多艺术家</view>
       </view>
     </view>
 
-    <view class="module">
-      <view class="module-title">正在升值</view>
-      <view class="rise-list">
-        <view class="rise-card" wx:for="{{risingWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
-          <view>
-            <view class="rise-title">{{item.title}}</view>
-            <view class="rise-meta">{{item.artistName}}</view>
-          </view>
-          <view class="rise-side">
-            <view class="rise-price">{{item.priceText}}</view>
-            <view class="rise-status">{{item.statusText}}</view>
-          </view>
-        </view>
+    <view class="empty-state" wx:else>
+      <view class="empty-title">首页内容准备中</view>
+      <view class="empty-desc">当前还没有可展示的作品或艺术家，先去发现页看看其他入口。</view>
+      <view class="hero-actions">
+        <view class="hero-action primary" bindtap="goDiscover">去发现</view>
       </view>
-    </view>
-
-    <view class="module">
-      <view class="module-title">推荐艺术家</view>
-      <view class="artist-list">
-        <view class="artist-card" wx:for="{{recommendedArtists}}" wx:key="id" bindtap="goArtistProfile" data-artist-id="{{item.id}}">
-          <view>
-            <view class="artist-name">{{item.artistName}}</view>
-            <view class="artist-level">{{item.levelName}}</view>
-            <view class="artist-slogan">{{item.slogan}}</view>
-          </view>
-          <view class="arrow">›</view>
-        </view>
-      </view>
-      <view class="load-more-tip" wx:if="{{!allArtistsLoaded}}">上拉加载更多推荐艺术家</view>
     </view>
   </view>
 
