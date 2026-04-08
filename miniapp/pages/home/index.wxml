@@ -2,7 +2,7 @@
   <view class="safe-top"></view>
   <view class="page-body" wx:if="{{!loading && !error}}">
     <view class="section">
-      <view class="surface-card hero-card">
+      <view class="surface-card hero-card home-hero">
         <view class="eyebrow">拾艺局</view>
         <view class="hero-title">艺术品流通与收藏</view>
         <view class="page-subtitle">发现艺术家与作品，完成收藏与流通。</view>
@@ -18,12 +18,11 @@
         <view class="section-title">热门藏品</view>
       </view>
       <view class="menu-list">
-        <view class="surface-card menu-item" wx:for="{{hotWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
-          <view>
+        <view class="surface-card work-card-large" wx:for="{{hotWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
+          <image wx:if="{{item.coverUrl}}" class="work-cover" src="{{item.coverUrl}}" mode="aspectFill"></image>
+          <view class="work-body">
             <view class="menu-title">{{item.title}}</view>
             <view class="page-subtitle">{{item.subtitle}}</view>
-          </view>
-          <view>
             <view class="metric-value rise">{{item.priceText}}</view>
           </view>
         </view>
@@ -34,8 +33,8 @@
       <view class="section-head">
         <view class="section-title">正在升值</view>
       </view>
-      <view class="grid-two">
-        <view class="surface-card value-card" wx:for="{{risingWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
+      <view class="grid-two compact-grid">
+        <view class="surface-card value-card compact-card" wx:for="{{risingWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
           <view class="value-title">{{item.title}}</view>
           <view class="page-subtitle">{{item.artistName}}</view>
           <view class="metric-value rise">{{item.priceText}}</view>
@@ -49,10 +48,11 @@
         <view class="section-title">推荐艺术家</view>
       </view>
       <view class="menu-list">
-        <view class="surface-card menu-item" wx:for="{{recommendedArtists}}" wx:key="id" bindtap="goArtistProfile" data-artist-id="{{item.id}}">
+        <view class="surface-card menu-item artist-item" wx:for="{{recommendedArtists}}" wx:key="id" bindtap="goArtistProfile" data-artist-id="{{item.id}}">
           <view>
             <view class="menu-title">{{item.artistName}}</view>
-            <view class="page-subtitle">{{item.levelName || '艺术家'}} · {{item.slogan || '持续上新中'}}</view>
+            <view class="page-subtitle">{{item.levelName || '艺术家'}}</view>
+            <view class="page-subtitle">{{item.slogan || '持续上新中'}}</view>
           </view>
           <view class="menu-arrow">›</view>
         </view>

@@ -1,5 +1,22 @@
 const api = require("../../utils/api")
 
+function formatPrice(price) {
+  if (price === null || price === undefined || price === "") {
+    return "价格待定"
+  }
+  return `¥${price}`
+}
+
+function formatSaleStatus(status) {
+  const map = {
+    ON_SALE: "在售中",
+    PUBLISHED: "在售中",
+    COLLECTED: "已收藏",
+    SOLD_OUT: "已售罄"
+  }
+  return map[status] || "持续更新"
+}
+
 Page({
   data: {
     loading: true,
@@ -22,24 +39,28 @@ Page({
         api.request({ url: "/artists/recommend?limit=6", method: "GET" })
       ])
 
-      const hotWorks = (works || []).slice(0, 4).map((item) => ({
+      const list = works || []
+      const hotSource = list.slice(0, 3)
+      const risingSource = list.slice(1, 3).length ? list.slice(1, 3) : list.slice(0, 2)
+
+      const hotWorks = hotSource.map((item) => ({
         id: item.artworkId,
         title: item.title,
         artistName: item.artistName,
         coverUrl: item.coverUrl,
-        priceText: this.formatPrice(item.currentPrice),
-        subtitle: `${item.artistName} · ${this.formatSaleStatus(item.saleStatus)}`
+        priceText: formatPrice(item.currentPrice),
+        subtitle: `${item.artistName} · ${formatSaleStatus(item.saleStatus)}`
       }))
 
-      const risingWorks = (works || []).slice(0, 4).map((item) => ({
+      const risingWorks = risingSource.map((item) => ({
         id: item.artworkId,
         title: item.title,
         artistName: item.artistName,
-        priceText: this.formatPrice(item.currentPrice),
-        trendText: this.formatSaleStatus(item.saleStatus)
+        priceText: formatPrice(item.currentPrice),
+        trendText: formatSaleStatus(item.saleStatus)
       }))
 
-      const recommendedArtists = (artists || []).map((item) => ({
+      const recommendedArtists = (artists || []).slice(0, 3).map((item) => ({
         id: item.artistId,
         artistName: item.artistName,
         avatar: item.avatar,
@@ -61,23 +82,6 @@ Page({
         error: error.message || "首页加载失败"
       })
     }
-  },
-
-  formatPrice(price) {
-    if (price === null || price === undefined || price === "") {
-      return "价格待定"
-    }
-    return `¥${price}`
-  },
-
-  formatSaleStatus(status) {
-    const map = {
-      ON_SALE: "在售中",
-      PUBLISHED: "在售中",
-      COLLECTED: "已收藏",
-      SOLD_OUT: "已售罄"
-    }
-    return map[status] || "持续更新"
   },
 
   goArtistProfile(event) {
