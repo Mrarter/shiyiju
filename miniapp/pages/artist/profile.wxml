@@ -1,0 +1,63 @@
+<view class="app-shell">
+  <view class="safe-top"></view>
+  <view class="page-body" wx:if="{{!loading && artist}}">
+    <view class="section">
+      <view class="surface-card hero-card">
+        <view class="hero-title">{{artist.artistName}}</view>
+        <view class="tag-row">
+          <view class="tag">{{artist.levelName || '艺术家'}}</view>
+        </view>
+        <view class="page-subtitle">{{artist.slogan || '持续创作中'}}</view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="grid-two">
+        <view class="surface-card value-card" wx:for="{{stats}}" wx:key="label">
+          <view class="metric-value">{{item.value}}</view>
+          <view class="value-title">{{item.label}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section" wx:if="{{artist.styleTags && artist.styleTags.length}}">
+      <view class="section-head">
+        <view class="section-title">风格标签</view>
+      </view>
+      <view class="tag-row">
+        <view class="tag" wx:for="{{artist.styleTags}}" wx:key="*this">{{item}}</view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-head">
+        <view class="section-title">在售作品</view>
+      </view>
+      <view class="menu-list">
+        <view class="surface-card menu-item" wx:for="{{works}}" wx:key="artworkId">
+          <view>
+            <view class="tag-row">
+              <view class="tag">{{item.saleStatusText}}</view>
+            </view>
+            <view class="menu-title">{{item.title}}</view>
+            <view class="metric-value rise">{{item.currentPriceText}}</view>
+            <view class="gold-button" bindtap="goArtworkDetail" data-artwork-id="{{item.artworkId}}">详情</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="page-body" wx:elif="{{loading}}">
+    <view class="section">
+      <view class="surface-card page-subtitle">艺术家页面加载中...</view>
+    </view>
+  </view>
+
+  <view class="page-body" wx:elif="{{error}}">
+    <view class="section">
+      <view class="surface-card page-subtitle">{{error}}</view>
+      <view class="gold-button" bindtap="handleRetry">重试</view>
+    </view>
+  </view>
+</view>
