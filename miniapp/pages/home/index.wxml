@@ -1,90 +1,80 @@
-<view class="app-shell home-page">
+<view class="home-page">
   <view class="safe-top"></view>
-  <view class="page-body" wx:if="{{!loading && !error}}">
-    <view class="home-hero-block">
-      <view class="eyebrow">拾艺局</view>
-      <view class="hero-title">把喜欢的作品，真正收藏下来</view>
-      <view class="page-subtitle">精选作品、在售艺术家与持续升值标的，一次看清。</view>
+
+  <view class="home-wrap" wx:if="{{!loading && !error}}">
+    <view class="home-header">
+      <view class="brand">拾艺局</view>
+      <view class="subtitle">艺术品流通与收藏</view>
+      <view class="desc">精选作品、热门藏品、升值标的与推荐艺术家。</view>
     </view>
 
-    <view class="section">
-      <view class="section-head">
-        <view class="section-title">本期推荐</view>
-      </view>
+    <view class="module">
+      <view class="module-title">本期推荐</view>
       <view class="featured-grid">
-        <view class="featured-grid-card" wx:for="{{featuredWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
-          <image wx:if="{{item.coverUrl}}" class="featured-grid-cover" src="{{item.coverUrl}}" mode="aspectFill"></image>
-          <view wx:else class="featured-fallback">{{item.coverFallback}}</view>
-          <view class="featured-grid-body">
-            <view class="tag">{{item.statusText}}</view>
-            <view class="featured-grid-title">{{item.title}}</view>
-            <view class="featured-grid-meta">{{item.artistName}}</view>
-            <view class="featured-grid-price">{{item.priceText}}</view>
+        <view class="featured-card" wx:for="{{featuredWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
+          <image wx:if="{{item.coverUrl}}" src="{{item.coverUrl}}" mode="aspectFill" class="card-cover"></image>
+          <view wx:else class="card-cover fallback">{{item.coverFallback}}</view>
+          <view class="card-body">
+            <view class="card-tag">{{item.statusText}}</view>
+            <view class="card-title">{{item.title}}</view>
+            <view class="card-meta">{{item.artistName}}</view>
+            <view class="card-price">{{item.priceText}}</view>
           </view>
         </view>
       </view>
     </view>
 
-    <view class="section">
-      <view class="section-head">
-        <view class="section-title">热门藏品</view>
-      </view>
+    <view class="module">
+      <view class="module-title">热门藏品</view>
       <view class="hot-grid">
-        <view class="hot-grid-card" wx:for="{{hotWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
-          <view class="menu-title">{{item.title}}</view>
-          <view class="page-subtitle">{{item.artistName}}</view>
-          <view class="page-subtitle">{{item.statusText}}</view>
-          <view class="metric-value rise">{{item.priceText}}</view>
+        <view class="hot-card" wx:for="{{hotWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
+          <view class="hot-title">{{item.title}}</view>
+          <view class="hot-meta">{{item.artistName}}</view>
+          <view class="hot-status">{{item.statusText}}</view>
+          <view class="hot-price">{{item.priceText}}</view>
         </view>
       </view>
     </view>
 
-    <view class="section">
-      <view class="section-head">
-        <view class="section-title">正在升值</view>
-      </view>
-      <view class="trend-list">
-        <view class="trend-card" wx:for="{{risingWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
+    <view class="module">
+      <view class="module-title">正在升值</view>
+      <view class="rise-list">
+        <view class="rise-card" wx:for="{{risingWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
           <view>
-            <view class="trend-title">{{item.title}}</view>
-            <view class="trend-meta">{{item.artistName}}</view>
+            <view class="rise-title">{{item.title}}</view>
+            <view class="rise-meta">{{item.artistName}}</view>
           </view>
-          <view class="trend-right">
-            <view class="trend-price">{{item.priceText}}</view>
-            <view class="trend-status">{{item.statusText}}</view>
+          <view class="rise-side">
+            <view class="rise-price">{{item.priceText}}</view>
+            <view class="rise-status">{{item.statusText}}</view>
           </view>
         </view>
       </view>
     </view>
 
-    <view class="section">
-      <view class="section-head">
-        <view class="section-title">推荐艺术家</view>
-      </view>
+    <view class="module">
+      <view class="module-title">推荐艺术家</view>
       <view class="artist-list">
         <view class="artist-card" wx:for="{{recommendedArtists}}" wx:key="id" bindtap="goArtistProfile" data-artist-id="{{item.id}}">
           <view>
             <view class="artist-name">{{item.artistName}}</view>
-            <view class="artist-level">{{item.levelName || '艺术家'}}</view>
-            <view class="artist-slogan">{{item.slogan || '持续上新中'}}</view>
+            <view class="artist-level">{{item.levelName}}</view>
+            <view class="artist-slogan">{{item.slogan}}</view>
           </view>
-          <view class="menu-arrow">›</view>
+          <view class="arrow">›</view>
         </view>
       </view>
+      <view class="load-more-tip" wx:if="{{!allArtistsLoaded}}">上拉加载更多推荐艺术家</view>
     </view>
   </view>
 
-  <view class="page-body" wx:elif="{{loading}}">
-    <view class="section">
-      <view class="surface-card page-subtitle">首页加载中...</view>
-    </view>
+  <view class="home-wrap" wx:elif="{{loading}}">
+    <view class="state-card">首页加载中...</view>
   </view>
 
-  <view class="page-body" wx:elif="{{error}}">
-    <view class="section">
-      <view class="surface-card page-subtitle">{{error}}</view>
-      <view class="gold-button" bindtap="handleRetry">重试</view>
-    </view>
+  <view class="home-wrap" wx:elif="{{error}}">
+    <view class="state-card">{{error}}</view>
+    <view class="retry-btn" bindtap="handleRetry">重试</view>
   </view>
 
   <view class="bottom-bar-spacer"></view>

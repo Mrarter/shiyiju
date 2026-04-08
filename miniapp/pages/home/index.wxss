@@ -1,104 +1,172 @@
 .home-page {
+  min-height: 100vh;
   background: #0f0c0b;
+  color: #fff;
 }
 
-.home-hero-block {
-  padding: 24rpx 0 8rpx;
+.home-wrap {
+  padding: 24rpx;
 }
 
-.featured-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 20rpx;
+.home-header {
+  padding: 12rpx 0 20rpx;
 }
 
-.featured-grid-card {
-  overflow: hidden;
-  border-radius: 24rpx;
-  background: #171210;
-  border: 1rpx solid rgba(201, 164, 92, 0.16);
-}
-
-.featured-grid-cover,
-.featured-fallback {
-  width: 100%;
-  height: 200rpx;
-  display: block;
-  background: linear-gradient(180deg, #35281f, #1b1512);
-}
-
-.featured-fallback {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: rgba(255,255,255,0.75);
-  font-size: 42rpx;
+.brand {
+  font-size: 34rpx;
   font-weight: 700;
 }
 
-.featured-grid-body {
-  padding: 20rpx;
-}
-
-.featured-grid-title,
-.artist-name,
-.trend-title {
-  color: #fff;
-  font-size: 30rpx;
+.subtitle {
+  font-size: 50rpx;
   font-weight: 700;
   margin-top: 12rpx;
 }
 
-.featured-grid-meta,
-.artist-level,
-.artist-slogan,
-.trend-meta,
-.trend-status {
-  color: rgba(255,255,255,0.68);
-  font-size: 22rpx;
-  margin-top: 8rpx;
-}
-
-.featured-grid-price,
-.trend-price {
-  color: #f6d38a;
-  font-size: 34rpx;
-  font-weight: 700;
+.desc {
+  font-size: 24rpx;
+  color: rgba(255,255,255,0.7);
   margin-top: 14rpx;
+  line-height: 1.6;
 }
 
+.module {
+  margin-top: 28rpx;
+}
+
+.module-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  margin-bottom: 18rpx;
+}
+
+.featured-grid,
 .hot-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 20rpx;
+  gap: 18rpx;
 }
 
-.hot-grid-card {
-  min-height: 200rpx;
-  padding: 22rpx;
-  border-radius: 24rpx;
+.featured-card,
+.hot-card,
+.rise-card,
+.artist-card,
+.state-card {
   background: #171210;
-  border: 1rpx solid rgba(201, 164, 92, 0.12);
+  border: 1rpx solid rgba(201,164,92,0.14);
+  border-radius: 24rpx;
 }
 
-.trend-list,
+.card-cover {
+  width: 100%;
+  height: 180rpx;
+  display: block;
+  border-top-left-radius: 24rpx;
+  border-top-right-radius: 24rpx;
+  background: #2a201a;
+}
+
+.fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 42rpx;
+  font-weight: 700;
+  color: rgba(255,255,255,0.75);
+}
+
+.card-body {
+  padding: 18rpx;
+}
+
+.card-tag {
+  display: inline-block;
+  padding: 6rpx 14rpx;
+  border-radius: 999rpx;
+  background: rgba(201,164,92,0.16);
+  color: #f6d38a;
+  font-size: 20rpx;
+}
+
+.card-title,
+.hot-title,
+.rise-title,
+.artist-name {
+  font-size: 28rpx;
+  font-weight: 700;
+  margin-top: 12rpx;
+}
+
+.card-meta,
+.hot-meta,
+.hot-status,
+.rise-meta,
+.rise-status,
+.artist-level,
+.artist-slogan {
+  font-size: 22rpx;
+  color: rgba(255,255,255,0.68);
+  margin-top: 8rpx;
+}
+
+.card-price,
+.hot-price,
+.rise-price {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #f6d38a;
+  margin-top: 14rpx;
+}
+
+.hot-card {
+  padding: 20rpx;
+  min-height: 190rpx;
+}
+
+.rise-list,
 .artist-list {
   display: flex;
   flex-direction: column;
-  gap: 20rpx;
+  gap: 18rpx;
 }
 
-.trend-card,
+.rise-card,
 .artist-card {
+  padding: 22rpx;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 24rpx;
-  border-radius: 24rpx;
-  background: #171210;
-  border: 1rpx solid rgba(201, 164, 92, 0.12);
 }
 
-.trend-right {
+.rise-side {
   text-align: right;
+}
+
+.arrow {
+  font-size: 36rpx;
+  color: rgba(255,255,255,0.5);
+}
+
+.load-more-tip {
+  margin-top: 16rpx;
+  text-align: center;
+  font-size: 22rpx;
+  color: rgba(255,255,255,0.48);
+}
+
+.state-card {
+  padding: 24rpx;
+}
+
+.retry-btn {
+  margin-top: 20rpx;
+  height: 84rpx;
+  border-radius: 22rpx;
+  background: linear-gradient(135deg, #d5b06a, #a67c33);
+  color: #120f0d;
+  font-size: 28rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
