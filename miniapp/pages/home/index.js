@@ -27,7 +27,8 @@ Page({
         title: item.title,
         artistName: item.artistName,
         coverUrl: item.coverUrl,
-        priceText: this.formatPrice(item.currentPrice)
+        priceText: this.formatPrice(item.currentPrice),
+        subtitle: `${item.artistName} · ${this.formatSaleStatus(item.saleStatus)}`
       }))
 
       const risingWorks = (works || []).slice(0, 4).map((item) => ({
@@ -35,7 +36,7 @@ Page({
         title: item.title,
         artistName: item.artistName,
         priceText: this.formatPrice(item.currentPrice),
-        trendText: item.saleStatus || "持续更新"
+        trendText: this.formatSaleStatus(item.saleStatus)
       }))
 
       const recommendedArtists = (artists || []).map((item) => ({
@@ -67,6 +68,16 @@ Page({
       return "价格待定"
     }
     return `¥${price}`
+  },
+
+  formatSaleStatus(status) {
+    const map = {
+      ON_SALE: "在售中",
+      PUBLISHED: "在售中",
+      COLLECTED: "已收藏",
+      SOLD_OUT: "已售罄"
+    }
+    return map[status] || "持续更新"
   },
 
   goArtistProfile(event) {

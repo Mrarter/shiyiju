@@ -5,7 +5,7 @@
       <view class="surface-card hero-card">
         <view class="eyebrow">拾艺局</view>
         <view class="hero-title">艺术品流通与收藏</view>
-        <view class="page-subtitle">先把首页、艺术家、作品详情这些主链路做实。</view>
+        <view class="page-subtitle">发现艺术家与作品，完成收藏与流通。</view>
       </view>
     </view>
 
@@ -21,9 +21,11 @@
         <view class="surface-card menu-item" wx:for="{{hotWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
           <view>
             <view class="menu-title">{{item.title}}</view>
-            <view class="page-subtitle">{{item.artistName}} · {{item.priceText}}</view>
+            <view class="page-subtitle">{{item.subtitle}}</view>
           </view>
-          <view class="menu-arrow">›</view>
+          <view>
+            <view class="metric-value rise">{{item.priceText}}</view>
+          </view>
         </view>
       </view>
     </view>
