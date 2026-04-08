@@ -1,223 +1,213 @@
 .home-page {
   min-height: 100vh;
-  background: linear-gradient(180deg, #0f0c0b 0%, #15100d 35%, #0b0908 100%);
-  color: #fff;
+  background: linear-gradient(180deg, #160d0a 0%, #0f0907 100%);
+  color: #f6eee8;
 }
 
 .home-wrap {
-  padding: 24rpx 24rpx 40rpx;
+  padding: 36rpx 26rpx 42rpx;
+}
+
+.home-header {
+  padding: 6rpx 10rpx 24rpx;
+}
+
+.brand {
+  font-size: 38rpx;
+  color: #dcc2a1;
+  font-weight: 600;
+}
+
+.subtitle {
+  margin-top: 18rpx;
+  font-size: 66rpx;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.desc {
+  margin-top: 16rpx;
+  font-size: 28rpx;
+  color: #b7a493;
 }
 
 .hero-card,
-.featured-card,
+.summary-card,
 .hot-card,
 .rise-card,
-.artist-card,
 .state-card,
 .empty-state {
-  background: rgba(23, 18, 16, 0.96);
-  border: 1rpx solid rgba(201, 164, 92, 0.16);
-  border-radius: 28rpx;
-  box-shadow: 0 18rpx 40rpx rgba(0, 0, 0, 0.18);
+  background: #1b1310;
+  border: 1rpx solid rgba(77, 53, 42, 0.85);
+  border-radius: 30rpx;
+  box-sizing: border-box;
 }
 
 .hero-card {
-  padding: 28rpx;
-  background: linear-gradient(135deg, rgba(39, 28, 21, 0.98), rgba(20, 15, 12, 0.98));
+  overflow: hidden;
 }
 
-.hero-top,
+.hero-image-wrap {
+  padding: 24rpx 24rpx 0;
+}
+
+.hero-image,
+.hot-image,
+.fallback-art {
+  width: 100%;
+  display: block;
+  border-radius: 22rpx;
+}
+
+.hero-image,
+.fallback-art {
+  height: 360rpx;
+}
+
+.hero-body {
+  padding: 22rpx 28rpx 28rpx;
+}
+
+.hero-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 110rpx;
+  height: 48rpx;
+  padding: 0 18rpx;
+  border-radius: 999rpx;
+  background: #2a1d17;
+  color: #e7c899;
+  font-size: 24rpx;
+}
+
+.hero-title {
+  margin-top: 28rpx;
+  font-size: 56rpx;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.hero-meta,
+.summary-desc,
+.hot-meta,
+.rise-meta,
+.rise-status,
+.empty-desc {
+  font-size: 28rpx;
+  color: #b7a493;
+}
+
+.hero-meta {
+  margin-top: 14rpx;
+}
+
+.hero-bottom,
 .module-head,
-.artist-name-row,
-.artist-left,
-.hero-actions,
 .rise-card,
-.artist-card {
+.hero-actions,
+.summary-grid {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.brand {
-  font-size: 32rpx;
+.hero-bottom {
+  margin-top: 26rpx;
+}
+
+.hero-price,
+.hot-price,
+.rise-price {
+  color: #d8b06a;
+  font-size: 50rpx;
+  line-height: 1;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.84);
 }
 
-.subtitle {
-  margin-top: 14rpx;
-  font-size: 48rpx;
-  line-height: 1.25;
-  font-weight: 700;
+.hero-status {
+  font-size: 26rpx;
+  color: #b7a493;
+  margin-top: 22rpx;
 }
 
-.hero-badge,
-.card-tag,
-.hot-tag,
-.artist-rank,
-.tag-chip {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6rpx 16rpx;
-  border-radius: 999rpx;
-  background: rgba(214, 176, 116, 0.14);
-  color: #f3d295;
-  font-size: 20rpx;
-}
-
-.desc,
-.module-desc,
-.card-meta,
-.hot-meta,
-.rise-meta,
-.rise-status,
-.artist-level,
-.artist-slogan,
-.load-more-tip,
-.empty-desc {
-  font-size: 24rpx;
-  color: rgba(255, 255, 255, 0.65);
-  line-height: 1.7;
-}
-
-.desc {
-  margin-top: 18rpx;
-}
-
-.hero-actions {
-  margin-top: 24rpx;
-  justify-content: flex-start;
+.summary-grid {
   gap: 18rpx;
+  margin-top: 22rpx;
 }
 
-.hero-action,
-.retry-btn {
-  height: 84rpx;
-  padding: 0 28rpx;
-  border-radius: 22rpx;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28rpx;
+.summary-card {
+  flex: 1;
+  padding: 22rpx 24rpx;
+  background: #241915;
+}
+
+.summary-title,
+.module-title {
+  font-size: 38rpx;
   font-weight: 700;
-  background: rgba(255, 255, 255, 0.06);
-  color: #fff;
 }
 
-.hero-action.primary,
-.retry-btn {
-  background: linear-gradient(135deg, #d5b06a, #a67c33);
-  color: #120f0d;
+.summary-desc,
+.module-count {
+  margin-top: 10rpx;
 }
 
 .module {
-  margin-top: 32rpx;
+  margin-top: 34rpx;
 }
 
-.module-title {
-  font-size: 34rpx;
-  font-weight: 700;
+.module-head {
+  margin-bottom: 18rpx;
+  padding: 0 6rpx;
 }
 
-.featured-scroll {
-  margin-top: 18rpx;
-  white-space: nowrap;
-}
-
-.featured-row {
-  display: inline-flex;
-  gap: 18rpx;
-  padding-right: 12rpx;
-}
-
-.featured-card {
-  width: 430rpx;
-  overflow: hidden;
-}
-
-.featured-cover-wrap {
-  position: relative;
-}
-
-.featured-badge {
-  position: absolute;
-  left: 18rpx;
-  top: 18rpx;
-  padding: 6rpx 14rpx;
-  border-radius: 999rpx;
-  font-size: 20rpx;
-  color: #120f0d;
-  background: #f3d295;
-}
-
-.card-cover {
-  width: 100%;
-  height: 260rpx;
-  display: block;
-  background: #2a201a;
-}
-
-.fallback,
-.artist-avatar,
-.artist-avatar-fallback {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.fallback {
-  font-size: 48rpx;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.75);
-}
-
-.card-body {
-  padding: 22rpx;
-}
-
-.card-title,
-.hot-title,
-.rise-title,
-.artist-name,
-.empty-title {
-  font-size: 30rpx;
-  font-weight: 700;
-  margin-top: 12rpx;
-}
-
-.card-price,
-.hot-price,
-.rise-price {
-  margin-top: 16rpx;
-  font-size: 34rpx;
-  font-weight: 700;
-  color: #f6d38a;
+.module-count {
+  font-size: 24rpx;
+  color: #968575;
 }
 
 .hot-grid {
-  margin-top: 18rpx;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18rpx;
 }
 
 .hot-card {
-  padding: 22rpx;
-  min-height: 220rpx;
+  padding: 18rpx;
 }
 
-.rise-list,
-.artist-list {
+.hot-image,
+.hot-image-wrap .fallback-art {
+  height: 136rpx;
+}
+
+.hot-title,
+.rise-title,
+.empty-title {
   margin-top: 18rpx;
+  font-size: 34rpx;
+  font-weight: 700;
+}
+
+.hot-meta {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+}
+
+.hot-price {
+  margin-top: 10rpx;
+  font-size: 42rpx;
+}
+
+.rise-list {
   display: flex;
   flex-direction: column;
-  gap: 18rpx;
+  gap: 14rpx;
 }
 
-.rise-card,
-.artist-card {
-  padding: 24rpx;
+.rise-card {
+  padding: 22rpx 28rpx;
 }
 
 .rise-main {
@@ -226,74 +216,139 @@
 }
 
 .rise-side {
+  margin-left: 18rpx;
   text-align: right;
-  margin-left: 20rpx;
 }
 
-.artist-left {
-  flex: 1;
-  min-width: 0;
-  justify-content: flex-start;
-  gap: 18rpx;
-}
-
-.artist-avatar {
-  width: 88rpx;
-  height: 88rpx;
-  border-radius: 50%;
-  background: rgba(214, 176, 116, 0.16);
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.artist-avatar-img {
-  width: 100%;
-  height: 100%;
-}
-
-.artist-avatar-fallback {
-  width: 100%;
-  height: 100%;
-  font-size: 32rpx;
-  font-weight: 700;
-  color: #f3d295;
-}
-
-.artist-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.artist-name-row {
-  justify-content: flex-start;
-  gap: 12rpx;
-}
-
-.artist-name,
-.artist-slogan,
-.card-title,
-.hot-title,
 .rise-title,
-.card-meta,
-.hot-meta {
+.hot-title,
+.hero-title,
+.hot-meta,
+.rise-meta {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.arrow {
-  margin-left: 18rpx;
-  font-size: 36rpx;
-  color: rgba(255, 255, 255, 0.45);
+.rise-title {
+  margin-top: 0;
 }
 
-.load-more-tip {
-  text-align: center;
+.rise-meta,
+.rise-status {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+}
+
+.fallback-art {
+  position: relative;
+  overflow: hidden;
+}
+
+.art-glow {
+  position: absolute;
+  left: 64rpx;
+  top: 48rpx;
+  width: 208rpx;
+  height: 208rpx;
+  border-radius: 50%;
+  opacity: 0.95;
+}
+
+.art-glow.small {
+  left: 30rpx;
+  top: 20rpx;
+  width: 104rpx;
+  height: 104rpx;
+}
+
+.art-mountain {
+  position: absolute;
+  bottom: 0;
+  width: 320rpx;
+  height: 220rpx;
+  opacity: 0.86;
+  clip-path: polygon(0 100%, 48% 18%, 100% 100%);
+}
+
+.art-mountain.left {
+  left: 300rpx;
+}
+
+.art-mountain.center {
+  left: 520rpx;
+  height: 160rpx;
+}
+
+.art-mountain.right {
+  right: -20rpx;
+}
+
+.art-mountain.small {
+  width: 120rpx;
+  height: 76rpx;
+}
+
+.art-mountain.left.small {
+  left: 110rpx;
+}
+
+.art-mountain.center.small {
+  left: 190rpx;
+  height: 58rpx;
+}
+
+.art-mountain.right.small {
+  right: -10rpx;
+}
+
+.art-line {
+  position: absolute;
+  left: 64rpx;
+  right: 120rpx;
+  top: 170rpx;
+  height: 8rpx;
+  background: #ebcba7;
+  transform: rotate(-13deg);
+  transform-origin: center;
+}
+
+.art-line.small {
+  left: 20rpx;
+  right: 52rpx;
+  top: 68rpx;
+  height: 5rpx;
 }
 
 .state-card,
 .empty-state {
-  padding: 28rpx;
+  padding: 32rpx 28rpx;
+}
+
+.hero-actions {
+  justify-content: flex-start;
+  gap: 18rpx;
+  margin-top: 24rpx;
+}
+
+.hero-action,
+.retry-btn {
+  height: 82rpx;
+  padding: 0 28rpx;
+  border-radius: 22rpx;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.06);
+  color: #f6eee8;
+}
+
+.hero-action.primary,
+.retry-btn {
+  background: linear-gradient(135deg, #d5b06a, #a67c33);
+  color: #120f0d;
 }
 
 .retry-btn {

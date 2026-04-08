@@ -15,6 +15,32 @@ function formatSaleStatus(status) {
   return map[status] || "持续更新"
 }
 
+function buildCoverStyle(index) {
+  const presets = [
+    {
+      background: "linear-gradient(135deg, #8f6552 0%, #6f4c3f 45%, #3a2925 100%)",
+      glow: "#d9b287",
+      mountain: "#8c5e49"
+    },
+    {
+      background: "linear-gradient(135deg, #7c665c 0%, #53433c 48%, #2d231f 100%)",
+      glow: "#d9cec0",
+      mountain: "#6d554b"
+    },
+    {
+      background: "linear-gradient(135deg, #a0785c 0%, #755842 46%, #3f2e27 100%)",
+      glow: "#e2c39e",
+      mountain: "#8a694f"
+    },
+    {
+      background: "linear-gradient(135deg, #6a5248 0%, #40322c 45%, #241b18 100%)",
+      glow: "#c59b6c",
+      mountain: "#5b473d"
+    }
+  ]
+  return presets[index % presets.length]
+}
+
 function normalizeWork(item, index) {
   return {
     id: item.artworkId,
@@ -25,19 +51,7 @@ function normalizeWork(item, index) {
     priceText: formatPrice(item.currentPrice),
     statusText: formatSaleStatus(item.saleStatus),
     coverFallback: (item.title || "作品").slice(0, 2),
-    badge: index < 3 ? ["TOP 1", "TOP 2", "TOP 3"][index] : "推荐"
-  }
-}
-
-function normalizeArtist(item, index) {
-  return {
-    id: item.artistId,
-    artistName: item.artistName,
-    levelName: item.levelName || "艺术家",
-    slogan: item.slogan || "持续上新中",
-    avatar: item.avatar || "",
-    avatarFallback: (item.artistName || "艺术家").slice(0, 1),
-    rankText: `0${index + 1}`.slice(-2)
+    coverStyle: buildCoverStyle(index)
   }
 }
 
@@ -46,13 +60,9 @@ function buildEmptyState() {
     loading: false,
     error: "",
     allWorks: [],
-    featuredWorks: [],
+    featuredWork: null,
     hotWorks: [],
     risingWorks: [],
-    recommendedArtists: [],
-    artistPool: [],
-    artistVisibleCount: 4,
-    allArtistsLoaded: true,
     hasAnyContent: false
   }
 }
@@ -62,14 +72,9 @@ Page({
     loading: true,
     error: "",
     allWorks: [],
-    featuredWorks: [],
+    featuredWork: null,
     hotWorks: [],
     risingWorks: [],
-    recommendedArtists: [],
-    artistPool: [],
-    artistVisibleCount: 4,
-    artistStep: 4,
-    allArtistsLoaded: false,
     hasAnyContent: false
   },
 
@@ -77,21 +82,12 @@ Page({
     this.loadHome()
   },
 
-  onReachBottom() {
-    this.loadMoreArtists()
-  },
-
   async loadHome() {
     this.setData({ loading: true, error: "" })
     try {
-      const [works, artists] = await Promise.all([
-        api.request({ url: "/works", method: "GET" }),
-        api.request({ url: "/artists/recommend?limit=20", method: "GET" })
-      ])
-
+      const works = await api.request({ url: "/works", method: "GET" })
       const workPool = (works || []).map(normalizeWork)
-      const artistPool = (artists || []).map(normalizeArtist)
-      const hasAnyContent = workPool.length > 0 || artistPool.length > 0
+      const hasAnyContent = workPool.length > 0
 
       if (!hasAnyContent) {
         this.setData(buildEmptyState())
@@ -102,13 +98,9 @@ Page({
         loading: false,
         error: "",
         allWorks: workPool,
-        artistPool,
-        featuredWorks: workPool.slice(0, 4),
-        hotWorks: workPool.slice(0, 6),
+        featuredWork: workPool[0] || null,
+        hotWorks: workPool.slice(0, 4),
         risingWorks: workPool.slice(0, 3),
-        recommendedArtists: artistPool.slice(0, 4),
-        artistVisibleCount: 4,
-        allArtistsLoaded: artistPool.length <= 4,
         hasAnyContent
       })
     } catch (error) {
@@ -120,27 +112,10 @@ Page({
     }
   },
 
-  loadMoreArtists() {
-    if (this.data.allArtistsLoaded) return
-    const nextCount = this.data.artistVisibleCount + this.data.artistStep
-    const recommendedArtists = this.data.artistPool.slice(0, nextCount)
-    this.setData({
-      recommendedArtists,
-      artistVisibleCount: nextCount,
-      allArtistsLoaded: recommendedArtists.length >= this.data.artistPool.length
-    })
-  },
-
   goArtworkDetail(event) {
     const artworkId = event.currentTarget.dataset.artworkId
     if (!artworkId) return
     wx.navigateTo({ url: `/pages/artwork/detail?id=${artworkId}` })
-  },
-
-  goArtistProfile(event) {
-    const artistId = event.currentTarget.dataset.artistId
-    if (!artistId) return
-    wx.navigateTo({ url: `/pages/artist/profile?id=${artistId}` })
   },
 
   goDiscover() {
