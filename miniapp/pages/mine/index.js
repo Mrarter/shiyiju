@@ -49,14 +49,17 @@ Page({
 
   handleMenuTap(event) {
     const key = event.currentTarget.dataset.key
-    const actionMap = {
-      collection: "藏品页仍在开发中，下一步会优先补齐。",
-      orders: "订单页仍在开发中，当前可通过后台查看订单状态。",
-      service: "客服入口仍在开发中，可先通过后台备注协同处理。"
+    if (key === 'collection') {
+      wx.navigateTo({ url: '/pages/collection/index' })
+      return
+    }
+    if (key === 'orders') {
+      wx.showToast({ title: '订单页正在补齐中', icon: 'none' })
+      return
     }
     wx.showToast({
-      title: actionMap[key] || "功能开发中",
-      icon: "none"
+      title: '客服入口仍在开发中',
+      icon: 'none'
     })
   },
 
