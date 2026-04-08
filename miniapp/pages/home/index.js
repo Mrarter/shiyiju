@@ -17,71 +17,70 @@ function formatSaleStatus(status) {
   return map[status] || "持续更新"
 }
 
+function buildArtworkCard(item) {
+  return {
+    id: item.artworkId,
+    title: item.title,
+    artistName: item.artistName,
+    coverUrl: item.coverUrl || "",
+    priceText: formatPrice(item.currentPrice),
+    statusText: formatSaleStatus(item.saleStatus),
+    coverFallback: (item.title || "作品").slice(0, 2)
+  }
+}
+
 Page({
   data: {
     loading: true,
     error: "",
     emptyState: false,
-    featuredWork: null,
+    featuredWorks: [],
     hotWorks: [],
     risingWorks: [],
-    recommendedArtists: []
+    recommendedArtists: [],
+    artistPage: 1,
+    artistPageSize: 4,
+    allArtistsLoaded: false
   },
 
   onShow() {
     this.loadHomeData()
   },
 
+  onReachBottom() {
+    if (this.data.allArtistsLoaded || this.data.loading) return
+    this.loadMoreArtists()
+  },
+
   async loadHomeData() {
-    this.setData({ loading: true, error: "", emptyState: false })
+    this.setData({ loading: true, error: "", emptyState: false, artistPage: 1, allArtistsLoaded: false })
     try {
       const [works, artists] = await Promise.all([
         api.request({ url: "/works", method: "GET" }),
-        api.request({ url: "/artists/recommend?limit=6", method: "GET" })
+        api.request({ url: "/artists/recommend?limit=4", method: "GET" })
       ])
 
-      const list = works || []
-      const featured = list[0]
-      const featuredWork = featured ? {
-        id: featured.artworkId,
-        title: featured.title,
-        artistName: featured.artistName,
-        coverUrl: featured.coverUrl,
-        priceText: formatPrice(featured.currentPrice),
-        statusText: formatSaleStatus(featured.saleStatus)
-      } : null
-
-      const hotWorks = list.slice(0, 4).map((item) => ({
-        id: item.artworkId,
-        title: item.title,
-        artistName: item.artistName,
-        priceText: formatPrice(item.currentPrice),
-        statusText: formatSaleStatus(item.saleStatus)
-      }))
-
-      const risingWorks = list.slice(0, 2).map((item) => ({
-        id: item.artworkId,
-        title: item.title,
-        artistName: item.artistName,
-        priceText: formatPrice(item.currentPrice),
-        statusText: formatSaleStatus(item.saleStatus)
-      }))
-
-      const recommendedArtists = (artists || []).slice(0, 3).map((item) => ({
+      const list = (works || []).map(buildArtworkCard)
+      const featuredWorks = list.slice(0, 6)
+      const hotWorks = list.slice(0, 4)
+      const risingWorks = (list.slice(1, 4).length ? list.slice(1, 4) : list.slice(0, 3))
+      const recommendedArtists = (artists || []).slice(0, 4).map((item) => ({
         id: item.artistId,
         artistName: item.artistName,
         levelName: item.levelName,
-        slogan: item.slogan
+        slogan: item.slogan,
+        avatar: item.avatar || ""
       }))
 
       this.setData({
         loading: false,
         error: "",
-        featuredWork,
+        featuredWorks,
         hotWorks,
         risingWorks,
         recommendedArtists,
-        emptyState: !featuredWork && !recommendedArtists.length
+        emptyState: !featuredWorks.length && !recommendedArtists.length,
+        allArtistsLoaded: recommendedArtists.length < 4
       })
     } catch (error) {
       this.setData({
@@ -89,6 +88,26 @@ Page({
         error: error.message || "首页加载失败"
       })
     }
+  },
+
+  async loadMoreArtists() {
+    try {
+      const nextPage = this.data.artistPage + 1
+      const limit = nextPage * this.data.artistPageSize
+      const artists = await api.request({ url: `/artists/recommend?limit=${limit}`, method: "GET" })
+      const normalized = (artists || []).slice(0, limit).map((item) => ({
+        id: item.artistId,
+        artistName: item.artistName,
+        levelName: item.levelName,
+        slogan: item.slogan,
+        avatar: item.avatar || ""
+      }))
+      this.setData({
+        recommendedArtists: normalized,
+        artistPage: nextPage,
+        allArtistsLoaded: normalized.length < limit
+      })
+    } catch (_) {}
   },
 
   goArtistProfile(event) {

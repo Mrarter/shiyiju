@@ -7,40 +7,39 @@
       <view class="page-subtitle">精选作品、在售艺术家与持续升值标的，一次看清。</view>
     </view>
 
-    <view class="section" wx:if="{{featuredWork}}">
+    <view class="section">
       <view class="section-head">
         <view class="section-title">本期推荐</view>
       </view>
-      <view class="featured-hero" bindtap="goArtworkDetail" data-artwork-id="{{featuredWork.id}}">
-        <image wx:if="{{featuredWork.coverUrl}}" class="featured-cover" src="{{featuredWork.coverUrl}}" mode="aspectFill"></image>
-        <view class="featured-overlay"></view>
-        <view class="featured-content">
-          <view class="tag">{{featuredWork.statusText}}</view>
-          <view class="featured-title">{{featuredWork.title}}</view>
-          <view class="featured-meta">{{featuredWork.artistName}}</view>
-          <view class="featured-price">{{featuredWork.priceText}}</view>
+      <scroll-view scroll-x class="horizontal-scroll" enable-flex="true">
+        <view class="horizontal-row">
+          <view class="featured-mini-card" wx:for="{{featuredWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
+            <image wx:if="{{item.coverUrl}}" class="featured-mini-cover" src="{{item.coverUrl}}" mode="aspectFill"></image>
+            <view wx:else class="featured-fallback">{{item.coverFallback}}</view>
+            <view class="featured-mini-body">
+              <view class="tag">{{item.statusText}}</view>
+              <view class="featured-mini-title">{{item.title}}</view>
+              <view class="featured-mini-meta">{{item.artistName}}</view>
+              <view class="featured-mini-price">{{item.priceText}}</view>
+            </view>
+          </view>
         </view>
-      </view>
-    </view>
-
-    <view class="section" wx:if="{{emptyState}}">
-      <view class="surface-card page-subtitle">当前还没有足够的首页推荐数据，正在持续补充。</view>
+      </scroll-view>
     </view>
 
     <view class="section">
       <view class="section-head">
         <view class="section-title">热门藏品</view>
       </view>
-      <scroll-view scroll-x class="horizontal-scroll" enable-flex="true">
-        <view class="horizontal-row">
-          <view class="hot-card" wx:for="{{hotWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
-            <view class="hot-title">{{item.title}}</view>
-            <view class="hot-meta">{{item.artistName}}</view>
-            <view class="hot-status">{{item.statusText}}</view>
-            <view class="hot-price">{{item.priceText}}</view>
+      <view class="menu-list">
+        <view class="surface-card compact-work-item" wx:for="{{hotWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
+          <view>
+            <view class="menu-title">{{item.title}}</view>
+            <view class="page-subtitle">{{item.artistName}} · {{item.statusText}}</view>
           </view>
+          <view class="metric-value rise">{{item.priceText}}</view>
         </view>
-      </scroll-view>
+      </view>
     </view>
 
     <view class="section">

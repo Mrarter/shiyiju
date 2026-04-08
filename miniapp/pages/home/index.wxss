@@ -6,58 +6,6 @@
   padding: 24rpx 0 8rpx;
 }
 
-.featured-hero {
-  position: relative;
-  overflow: hidden;
-  border-radius: 28rpx;
-  min-height: 420rpx;
-  background: linear-gradient(180deg, #2a201a, #171210);
-  border: 1rpx solid rgba(201, 164, 92, 0.2);
-}
-
-.featured-cover {
-  width: 100%;
-  height: 420rpx;
-  display: block;
-  opacity: 0.9;
-}
-
-.featured-overlay {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  top: 0;
-  background: linear-gradient(180deg, rgba(8, 8, 8, 0.05), rgba(8, 8, 8, 0.78));
-}
-
-.featured-content {
-  position: absolute;
-  left: 28rpx;
-  right: 28rpx;
-  bottom: 28rpx;
-}
-
-.featured-title {
-  font-size: 44rpx;
-  font-weight: 700;
-  color: #fff;
-  margin-top: 16rpx;
-}
-
-.featured-meta {
-  margin-top: 12rpx;
-  color: rgba(255, 255, 255, 0.78);
-  font-size: 26rpx;
-}
-
-.featured-price {
-  margin-top: 18rpx;
-  color: #f6d38a;
-  font-size: 46rpx;
-  font-weight: 700;
-}
-
 .horizontal-scroll {
   white-space: nowrap;
 }
@@ -67,14 +15,60 @@
   gap: 20rpx;
 }
 
-.hot-card {
-  width: 300rpx;
-  min-height: 220rpx;
-  padding: 24rpx;
-  border-radius: 24rpx;
+.featured-mini-card {
+  width: 360rpx;
+  overflow: hidden;
+  border-radius: 28rpx;
   background: #171210;
-  border: 1rpx solid rgba(201, 164, 92, 0.15);
-  box-sizing: border-box;
+  border: 1rpx solid rgba(201, 164, 92, 0.16);
+}
+
+.featured-mini-cover,
+.featured-fallback {
+  width: 100%;
+  height: 240rpx;
+  display: block;
+  background: linear-gradient(180deg, #35281f, #1b1512);
+}
+
+.featured-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.75);
+  font-size: 48rpx;
+  font-weight: 700;
+}
+
+.featured-mini-body {
+  padding: 22rpx;
+}
+
+.featured-mini-title {
+  color: #fff;
+  font-size: 34rpx;
+  font-weight: 700;
+  margin-top: 14rpx;
+}
+
+.featured-mini-meta {
+  color: rgba(255,255,255,0.7);
+  font-size: 24rpx;
+  margin-top: 8rpx;
+}
+
+.featured-mini-price {
+  color: #f6d38a;
+  font-size: 40rpx;
+  font-weight: 700;
+  margin-top: 16rpx;
+}
+
+.compact-work-item {
+  min-height: 120rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .hot-title,
@@ -83,25 +77,6 @@
   color: #fff;
   font-size: 30rpx;
   font-weight: 600;
-}
-
-.hot-meta,
-.hot-status,
-.trend-meta,
-.trend-status,
-.artist-level,
-.artist-slogan {
-  color: rgba(255, 255, 255, 0.68);
-  font-size: 24rpx;
-  margin-top: 10rpx;
-}
-
-.hot-price,
-.trend-price {
-  color: #f6d38a;
-  font-size: 40rpx;
-  font-weight: 700;
-  margin-top: 20rpx;
 }
 
 .trend-list,
@@ -124,4 +99,23 @@
 
 .trend-right {
   text-align: right;
+}
+
+.hot-meta,
+.hot-status,
+.trend-meta,
+.trend-status,
+.artist-level,
+.artist-slogan {
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 24rpx;
+  margin-top: 10rpx;
+}
+
+.hot-price,
+.trend-price {
+  color: #f6d38a;
+  font-size: 40rpx;
+  font-weight: 700;
+  margin-top: 20rpx;
 }
