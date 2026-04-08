@@ -18,7 +18,8 @@
     </view>
 
     <view class="section" wx:else>
-      <view class="surface-card page-subtitle">{{user.nickname || '当前用户'}} 暂无可展示的藏品记录，后续会继续补齐订单与藏品联动。</view>
+      <view class="surface-card page-subtitle" wx:if="{{user}}">{{user.nickname || '当前用户'}} 暂无可展示的藏品记录，后续会继续补齐订单与藏品联动。</view>
+      <view class="surface-card page-subtitle" wx:else>当前还未获取到用户藏品数据，后续会继续补齐登录与藏品联动。</view>
     </view>
   </view>
   <view class="bottom-bar-spacer"></view>

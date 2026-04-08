@@ -17,8 +17,12 @@ Page({
   async loadCollectionState() {
     this.setData({ loading: true, error: "" })
     try {
-      await api.ensureLogin()
-      const user = await api.request({ url: "/users/me", method: "GET" })
+      let user = null
+      try {
+        user = await api.request({ url: "/users/me", method: "GET" })
+      } catch (_) {
+        user = null
+      }
       this.setData({
         user,
         cards: [],
