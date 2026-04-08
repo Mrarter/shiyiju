@@ -11,32 +11,29 @@
       <view class="section-head">
         <view class="section-title">本期推荐</view>
       </view>
-      <scroll-view scroll-x class="horizontal-scroll" enable-flex="true">
-        <view class="horizontal-row">
-          <view class="featured-mini-card" wx:for="{{featuredWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
-            <image wx:if="{{item.coverUrl}}" class="featured-mini-cover" src="{{item.coverUrl}}" mode="aspectFill"></image>
-            <view wx:else class="featured-fallback">{{item.coverFallback}}</view>
-            <view class="featured-mini-body">
-              <view class="tag">{{item.statusText}}</view>
-              <view class="featured-mini-title">{{item.title}}</view>
-              <view class="featured-mini-meta">{{item.artistName}}</view>
-              <view class="featured-mini-price">{{item.priceText}}</view>
-            </view>
+      <view class="featured-grid">
+        <view class="featured-grid-card" wx:for="{{featuredWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
+          <image wx:if="{{item.coverUrl}}" class="featured-grid-cover" src="{{item.coverUrl}}" mode="aspectFill"></image>
+          <view wx:else class="featured-fallback">{{item.coverFallback}}</view>
+          <view class="featured-grid-body">
+            <view class="tag">{{item.statusText}}</view>
+            <view class="featured-grid-title">{{item.title}}</view>
+            <view class="featured-grid-meta">{{item.artistName}}</view>
+            <view class="featured-grid-price">{{item.priceText}}</view>
           </view>
         </view>
-      </scroll-view>
+      </view>
     </view>
 
     <view class="section">
       <view class="section-head">
         <view class="section-title">热门藏品</view>
       </view>
-      <view class="menu-list">
-        <view class="surface-card compact-work-item" wx:for="{{hotWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
-          <view>
-            <view class="menu-title">{{item.title}}</view>
-            <view class="page-subtitle">{{item.artistName}} · {{item.statusText}}</view>
-          </view>
+      <view class="hot-grid">
+        <view class="hot-grid-card" wx:for="{{hotWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
+          <view class="menu-title">{{item.title}}</view>
+          <view class="page-subtitle">{{item.artistName}}</view>
+          <view class="page-subtitle">{{item.statusText}}</view>
           <view class="metric-value rise">{{item.priceText}}</view>
         </view>
       </view>
