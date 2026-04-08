@@ -22,6 +22,7 @@ Page({
     loading: true,
     error: "",
     emptyState: false,
+    featuredWork: null,
     hotWorks: [],
     risingWorks: [],
     recommendedArtists: []
@@ -40,30 +41,35 @@ Page({
       ])
 
       const list = works || []
-      const hotSource = list.slice(0, 3)
-      const risingSource = list.slice(1, 3).length ? list.slice(1, 3) : list.slice(0, 2)
+      const featured = list[0]
+      const featuredWork = featured ? {
+        id: featured.artworkId,
+        title: featured.title,
+        artistName: featured.artistName,
+        coverUrl: featured.coverUrl,
+        priceText: formatPrice(featured.currentPrice),
+        statusText: formatSaleStatus(featured.saleStatus)
+      } : null
 
-      const hotWorks = hotSource.map((item) => ({
+      const hotWorks = list.slice(0, 4).map((item) => ({
         id: item.artworkId,
         title: item.title,
         artistName: item.artistName,
-        coverUrl: item.coverUrl,
         priceText: formatPrice(item.currentPrice),
-        subtitle: `${item.artistName} · ${formatSaleStatus(item.saleStatus)}`
+        statusText: formatSaleStatus(item.saleStatus)
       }))
 
-      const risingWorks = risingSource.map((item) => ({
+      const risingWorks = list.slice(0, 2).map((item) => ({
         id: item.artworkId,
         title: item.title,
         artistName: item.artistName,
         priceText: formatPrice(item.currentPrice),
-        trendText: formatSaleStatus(item.saleStatus)
+        statusText: formatSaleStatus(item.saleStatus)
       }))
 
       const recommendedArtists = (artists || []).slice(0, 3).map((item) => ({
         id: item.artistId,
         artistName: item.artistName,
-        avatar: item.avatar,
         levelName: item.levelName,
         slogan: item.slogan
       }))
@@ -71,10 +77,11 @@ Page({
       this.setData({
         loading: false,
         error: "",
+        featuredWork,
         hotWorks,
         risingWorks,
         recommendedArtists,
-        emptyState: !hotWorks.length && !recommendedArtists.length
+        emptyState: !featuredWork && !recommendedArtists.length
       })
     } catch (error) {
       this.setData({
