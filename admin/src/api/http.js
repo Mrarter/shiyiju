@@ -3,6 +3,8 @@ import { API_BASE_URL } from '../config/env'
 async function request(path, options = {}) {
   const token = localStorage.getItem('shiyiju_admin_token')
   const response = await fetch(`${API_BASE_URL}${path}`, {
+    mode: 'cors',
+    credentials: 'omit',
     headers: {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -11,11 +13,17 @@ async function request(path, options = {}) {
     ...options
   })
 
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status}`)
+  let json = null
+  try {
+    json = await response.json()
+  } catch (error) {
+    throw new Error('服务返回异常，未读取到有效响应')
   }
 
-  const json = await response.json()
+  if (!response.ok) {
+    throw new Error(json?.message || `请求失败（HTTP ${response.status}）`)
+  }
+
   if (json?.code && json.code !== 0) {
     throw new Error(json.message || '请求失败')
   }

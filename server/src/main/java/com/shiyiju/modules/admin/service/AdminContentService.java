@@ -2,6 +2,8 @@ package com.shiyiju.modules.admin.service;
 
 import com.shiyiju.common.exception.BusinessException;
 import com.shiyiju.modules.admin.dto.AdminOperationSaveDTO;
+import com.shiyiju.modules.admin.dto.AdminArtistSaveDTO;
+import com.shiyiju.modules.admin.dto.AdminArtworkSaveDTO;
 import com.shiyiju.modules.admin.dto.AdminRemarkUpdateDTO;
 import com.shiyiju.modules.admin.dto.AdminShipmentUpdateDTO;
 import com.shiyiju.modules.admin.entity.AdminArtistEntity;
@@ -15,8 +17,11 @@ import com.shiyiju.modules.admin.vo.AdminArtworkVO;
 import com.shiyiju.modules.admin.vo.AdminOperationVO;
 import com.shiyiju.modules.admin.vo.AdminOrderVO;
 import com.shiyiju.modules.admin.vo.AdminUserVO;
+import com.shiyiju.modules.user.entity.UserAccountEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -75,16 +80,49 @@ public class AdminContentService {
         List<AdminArtistEntity> entities = adminMapper.findArtists();
         if (entities == null || entities.isEmpty()) {
             return List.of(
-                artist("林观山", "杭州", "油画, 当代", 12, "上线", 1),
-                artist("周岚", "上海", "版画, 新锐", 8, "上线", 2),
-                artist("陈河", "苏州", "水墨, 山水", 15, "下线", 3)
+                artist(3001L, "林观山", "杭州", "油画, 当代", 12, "上线", 1),
+                artist(3002L, "周岚", "上海", "版画, 新锐", 8, "上线", 2),
+                artist(3003L, "陈河", "苏州", "水墨, 山水", 15, "下线", 3)
             );
         }
         return entities.stream().map(this::toArtistVO).toList();
     }
 
+    @Transactional
+    public AdminArtistVO createArtist(AdminArtistSaveDTO request) {
+        UserAccountEntity user = new UserAccountEntity();
+        user.setUserNo(generateUserNo("SYJ9"));
+        user.setNickname("艺术家" + request.getName());
+        user.setGender(0);
+        user.setStatus("ENABLED");
+        user.setRegisterSource("ADMIN_CREATE");
+        adminMapper.insertArtistUser(user);
+
+        AdminArtistEntity entity = new AdminArtistEntity();
+        entity.setUserId(user.getId());
+        entity.setName(request.getName());
+        entity.setTags(request.getTags());
+        entity.setWorks(request.getWorks());
+        entity.setStatus(toArtistStatus(request.getStatus()));
+        adminMapper.insertArtist(entity);
+        return artist(entity.getId(), request.getName(), "", request.getTags(), request.getWorks(), displayArtistStatus(entity.getStatus()), entity.getId().intValue());
+    }
+
+    public AdminArtistVO updateArtist(Long id, AdminArtistSaveDTO request) {
+        AdminArtistEntity entity = new AdminArtistEntity();
+        entity.setId(id);
+        entity.setName(request.getName());
+        entity.setTags(request.getTags());
+        entity.setWorks(request.getWorks());
+        entity.setStatus(toArtistStatus(request.getStatus()));
+        if (adminMapper.updateArtist(entity) <= 0) {
+            throw new BusinessException(40404, "艺术家不存在");
+        }
+        return artist(id, request.getName(), "", request.getTags(), request.getWorks(), displayArtistStatus(entity.getStatus()), id.intValue());
+    }
+
     public void updateArtistStatus(Long id, String status) {
-        String targetStatus = "ONLINE".equalsIgnoreCase(status) ? "ACTIVE" : "INACTIVE";
+        String targetStatus = toArtistStatus(status);
         if (adminMapper.updateArtistStatus(id, targetStatus) <= 0) {
             throw new BusinessException(40404, "艺术家不存在");
         }
@@ -94,25 +132,59 @@ public class AdminContentService {
         List<AdminArtworkEntity> entities = adminMapper.findArtworks();
         if (entities == null || entities.isEmpty()) {
             return List.of(
-                artwork("春山可望", "林观山", "¥12,800", 1, "上架", "热门藏品"),
-                artwork("潮汐笔记", "周岚", "¥8,600", 2, "上架", "正在升值"),
-                artwork("园林记忆", "陈河", "¥16,500", 1, "下架", "无")
+                artwork(4001L, 3001L, "春山可望", "林观山", "¥12,800", 1, "上架", "热门藏品", ""),
+                artwork(4002L, 3002L, "潮汐笔记", "周岚", "¥8,600", 2, "上架", "正在升值", ""),
+                artwork(4003L, 3003L, "园林记忆", "陈河", "¥16,500", 1, "下架", "无", "")
             );
         }
         return entities.stream().map(this::toArtworkVO).toList();
     }
 
+    public AdminArtworkVO createArtwork(AdminArtworkSaveDTO request) {
+        AdminArtworkEntity entity = new AdminArtworkEntity();
+        entity.setArtistId(request.getArtistId());
+        entity.setName(request.getName());
+        entity.setPrice(request.getPrice().toPlainString());
+        entity.setStock(request.getStock());
+        entity.setStatus(toArtworkStatus(request.getStatus()));
+        entity.setDescription(request.getDescription());
+        entity.setTag(generateArtworkNo());
+        adminMapper.insertArtwork(entity);
+        return findArtworkVO(entity.getId());
+    }
+
+    public AdminArtworkVO updateArtwork(Long id, AdminArtworkSaveDTO request) {
+        AdminArtworkEntity entity = new AdminArtworkEntity();
+        entity.setId(id);
+        entity.setArtistId(request.getArtistId());
+        entity.setName(request.getName());
+        entity.setPrice(request.getPrice().toPlainString());
+        entity.setStock(request.getStock());
+        entity.setStatus(toArtworkStatus(request.getStatus()));
+        entity.setDescription(request.getDescription());
+        if (adminMapper.updateArtwork(entity) <= 0) {
+            throw new BusinessException(40404, "作品不存在");
+        }
+        return findArtworkVO(id);
+    }
+
     public void updateArtworkStatus(Long id, String status) {
-        String targetStatus = "ONLINE".equalsIgnoreCase(status) ? "PUBLISHED" : "DRAFT";
+        String targetStatus = toArtworkStatus(status);
         if (adminMapper.updateArtworkStatus(id, targetStatus) <= 0) {
             throw new BusinessException(40404, "作品不存在");
         }
     }
 
+    @Transactional
     public void updateOrderShipment(Long orderId, AdminShipmentUpdateDTO request) {
-        if (adminMapper.updateOrderShipment(orderId, request.getCompany(), request.getTrackingNo(), request.getCompany()) <= 0) {
-            throw new BusinessException(40404, "订单不存在");
+        int affected = adminMapper.updateOrderShipment(orderId, request.getCompany(), request.getTrackingNo());
+        if (affected <= 0) {
+            affected = adminMapper.insertOrderShipment(orderId, request.getCompany(), request.getTrackingNo());
         }
+        if (affected <= 0) {
+            throw new BusinessException(40404, "订单不存在或发货信息更新失败");
+        }
+        adminMapper.updateOrderStatus(orderId, "DELIVERED");
     }
 
     public void updateOrderRemark(Long orderId, AdminRemarkUpdateDTO request) {
@@ -137,9 +209,9 @@ public class AdminContentService {
         List<AdminOrderEntity> entities = adminMapper.findOrders();
         if (entities == null || entities.isEmpty()) {
             return List.of(
-                order("SYJ202604070001", "木木", "春山可望", "¥12,800", "待发货", "已支付", "未发货"),
-                order("SYJ202604070002", "阿泽", "潮汐笔记", "¥8,600", "待支付", "待支付", "未发货"),
-                order("SYJ202604060018", "Suki", "园林记忆", "¥16,500", "已完成", "已支付", "已发货")
+                order(5001L, "SYJ202604070001", "木木", "春山可望", "¥12,800", "待发货", "已支付", "未发货"),
+                order(5002L, "SYJ202604070002", "阿泽", "潮汐笔记", "¥8,600", "待支付", "待支付", "未发货"),
+                order(5003L, "SYJ202604060018", "Suki", "园林记忆", "¥16,500", "已完成", "已支付", "已发货")
             );
         }
         return entities.stream().map(this::toOrderVO).toList();
@@ -158,11 +230,11 @@ public class AdminContentService {
     }
 
     private AdminArtistVO toArtistVO(AdminArtistEntity entity) {
-        return artist(entity.getName(), entity.getCity(), entity.getTags(), entity.getWorks(), entity.getStatus(), entity.getSort());
+        return artist(entity.getId(), entity.getName(), entity.getCity(), entity.getTags(), entity.getWorks(), entity.getStatus(), entity.getSort());
     }
 
     private AdminArtworkVO toArtworkVO(AdminArtworkEntity entity) {
-        return artwork(entity.getName(), entity.getArtist(), entity.getPrice(), entity.getStock(), entity.getStatus(), entity.getTag());
+        return artwork(entity.getId(), entity.getArtistId(), entity.getName(), entity.getArtist(), entity.getPrice(), entity.getStock(), entity.getStatus(), entity.getTag(), entity.getDescription());
     }
 
     private AdminUserVO toUserVO(AdminUserEntity entity) {
@@ -170,7 +242,7 @@ public class AdminContentService {
     }
 
     private AdminOrderVO toOrderVO(AdminOrderEntity entity) {
-        return order(entity.getOrderNo(), entity.getUser(), entity.getArtwork(), entity.getAmount(), entity.getStatus(), entity.getPayStatus(), entity.getShipStatus());
+        return order(entity.getId(), entity.getOrderNo(), entity.getUser(), entity.getArtwork(), entity.getAmount(), entity.getStatus(), entity.getPayStatus(), entity.getShipStatus());
     }
 
     private AdminOperationVO operation(Long id, String title, String type, String target, String status, String updatedAt) {
@@ -184,8 +256,9 @@ public class AdminContentService {
         return item;
     }
 
-    private AdminArtistVO artist(String name, String city, String tags, Integer works, String status, Integer sort) {
+    private AdminArtistVO artist(Long id, String name, String city, String tags, Integer works, String status, Integer sort) {
         AdminArtistVO item = new AdminArtistVO();
+        item.setId(id);
         item.setName(name);
         item.setCity(city);
         item.setTags(tags);
@@ -195,14 +268,17 @@ public class AdminContentService {
         return item;
     }
 
-    private AdminArtworkVO artwork(String name, String artist, String price, Integer stock, String status, String tag) {
+    private AdminArtworkVO artwork(Long id, Long artistId, String name, String artist, String price, Integer stock, String status, String tag, String description) {
         AdminArtworkVO item = new AdminArtworkVO();
+        item.setId(id);
+        item.setArtistId(artistId);
         item.setName(name);
         item.setArtist(artist);
         item.setPrice(price);
         item.setStock(stock);
         item.setStatus(status);
         item.setTag(tag);
+        item.setDescription(description);
         return item;
     }
 
@@ -216,8 +292,9 @@ public class AdminContentService {
         return item;
     }
 
-    private AdminOrderVO order(String orderNo, String user, String artwork, String amount, String status, String payStatus, String shipStatus) {
+    private AdminOrderVO order(Long id, String orderNo, String user, String artwork, String amount, String status, String payStatus, String shipStatus) {
         AdminOrderVO item = new AdminOrderVO();
+        item.setId(id);
         item.setOrderNo(orderNo);
         item.setUser(user);
         item.setArtwork(artwork);
@@ -226,5 +303,38 @@ public class AdminContentService {
         item.setPayStatus(payStatus);
         item.setShipStatus(shipStatus);
         return item;
+    }
+
+    private AdminArtworkVO findArtworkVO(Long id) {
+        return listArtworks().stream()
+            .filter(item -> id.equals(item.getId()))
+            .findFirst()
+            .orElseThrow(() -> new BusinessException(40404, "作品不存在"));
+    }
+
+    private String toArtistStatus(String status) {
+        return "ONLINE".equalsIgnoreCase(status) || "ACTIVE".equalsIgnoreCase(status) ? "ACTIVE" : "INACTIVE";
+    }
+
+    private String displayArtistStatus(String status) {
+        return "ACTIVE".equalsIgnoreCase(status) ? "上线" : "下线";
+    }
+
+    private String toArtworkStatus(String status) {
+        return switch (status == null ? "" : status.toUpperCase()) {
+            case "ONLINE", "PUBLISHED", "上架" -> "PUBLISHED";
+            case "OFFLINE", "OFF_SHELF", "下架" -> "OFF_SHELF";
+            case "COLLECTED", "已收藏" -> "COLLECTED";
+            case "SOLD_OUT", "售罄" -> "SOLD_OUT";
+            default -> "DRAFT";
+        };
+    }
+
+    private String generateUserNo(String prefix) {
+        return prefix + String.valueOf(System.currentTimeMillis()).substring(3);
+    }
+
+    private String generateArtworkNo() {
+        return "ART" + String.valueOf(System.currentTimeMillis());
     }
 }

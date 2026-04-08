@@ -2,6 +2,8 @@ package com.shiyiju.modules.admin.controller;
 
 import com.shiyiju.common.api.ApiResponse;
 import com.shiyiju.modules.admin.dto.AdminOperationSaveDTO;
+import com.shiyiju.modules.admin.dto.AdminArtistSaveDTO;
+import com.shiyiju.modules.admin.dto.AdminArtworkSaveDTO;
 import com.shiyiju.modules.admin.dto.AdminRemarkUpdateDTO;
 import com.shiyiju.modules.admin.dto.AdminShipmentUpdateDTO;
 import com.shiyiju.modules.admin.dto.AdminStatusUpdateDTO;
@@ -58,6 +60,16 @@ public class AdminContentController {
         return ApiResponse.success(adminContentService.listArtists());
     }
 
+    @PostMapping("/artists")
+    public ApiResponse<AdminArtistVO> createArtist(@Valid @RequestBody AdminArtistSaveDTO request) {
+        return ApiResponse.success("创建成功", adminContentService.createArtist(request));
+    }
+
+    @PutMapping("/artists/{id}")
+    public ApiResponse<AdminArtistVO> updateArtist(@PathVariable Long id, @Valid @RequestBody AdminArtistSaveDTO request) {
+        return ApiResponse.success("更新成功", adminContentService.updateArtist(id, request));
+    }
+
     @PutMapping("/artists/{id}/status")
     public ApiResponse<Void> updateArtistStatus(@PathVariable Long id, @Valid @RequestBody AdminStatusUpdateDTO request) {
         adminContentService.updateArtistStatus(id, request.getStatus());
@@ -67,6 +79,16 @@ public class AdminContentController {
     @GetMapping("/artworks")
     public ApiResponse<List<AdminArtworkVO>> artworks() {
         return ApiResponse.success(adminContentService.listArtworks());
+    }
+
+    @PostMapping("/artworks")
+    public ApiResponse<AdminArtworkVO> createArtwork(@Valid @RequestBody AdminArtworkSaveDTO request) {
+        return ApiResponse.success("创建成功", adminContentService.createArtwork(request));
+    }
+
+    @PutMapping("/artworks/{id}")
+    public ApiResponse<AdminArtworkVO> updateArtwork(@PathVariable Long id, @Valid @RequestBody AdminArtworkSaveDTO request) {
+        return ApiResponse.success("更新成功", adminContentService.updateArtwork(id, request));
     }
 
     @PutMapping("/artworks/{id}/status")

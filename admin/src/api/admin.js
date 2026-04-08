@@ -43,6 +43,16 @@ export async function updateArtistStatus(id, status) {
   return http.put(`${ADMIN_API_PREFIX}/artists/${id}/status`, { status })
 }
 
+export async function createArtist(payload) {
+  if (useMock) return { id: Date.now(), ...payload }
+  return http.post(`${ADMIN_API_PREFIX}/artists`, payload)
+}
+
+export async function updateArtist(id, payload) {
+  if (useMock) return { id, ...payload }
+  return http.put(`${ADMIN_API_PREFIX}/artists/${id}`, payload)
+}
+
 export async function updateOrderShipment(id, payload) {
   if (useMock) return { success: true }
   return http.put(`${ADMIN_API_PREFIX}/orders/${id}/shipment`, payload)
@@ -63,6 +73,16 @@ export async function getArtworks() {
   return http.get(`${ADMIN_API_PREFIX}/artworks`)
 }
 
+export async function createArtwork(payload) {
+  if (useMock) return { id: Date.now(), ...payload }
+  return http.post(`${ADMIN_API_PREFIX}/artworks`, payload)
+}
+
+export async function updateArtwork(id, payload) {
+  if (useMock) return { id, ...payload }
+  return http.put(`${ADMIN_API_PREFIX}/artworks/${id}`, payload)
+}
+
 export async function getUsers() {
   if (useMock) return users
   return http.get(`${ADMIN_API_PREFIX}/users`)
@@ -74,15 +94,12 @@ export async function getOrders() {
 }
 
 export async function getCurrentMiniappCapabilities() {
-  if (useMock) {
-    return {
-      artistsDetailApi: `${API_PREFIX}/artists/{id}`,
-      artistRecommendApi: `${API_PREFIX}/artists/recommend`,
-      artworkListApi: `${API_PREFIX}/works`,
-      artworkDetailApi: `${API_PREFIX}/works/{id}`,
-      userMeApi: `${API_PREFIX}/users/me`,
-      orderDetailApi: `${API_PREFIX}/orders/{id}`
-    }
+  return {
+    artistsDetailApi: `${API_PREFIX}/artists/{id}`,
+    artistRecommendApi: `${API_PREFIX}/artists/recommend`,
+    artworkListApi: `${API_PREFIX}/works`,
+    artworkDetailApi: `${API_PREFIX}/works/{id}`,
+    userMeApi: `${API_PREFIX}/users/me`,
+    orderDetailApi: `${API_PREFIX}/orders/{id}`
   }
-  return {}
 }

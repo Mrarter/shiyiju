@@ -2,6 +2,7 @@ package com.shiyiju.modules.admin.vo;
 
 public class AdminOrderVO {
 
+    private Long id;
     private String orderNo;
     private String user;
     private String artwork;
@@ -10,6 +11,8 @@ public class AdminOrderVO {
     private String payStatus;
     private String shipStatus;
 
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
     public String getOrderNo() { return orderNo; }
     public void setOrderNo(String orderNo) { this.orderNo = orderNo; }
     public String getUser() { return user; }

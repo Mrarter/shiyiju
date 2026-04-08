@@ -40,6 +40,8 @@
 
     <select id="findArtists" resultType="com.shiyiju.modules.admin.entity.AdminArtistEntity">
         SELECT
+            id,
+            user_id AS userId,
             artist_name AS name,
             '' AS city,
             COALESCE(style_tags, '') AS tags,
@@ -51,6 +53,28 @@
         LIMIT 100
     </select>
 
+    <insert id="insertArtistUser" parameterType="com.shiyiju.modules.user.entity.UserAccountEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_account
+        (user_no, nickname, avatar_url, gender, status, register_source, invitation_code_used, last_login_at)
+        VALUES
+        (#{userNo}, #{nickname}, #{avatarUrl}, #{gender}, #{status}, #{registerSource}, #{invitationCodeUsed}, #{lastLoginAt})
+    </insert>
+
+    <insert id="insertArtist" parameterType="com.shiyiju.modules.admin.entity.AdminArtistEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO artist_profile (user_id, artist_name, real_name, style_tags, work_count, is_signed, status)
+        VALUES (#{userId}, #{name}, #{name}, #{tags}, #{works}, 0, #{status})
+    </insert>
+
+    <update id="updateArtist" parameterType="com.shiyiju.modules.admin.entity.AdminArtistEntity">
+        UPDATE artist_profile
+        SET artist_name = #{name},
+            real_name = #{name},
+            style_tags = #{tags},
+            work_count = #{works},
+            status = #{status}
+        WHERE id = #{id}
+    </update>
+
     <update id="updateArtistStatus">
         UPDATE artist_profile
         SET status = #{status}
@@ -59,6 +83,8 @@
 
     <select id="findArtworks" resultType="com.shiyiju.modules.admin.entity.AdminArtworkEntity">
         SELECT
+            a.id AS id,
+            a.artist_id AS artistId,
             a.title AS name,
             ap.artist_name AS artist,
             CONCAT('¥', FORMAT(a.current_price, 2)) AS price,
@@ -69,12 +95,43 @@
                 WHEN a.status = 'SOLD_OUT' THEN '售罄'
                 ELSE '下架'
             END AS status,
-            '无' AS tag
+            '无' AS tag,
+            COALESCE(a.description, '') AS description
         FROM artwork a
         LEFT JOIN artist_profile ap ON ap.id = a.artist_id
         ORDER BY a.created_at DESC
         LIMIT 100
     </select>
+
+    <insert id="insertArtwork" parameterType="com.shiyiju.modules.admin.entity.AdminArtworkEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO artwork (
+            artwork_no, artist_id, title, category, style, description, base_price, current_price,
+            inventory_total, inventory_available, status, published_at
+        )
+        VALUES (
+            #{tag}, #{artistId}, #{name}, 'OTHER', '后台录入', #{description}, #{price}, #{price},
+            #{stock}, #{stock}, #{status},
+            CASE WHEN #{status} = 'PUBLISHED' THEN NOW() ELSE NULL END
+        )
+    </insert>
+
+    <update id="updateArtwork" parameterType="com.shiyiju.modules.admin.entity.AdminArtworkEntity">
+        UPDATE artwork
+        SET artist_id = #{artistId},
+            title = #{name},
+            description = #{description},
+            base_price = #{price},
+            current_price = #{price},
+            inventory_available = #{stock},
+            inventory_total = #{stock},
+            status = #{status},
+            published_at = CASE
+                WHEN #{status} = 'PUBLISHED' AND published_at IS NULL THEN NOW()
+                WHEN #{status} != 'PUBLISHED' THEN NULL
+                ELSE published_at
+            END
+        WHERE id = #{id}
+    </update>
 
     <update id="updateArtworkStatus">
         UPDATE artwork
@@ -83,14 +140,24 @@
     </update>
 
     <update id="updateOrderShipment">
-        INSERT INTO shipment_order (order_id, shipment_no, shipment_type, logistics_company, logistics_code, tracking_no, shipment_status, consigned_at)
-        VALUES (#{orderId}, CONCAT('SHIP', #{orderId}), 'ARTWORK', #{company}, #{logisticsCode}, #{trackingNo}, 'SHIPPED', NOW())
-        ON DUPLICATE KEY UPDATE
-            logistics_company = #{company},
-            logistics_code = #{logisticsCode},
+        UPDATE shipment_order
+        SET logistics_company = #{company},
+            logistics_code = NULL,
             tracking_no = #{trackingNo},
             shipment_status = 'SHIPPED',
-            consigned_at = NOW();
+            consigned_at = NOW()
+        WHERE order_id = #{orderId}
+    </update>
+
+    <insert id="insertOrderShipment">
+        INSERT INTO shipment_order (order_id, shipment_no, shipment_type, logistics_company, logistics_code, tracking_no, shipment_status, consigned_at)
+        VALUES (#{orderId}, CONCAT('SHIP', #{orderId}), 'ARTWORK', #{company}, NULL, #{trackingNo}, 'SHIPPED', NOW())
+    </insert>
+
+    <update id="updateOrderStatus">
+        UPDATE trade_order
+        SET order_status = #{status}
+        WHERE id = #{orderId}
     </update>
 
     <update id="updateOrderRemark">
@@ -117,17 +184,48 @@
 
     <select id="findOrders" resultType="com.shiyiju.modules.admin.entity.AdminOrderEntity">
         SELECT
+            o.id AS id,
             o.order_no AS orderNo,
             COALESCE(u.nickname, CONCAT('用户#', o.buyer_user_id)) AS user,
             COALESCE(oi.item_title, '-') AS artwork,
             CONCAT('¥', FORMAT(o.pay_amount, 2)) AS amount,
-            o.order_status AS status,
-            o.payment_status AS payStatus,
-            COALESCE(so.shipment_status, '未发货') AS shipStatus
+            CASE
+                WHEN o.order_status = 'PENDING_PAYMENT' THEN '待支付'
+                WHEN o.order_status = 'PAID' THEN '已支付'
+                WHEN o.order_status = 'WAIT_DELIVER' THEN '待发货'
+                WHEN o.order_status = 'DELIVERED' THEN '已发货'
+                WHEN o.order_status = 'COMPLETED' THEN '已完成'
+                WHEN o.order_status = 'CANCELLED' THEN '已取消'
+                WHEN o.order_status = 'REFUNDING' THEN '退款中'
+                WHEN o.order_status = 'REFUNDED' THEN '已退款'
+                ELSE o.order_status
+            END AS status,
+            CASE
+                WHEN o.payment_status = 'UNPAID' THEN '待支付'
+                WHEN o.payment_status = 'PAID' THEN '已支付'
+                WHEN o.payment_status = 'PARTIAL_REFUND' THEN '部分退款'
+                WHEN o.payment_status = 'REFUNDED' THEN '已退款'
+                ELSE o.payment_status
+            END AS payStatus,
+            CASE
+                WHEN COALESCE(so.shipment_status, 'TO_BE_SHIPPED') = 'TO_BE_SHIPPED' THEN '未发货'
+                WHEN so.shipment_status = 'SHIPPED' THEN '已发货'
+                WHEN so.shipment_status = 'SIGNED' THEN '已签收'
+                WHEN so.shipment_status = 'EXCEPTION' THEN '异常'
+                ELSE COALESCE(so.shipment_status, '未发货')
+            END AS shipStatus
         FROM trade_order o
         LEFT JOIN user_account u ON u.id = o.buyer_user_id
         LEFT JOIN trade_order_item oi ON oi.order_id = o.id
-        LEFT JOIN shipment_order so ON so.order_id = o.id
+        LEFT JOIN (
+            SELECT s.*
+            FROM shipment_order s
+            INNER JOIN (
+                SELECT MAX(id) AS id
+                FROM shipment_order
+                GROUP BY order_id
+            ) latest ON latest.id = s.id
+        ) so ON so.order_id = o.id
         ORDER BY o.created_at DESC
         LIMIT 100
     </select>
