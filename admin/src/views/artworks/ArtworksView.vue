@@ -106,76 +106,115 @@
       destroy-on-close
     >
       <div style="margin-bottom: 16px;">
+        <div class="form-label">作品封面</div>
         <UploadImageField v-model="form.coverUrl" placeholder="作品封面图片URL" tip="建议上传竖图或方图作为作品主图" />
       </div>
       <div class="form-grid">
-        <el-input v-model="form.name" placeholder="请输入作品名称，如《静谧的山谷》" />
-        <el-select v-model="form.artistId" placeholder="请选择所属艺术家" style="width: 100%;">
-          <el-option
-            v-for="artist in artists"
-            :key="artist.id"
-            :label="artist.name"
-            :value="artist.id"
-          />
-        </el-select>
-        <el-select v-model="form.category" placeholder="请选择作品类别" style="width: 100%;">
-          <el-option label="绘画（油画、丙烯等）" value="PAINTING" />
-          <el-option label="版画（丝网、木刻等）" value="PRINT" />
-          <el-option label="水墨（国画、书法等）" value="INK" />
-          <el-option label="雕塑（青铜、陶瓷等）" value="SCULPTURE" />
-          <el-option label="综合（装置、摄影等）" value="OTHER" />
-        </el-select>
-        <el-select v-model="form.status" placeholder="请选择状态" style="width: 100%;">
-          <el-option label="草稿（暂不上架）" value="DRAFT" />
-          <el-option label="上架（公开销售）" value="PUBLISHED" />
-          <el-option label="下架（暂停销售）" value="OFF_SHELF" />
-        </el-select>
-      </div>
-      <div class="form-grid" style="margin-top: 16px;">
-        <el-input v-model.number="form.price" placeholder="请输入发售价格，单位：元" />
-        <el-input v-model.number="form.stock" placeholder="请输入可售库存数量" />
-        <el-input v-model="form.material" placeholder="请输入材质，如：布面油画、铜版画" />
-        <el-input v-model.number="form.creationYear" placeholder="请输入创作年份，如：2025" />
-      </div>
-      <div class="form-grid" style="margin-top: 16px;">
-        <el-select v-model="form.sizePreset" placeholder="请选择常见尺寸" style="width: 100%;" @change="onSizePresetChange">
-          <el-option label="自定义尺寸" value="custom" />
-          <el-option label="10×10cm" :value="10" />
-          <el-option label="20×20cm" :value="20" />
-          <el-option label="30×30cm" :value="30" />
-          <el-option label="40×40cm" :value="40" />
-          <el-option label="50×50cm" :value="50" />
-          <el-option label="60×60cm" :value="60" />
-          <el-option label="80×80cm" :value="80" />
-          <el-option label="100×100cm" :value="100" />
-          <el-option label="30×40cm" value="30x40" />
-          <el-option label="40×50cm" value="40x50" />
-          <el-option label="50×60cm" value="50x60" />
-          <el-option label="60×80cm" value="60x80" />
-          <el-option label="70×100cm" value="70x100" />
-          <el-option label="100×120cm" value="100x120" />
-          <el-option label="120×160cm" value="120x160" />
-          <el-option label="雕塑（小）/ 约20cm高" value="sculpture_small" />
-          <el-option label="雕塑（中）/ 约40cm高" value="sculpture_mid" />
-          <el-option label="雕塑（大）/ 约80cm高" value="sculpture_large" />
-        </el-select>
-        <div v-if="form.sizePreset === 'custom'" class="custom-size-inputs">
-          <el-input-number v-model="form.widthCm" :min="1" :max="1000" placeholder="宽度" />
-          <span class="size-separator">×</span>
-          <el-input-number v-model="form.heightCm" :min="1" :max="1000" placeholder="高度" />
-          <span class="size-separator">×</span>
-          <el-input-number v-model="form.depthCm" :min="1" :max="1000" placeholder="深度(可选)" />
-          <span class="size-unit">cm</span>
+        <div class="form-field">
+          <div class="form-label">作品名称</div>
+          <el-input v-model="form.name" placeholder="请输入作品名称，如《静谧的山谷》" />
         </div>
-        <el-input-number v-model="form.adminWeight" :min="0" :max="9999" placeholder="权重" />
+        <div class="form-field">
+          <div class="form-label">所属艺术家</div>
+          <el-select v-model="form.artistId" placeholder="请选择所属艺术家" style="width: 100%;">
+            <el-option
+              v-for="artist in artists"
+              :key="artist.id"
+              :label="artist.name"
+              :value="artist.id"
+            />
+          </el-select>
+        </div>
+        <div class="form-field">
+          <div class="form-label">作品类别</div>
+          <el-select v-model="form.category" placeholder="请选择作品类别" style="width: 100%;">
+            <el-option label="绘画（油画、丙烯等）" value="PAINTING" />
+            <el-option label="版画（丝网、木刻等）" value="PRINT" />
+            <el-option label="水墨（国画、书法等）" value="INK" />
+            <el-option label="雕塑（青铜、陶瓷等）" value="SCULPTURE" />
+            <el-option label="综合（装置、摄影等）" value="OTHER" />
+          </el-select>
+        </div>
+        <div class="form-field">
+          <div class="form-label">状态</div>
+          <el-select v-model="form.status" placeholder="请选择状态" style="width: 100%;">
+            <el-option label="草稿（暂不上架）" value="DRAFT" />
+            <el-option label="上架（公开销售）" value="PUBLISHED" />
+            <el-option label="下架（暂停销售）" value="OFF_SHELF" />
+          </el-select>
+        </div>
       </div>
-      <el-input
-        v-model="form.description"
-        type="textarea"
-        :rows="4"
-        placeholder="请输入作品描述，介绍作品特点、创作背景等"
-        style="margin-top: 16px;"
-      />
+      <div class="form-grid" style="margin-top: 16px;">
+        <div class="form-field">
+          <div class="form-label">发售价格</div>
+          <el-input v-model.number="form.price" placeholder="请输入发售价格，单位：元" />
+        </div>
+        <div class="form-field">
+          <div class="form-label">可售库存</div>
+          <el-input v-model.number="form.stock" placeholder="请输入可售库存数量" />
+        </div>
+        <div class="form-field">
+          <div class="form-label">材质</div>
+          <el-input v-model="form.material" placeholder="如：布面油画、铜版画" />
+        </div>
+        <div class="form-field">
+          <div class="form-label">创作年份</div>
+          <el-input v-model.number="form.creationYear" placeholder="如：2025" />
+        </div>
+      </div>
+      <div class="form-grid" style="margin-top: 16px;">
+        <div class="form-field">
+          <div class="form-label">尺寸预设</div>
+          <el-select v-model="form.sizePreset" placeholder="请选择常见尺寸" style="width: 100%;" @change="onSizePresetChange">
+            <el-option label="自定义尺寸" value="custom" />
+            <el-option label="10×10cm" :value="10" />
+            <el-option label="20×20cm" :value="20" />
+            <el-option label="30×30cm" :value="30" />
+            <el-option label="40×40cm" :value="40" />
+            <el-option label="50×50cm" :value="50" />
+            <el-option label="60×60cm" :value="60" />
+            <el-option label="80×80cm" :value="80" />
+            <el-option label="100×100cm" :value="100" />
+            <el-option label="30×40cm" value="30x40" />
+            <el-option label="40×50cm" value="40x50" />
+            <el-option label="50×60cm" value="50x60" />
+            <el-option label="60×80cm" value="60x80" />
+            <el-option label="70×100cm" value="70x100" />
+            <el-option label="100×120cm" value="100x120" />
+            <el-option label="120×160cm" value="120x160" />
+            <el-option label="雕塑（小）/ 约20cm高" value="sculpture_small" />
+            <el-option label="雕塑（中）/ 约40cm高" value="sculpture_mid" />
+            <el-option label="雕塑（大）/ 约80cm高" value="sculpture_large" />
+          </el-select>
+        </div>
+        <div class="form-field">
+          <div class="form-label">自定义尺寸</div>
+          <div v-if="form.sizePreset === 'custom'" class="custom-size-inputs">
+            <el-input-number v-model="form.widthCm" :min="1" :max="1000" placeholder="宽" />
+            <span class="size-separator">×</span>
+            <el-input-number v-model="form.heightCm" :min="1" :max="1000" placeholder="高" />
+            <span class="size-separator">×</span>
+            <el-input-number v-model="form.depthCm" :min="1" :max="1000" placeholder="深" />
+            <span class="size-unit">cm</span>
+          </div>
+          <span v-else class="size-preview">
+            {{ form.widthCm || '-' }}×{{ form.heightCm || '-' }}{{ form.depthCm ? '×' + form.depthCm : '' }}cm
+          </span>
+        </div>
+        <div class="form-field">
+          <div class="form-label">推荐权重</div>
+          <el-input-number v-model="form.adminWeight" :min="0" :max="9999" placeholder="数字越大越靠前" />
+        </div>
+      </div>
+      <div style="margin-top: 16px;">
+        <div class="form-label">作品描述</div>
+        <el-input
+          v-model="form.description"
+          type="textarea"
+          :rows="4"
+          placeholder="请输入作品描述，介绍作品特点、创作背景等"
+        />
+      </div>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
         <el-button type="primary" :loading="saving" @click="submitForm">保存作品</el-button>
@@ -842,6 +881,28 @@ onMounted(async () => {
 .detail-value {
   font-size: 14px;
   color: #303133;
+}
+
+/* 表单样式 */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.form-label {
+  font-size: 13px;
+  color: #606266;
+  font-weight: 500;
+}
+.size-preview {
+  font-size: 13px;
+  color: #909399;
+  line-height: 32px;
 }
 
 /* 批量上传样式 */

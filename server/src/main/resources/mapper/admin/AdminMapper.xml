@@ -156,6 +156,7 @@
             current_price = #{price},
             inventory_available = #{stock},
             inventory_total = #{stock},
+            admin_weight = #{adminWeight},
             status = #{status},
             published_at = CASE
                 WHEN #{status} = 'PUBLISHED' AND published_at IS NULL THEN NOW()

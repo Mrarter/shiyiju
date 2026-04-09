@@ -267,6 +267,7 @@ public class AdminContentService {
         entity.setPrice(request.getPrice().toPlainString());
         entity.setStock(request.getStock());
         entity.setStatus(toArtworkStatus(request.getStatus()));
+        entity.setAdminWeight(request.getAdminWeight());
         entity.setDescription(request.getDescription());
         entity.setCoverUrl(request.getCoverUrl());
         entity.setTag(generateArtworkNo());
@@ -314,6 +315,7 @@ public class AdminContentService {
         entity.setPrice(request.getPrice().toPlainString());
         entity.setStock(request.getStock());
         entity.setStatus(toArtworkStatus(request.getStatus()));
+        entity.setAdminWeight(request.getAdminWeight());
         entity.setDescription(request.getDescription());
         entity.setCoverUrl(request.getCoverUrl());
         if (adminMapper.updateArtwork(entity) <= 0) {
