@@ -80,13 +80,14 @@
           <el-option label="公告" value="NOTICE" />
         </el-select>
         <el-select v-model="form.status" placeholder="状态">
-          <el-option label="启用" value="ENABLED" />
+          <el-option label="上线" value="ENABLED" />
           <el-option label="草稿" value="DRAFT" />
-          <el-option label="停用" value="DISABLED" />
+          <el-option label="下线" value="DISABLED" />
         </el-select>
       </div>
       <div style="margin-top: 16px;">
-        <el-input v-model.number="form.sortNo" placeholder="排序值（越小越靠前）" />
+        <div style="margin-bottom: 4px; color: #666; font-size: 14px;">排序权重</div>
+        <el-input-number v-model="form.sortNo" :min="0" :max="999" placeholder="值越小越靠前" />
       </div>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
