@@ -90,43 +90,53 @@ public class AdminContentService {
     }
 
     public List<AdminArtistVO> listArtists() {
-        // 占位头像URL（使用 picsum.photos 提供1:1比例头像图）
-        String[] avatarUrls = {
-            "https://picsum.photos/seed/artist1/200/200",
-            "https://picsum.photos/seed/artist2/200/200",
-            "https://picsum.photos/seed/artist3/200/200",
-            "https://picsum.photos/seed/artist4/200/200",
-            "https://picsum.photos/seed/artist5/200/200",
-            "https://picsum.photos/seed/artist6/200/200",
-            "https://picsum.photos/seed/artist7/200/200",
-            "https://picsum.photos/seed/artist8/200/200",
-            "https://picsum.photos/seed/artist9/200/200",
-            "https://picsum.photos/seed/artist10/200/200",
-            "https://picsum.photos/seed/artist11/200/200",
-            "https://picsum.photos/seed/artist12/200/200",
-            "https://picsum.photos/seed/artist13/200/200",
-            "https://picsum.photos/seed/artist14/200/200",
-            "https://picsum.photos/seed/artist15/200/200"
+        // 艺术家名字和对应配色
+        String[][] artists = {
+            {"林观山", "杭州", "油画, 当代", "5B8C5A"},
+            {"周岚", "上海", "版画, 新锐", "8B5A8B"},
+            {"陈河", "苏州", "水墨, 山水", "5A7B8C"},
+            {"李明", "北京", "油画, 抽象", "8C7A5B"},
+            {"王芳", "广州", "版画, 丝网", "8B5B5B"},
+            {"张伟", "成都", "水墨, 写意", "5B8B8B"},
+            {"陈静", "深圳", "油画, 风景", "7A5B8C"},
+            {"赵磊", "西安", "雕塑, 青铜", "8C5A6A"},
+            {"孙丽", "南京", "版画, 铜版", "5A6A8C"},
+            {"周杰", "武汉", "水墨, 山水", "8C7A6A"},
+            {"吴敏", "重庆", "油画, 人物", "6A8C5A"},
+            {"郑强", "天津", "雕塑, 陶瓷", "8C5A8C"},
+            {"林立", "青岛", "油画, 静物", "5A8C7A"},
+            {"黄丽", "大连", "版画, 石版", "8B7A5A"},
+            {"杨帆", "厦门", "水墨, 花鸟", "5B5B8C"}
         };
         
         // 演示模式：始终返回 15 名艺术家
         return List.of(
-            artist(3001L, "林观山", "杭州", "油画, 当代", avatarUrls[0], 12, "上线", 1),
-            artist(3002L, "周岚", "上海", "版画, 新锐", avatarUrls[1], 8, "上线", 2),
-            artist(3003L, "陈河", "苏州", "水墨, 山水", avatarUrls[2], 15, "上线", 3),
-            artist(3004L, "李明", "北京", "油画, 抽象", avatarUrls[3], 25, "上线", 4),
-            artist(3005L, "王芳", "广州", "版画, 丝网", avatarUrls[4], 18, "上线", 5),
-            artist(3006L, "张伟", "成都", "水墨, 写意", avatarUrls[5], 20, "上线", 6),
-            artist(3007L, "陈静", "深圳", "油画, 风景", avatarUrls[6], 14, "上线", 7),
-            artist(3008L, "赵磊", "西安", "雕塑, 青铜", avatarUrls[7], 10, "上线", 8),
-            artist(3009L, "孙丽", "南京", "版画, 铜版", avatarUrls[8], 16, "上线", 9),
-            artist(3010L, "周杰", "武汉", "水墨, 山水", avatarUrls[9], 22, "上线", 10),
-            artist(3011L, "吴敏", "重庆", "油画, 人物", avatarUrls[10], 12, "上线", 11),
-            artist(3012L, "郑强", "天津", "雕塑, 陶瓷", avatarUrls[11], 8, "上线", 12),
-            artist(3013L, "林立", "青岛", "油画, 静物", avatarUrls[12], 19, "上线", 13),
-            artist(3014L, "黄丽", "大连", "版画, 石版", avatarUrls[13], 11, "上线", 14),
-            artist(3015L, "杨帆", "厦门", "水墨, 花鸟", avatarUrls[14], 17, "上线", 15)
+            artist(3001L, artists[0][0], artists[0][1], artists[0][2], genAvatarUrl(artists[0][0], artists[0][3]), 12, "上线", 1),
+            artist(3002L, artists[1][0], artists[1][1], artists[1][2], genAvatarUrl(artists[1][0], artists[1][3]), 8, "上线", 2),
+            artist(3003L, artists[2][0], artists[2][1], artists[2][2], genAvatarUrl(artists[2][0], artists[2][3]), 15, "上线", 3),
+            artist(3004L, artists[3][0], artists[3][1], artists[3][2], genAvatarUrl(artists[3][0], artists[3][3]), 25, "上线", 4),
+            artist(3005L, artists[4][0], artists[4][1], artists[4][2], genAvatarUrl(artists[4][0], artists[4][3]), 18, "上线", 5),
+            artist(3006L, artists[5][0], artists[5][1], artists[5][2], genAvatarUrl(artists[5][0], artists[5][3]), 20, "上线", 6),
+            artist(3007L, artists[6][0], artists[6][1], artists[6][2], genAvatarUrl(artists[6][0], artists[6][3]), 14, "上线", 7),
+            artist(3008L, artists[7][0], artists[7][1], artists[7][2], genAvatarUrl(artists[7][0], artists[7][3]), 10, "上线", 8),
+            artist(3009L, artists[8][0], artists[8][1], artists[8][2], genAvatarUrl(artists[8][0], artists[8][3]), 16, "上线", 9),
+            artist(3010L, artists[9][0], artists[9][1], artists[9][2], genAvatarUrl(artists[9][0], artists[9][3]), 22, "上线", 10),
+            artist(3011L, artists[10][0], artists[10][1], artists[10][2], genAvatarUrl(artists[10][0], artists[10][3]), 12, "上线", 11),
+            artist(3012L, artists[11][0], artists[11][1], artists[11][2], genAvatarUrl(artists[11][0], artists[11][3]), 8, "上线", 12),
+            artist(3013L, artists[12][0], artists[12][1], artists[12][2], genAvatarUrl(artists[12][0], artists[12][3]), 19, "上线", 13),
+            artist(3014L, artists[13][0], artists[13][1], artists[13][2], genAvatarUrl(artists[13][0], artists[13][3]), 11, "上线", 14),
+            artist(3015L, artists[14][0], artists[14][1], artists[14][2], genAvatarUrl(artists[14][0], artists[14][3]), 17, "上线", 15)
         );
+    }
+    
+    // 生成艺术家头像URL（使用ui-avatars带名字的彩色头像）
+    private String genAvatarUrl(String name, String bgColor) {
+        try {
+            return "https://ui-avatars.com/api/?name=" + java.net.URLEncoder.encode(name, "UTF-8") 
+                   + "&background=" + bgColor + "&color=fff&size=128&font-size=0.4&bold=true&rounded=true";
+        } catch (Exception e) {
+            return "https://ui-avatars.com/api/?name=" + name + "&background=5B8C5A&color=fff&size=128&rounded=true";
+        }
     }
 
     @Transactional
