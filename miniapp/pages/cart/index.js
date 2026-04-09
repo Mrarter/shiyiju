@@ -29,6 +29,10 @@ Page({
           quantity: 1,
           stock: 5,
           coverUrl: "https://picsum.photos/seed/art1/400/500",
+          widthCm: 80,
+          heightCm: 100,
+          creationYear: 2025,
+          category: "PAINTING",
           selected: false
         },
         {
@@ -39,6 +43,10 @@ Page({
           quantity: 2,
           stock: 3,
           coverUrl: "https://picsum.photos/seed/art2/400/500",
+          widthCm: 50,
+          heightCm: 70,
+          creationYear: 2024,
+          category: "PRINT",
           selected: false
         },
         {
@@ -49,18 +57,22 @@ Page({
           quantity: 1,
           stock: 1,
           coverUrl: "https://picsum.photos/seed/art3/400/500",
+          widthCm: 138,
+          heightCm: 69,
+          creationYear: 2025,
+          category: "INK",
           selected: false
         }
       ]
 
       // 模拟推荐作品数据 - 使用首页存在的作品ID
       const recommendProducts = [
-        { id: 4, title: "抽象艺术 No.7", artistName: "刘涛", price: "15,800", coverUrl: "https://picsum.photos/seed/art4/400/500", tag: "特价" },
-        { id: 5, title: "海边日落", artistName: "陈静", price: "8,800", coverUrl: "https://picsum.photos/seed/art5/400/500", tag: "" },
-        { id: 6, title: "雕塑作品 #3", artistName: "赵磊", price: "45,000", coverUrl: "https://picsum.photos/seed/art6/400/500", tag: "独家" },
-        { id: 7, title: "花卉系列", artistName: "孙丽", price: "5,200", coverUrl: "https://picsum.photos/seed/art7/400/500", tag: "" },
-        { id: 8, title: "竹林深处", artistName: "周杰", price: "19,800", coverUrl: "https://picsum.photos/seed/art8/400/500", tag: "热卖" },
-        { id: 9, title: "星空之下", artistName: "吴敏", price: "22,800", coverUrl: "https://picsum.photos/seed/art9/400/500", tag: "新品" }
+        { id: 4, title: "抽象艺术 No.7", artistName: "刘涛", price: "15,800", coverUrl: "https://picsum.photos/seed/art4/400/500", widthCm: 60, heightCm: 80, creationYear: 2024, category: "PAINTING", tag: "特价" },
+        { id: 5, title: "海边日落", artistName: "陈静", price: "8,800", coverUrl: "https://picsum.photos/seed/art5/400/500", widthCm: 40, heightCm: 50, creationYear: 2025, category: "PAINTING", tag: "" },
+        { id: 6, title: "雕塑作品 #3", artistName: "赵磊", price: "45,000", coverUrl: "https://picsum.photos/seed/art6/400/500", widthCm: 25, heightCm: 45, creationYear: 2023, category: "SCULPTURE", tag: "独家" },
+        { id: 7, title: "花卉系列", artistName: "孙丽", price: "5,200", coverUrl: "https://picsum.photos/seed/art7/400/500", widthCm: 45, heightCm: 60, creationYear: 2024, category: "PRINT", tag: "" },
+        { id: 8, title: "竹林深处", artistName: "周杰", price: "19,800", coverUrl: "https://picsum.photos/seed/art8/400/500", widthCm: 68, heightCm: 136, creationYear: 2024, category: "INK", tag: "热卖" },
+        { id: 9, title: "星空之下", artistName: "吴敏", price: "22,800", coverUrl: "https://picsum.photos/seed/art9/400/500", widthCm: 90, heightCm: 120, creationYear: 2025, category: "PAINTING", tag: "新品" }
       ]
 
       this.setData({

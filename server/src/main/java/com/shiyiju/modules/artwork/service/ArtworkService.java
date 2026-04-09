@@ -28,7 +28,51 @@ public class ArtworkService {
         
         // 演示模式：始终返回模拟数据，避免数据库为空时前端无内容
         // 正式环境可将此行注释或删除
-        return getMockWorks();
+        List<ArtworkListItemVO> works = getMockWorks();
+        
+        // 按权重排序
+        return sortByWeight(works);
+    }
+    
+    // 权重排序：后台配置权重*10 + 点击次数*1 + 收藏次数*3 + 加入购物车次数*5
+    private List<ArtworkListItemVO> sortByWeight(List<ArtworkListItemVO> works) {
+        return works.stream()
+            .map(work -> {
+                // 计算权重得分
+                int adminWeight = work.getAdminWeight() != null ? work.getAdminWeight() : 1;
+                int viewScore = (work.getViewCount() != null ? work.getViewCount() : 0) * 1;
+                int favoriteScore = (work.getFavoriteCount() != null ? work.getFavoriteCount() : 0) * 3;
+                int cartScore = (work.getCartCount() != null ? work.getCartCount() : 0) * 5;
+                int totalWeight = adminWeight * 10 + viewScore + favoriteScore + cartScore;
+                work.setWeight(totalWeight);
+                return work;
+            })
+            .sorted((a, b) -> {
+                // 权重高的在前
+                int weightCompare = Integer.compare(b.getWeight(), a.getWeight());
+                if (weightCompare != 0) return weightCompare;
+                // 权重相同按原始顺序
+                return a.getArtworkId().compareTo(b.getArtworkId());
+            })
+            .toList();
+    }
+    
+    // 记录点击次数
+    public void recordClick(Long artworkId) {
+        // 演示模式：只打印日志，不实际存储
+        System.out.println("Record click for artwork: " + artworkId);
+    }
+    
+    // 记录收藏状态
+    public void recordFavorite(Long artworkId, boolean isFavorite) {
+        // 演示模式：只打印日志，不实际存储
+        System.out.println("Record favorite for artwork: " + artworkId + ", isFavorite: " + isFavorite);
+    }
+    
+    // 记录加入购物车
+    public void recordCart(Long artworkId) {
+        // 演示模式：只打印日志，不实际存储
+        System.out.println("Record cart for artwork: " + artworkId);
     }
 
     public ArtworkDetailVO getWorkDetail(Long artworkId) {

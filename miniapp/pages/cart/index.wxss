@@ -131,6 +131,12 @@
   color: #999;
 }
 
+.item-spec {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: #b8b8b8;
+}
+
 .item-bottom {
   display: flex;
   align-items: center;

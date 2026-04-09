@@ -31,6 +31,14 @@
         <view class="item-content">
           <view class="item-title">{{item.title}}</view>
           <view class="item-artist">{{item.artistName}}</view>
+          <view class="item-spec">
+            <text wx:if="{{item.category === 'PAINTING'}}">油画</text>
+            <text wx:elif="{{item.category === 'PRINT'}}">版画</text>
+            <text wx:elif="{{item.category === 'INK'}}">水墨</text>
+            <text wx:elif="{{item.category === 'SCULPTURE'}}">雕塑</text>
+            <text wx:else>综合</text>
+            /{{item.widthCm}}cm×{{item.heightCm}}cm/{{item.creationYear}}年
+          </view>
           <view class="item-bottom">
             <view class="item-price">¥{{item.price}}</view>
             <view class="item-stock" wx:if="{{item.stock > 0}}">剩余 {{item.stock}}</view>

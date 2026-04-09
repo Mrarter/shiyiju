@@ -17,6 +17,9 @@ public class ArtworkListItemVO {
     private BigDecimal currentPrice;
     private Integer favoriteCount;
     private Integer viewCount;
+    private Integer cartCount;
+    private Integer adminWeight;
+    private Integer weight;
 
     public Long getArtworkId() { return artworkId; }
     public void setArtworkId(Long artworkId) { this.artworkId = artworkId; }
@@ -44,4 +47,10 @@ public class ArtworkListItemVO {
     public void setFavoriteCount(Integer favoriteCount) { this.favoriteCount = favoriteCount; }
     public Integer getViewCount() { return viewCount; }
     public void setViewCount(Integer viewCount) { this.viewCount = viewCount; }
+    public Integer getCartCount() { return cartCount; }
+    public void setCartCount(Integer cartCount) { this.cartCount = cartCount; }
+    public Integer getAdminWeight() { return adminWeight; }
+    public void setAdminWeight(Integer adminWeight) { this.adminWeight = adminWeight; }
+    public Integer getWeight() { return weight; }
+    public void setWeight(Integer weight) { this.weight = weight; }
 }

@@ -27,10 +27,22 @@
         </el-table-column>
         <el-table-column prop="name" label="作品名" min-width="180" />
         <el-table-column prop="artist" label="艺术家" width="140" />
+        <el-table-column prop="category" label="类别" width="100">
+          <template #default="{ row }">
+            {{ formatCategory(row.category) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="尺寸" width="120">
+          <template #default="{ row }">
+            <span v-if="row.widthCm && row.heightCm">{{ row.widthCm }}×{{ row.heightCm }}cm</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="creationYear" label="创作年份" width="100" />
         <el-table-column prop="price" label="价格" width="120" />
-        <el-table-column prop="stock" label="库存" width="100" />
+        <el-table-column prop="stock" label="库存" width="80" />
         <el-table-column prop="status" label="状态" width="100" />
-        <el-table-column prop="tag" label="推荐标签" width="140" />
+        <el-table-column prop="tag" label="标签" width="100" />
         <el-table-column label="操作" width="260">
           <template #default="{ row }">
             <el-button link type="primary" @click="startEdit(row)">编辑</el-button>
@@ -56,13 +68,30 @@
             :value="artist.id"
           />
         </el-select>
+        <el-select v-model="form.category" placeholder="作品类别">
+          <el-option label="绘画" value="PAINTING" />
+          <el-option label="版画" value="PRINT" />
+          <el-option label="水墨" value="INK" />
+          <el-option label="雕塑" value="SCULPTURE" />
+          <el-option label="综合" value="OTHER" />
+        </el-select>
         <el-select v-model="form.status" placeholder="状态">
           <el-option label="草稿" value="DRAFT" />
           <el-option label="上架" value="PUBLISHED" />
           <el-option label="下架" value="OFF_SHELF" />
         </el-select>
-        <el-input v-model.number="form.price" placeholder="发售价格" />
-        <el-input v-model.number="form.stock" placeholder="库存" />
+      </div>
+      <div class="form-grid" style="margin-top: 16px;">
+        <el-input v-model.number="form.price" placeholder="发售价格(元)" />
+        <el-input v-model.number="form.stock" placeholder="库存数量" />
+        <el-input v-model="form.material" placeholder="材质(如:布面油画)" />
+        <el-input v-model.number="form.creationYear" placeholder="创作年份(如:2025)" />
+      </div>
+      <div class="form-grid" style="margin-top: 16px;">
+        <el-input v-model.number="form.widthCm" placeholder="宽度(cm)" />
+        <el-input v-model.number="form.heightCm" placeholder="高度(cm)" />
+        <el-input v-model.number="form.depthCm" placeholder="深度(cm,雕塑用)" />
+        <el-input v-model.number="form.adminWeight" placeholder="推荐权重(1-10)" />
       </div>
       <el-input
         v-model="form.description"
@@ -94,9 +123,17 @@ const editingId = ref(null)
 const form = reactive({
   name: '',
   artistId: null,
+  category: 'PAINTING',
   status: 'DRAFT',
   price: 0,
   stock: 1,
+  material: '',
+  creationYear: new Date().getFullYear(),
+  widthCm: null,
+  heightCm: null,
+  depthCm: null,
+  adminWeight: 1,
+  tag: '',
   description: '',
   coverUrl: ''
 })
@@ -113,9 +150,17 @@ function resetForm() {
   editingId.value = null
   form.name = ''
   form.artistId = artists.value[0]?.id || null
+  form.category = 'PAINTING'
   form.status = 'DRAFT'
   form.price = 0
   form.stock = 1
+  form.material = ''
+  form.creationYear = new Date().getFullYear()
+  form.widthCm = null
+  form.heightCm = null
+  form.depthCm = null
+  form.adminWeight = 1
+  form.tag = ''
   form.description = ''
   form.coverUrl = ''
 }
@@ -128,9 +173,17 @@ function startEdit(row) {
   editingId.value = row.id
   form.name = row.name || ''
   form.artistId = row.artistId || artists.value.find((artist) => artist.name === row.artist)?.id || null
+  form.category = row.category || 'PAINTING'
   form.status = normalizeArtworkStatus(row.status)
   form.price = parsePrice(row.price)
   form.stock = Number(row.stock || 0)
+  form.material = row.material || ''
+  form.creationYear = row.creationYear || new Date().getFullYear()
+  form.widthCm = row.widthCm || null
+  form.heightCm = row.heightCm || null
+  form.depthCm = row.depthCm || null
+  form.adminWeight = row.adminWeight || 1
+  form.tag = row.tag || ''
   form.description = row.description || ''
   form.coverUrl = row.coverUrl || ''
 }
@@ -155,6 +208,17 @@ function parsePrice(price) {
   return Number.isFinite(numeric) ? numeric : 0
 }
 
+function formatCategory(category) {
+  const map = {
+    PAINTING: '绘画',
+    PRINT: '版画',
+    INK: '水墨',
+    SCULPTURE: '雕塑',
+    OTHER: '综合'
+  }
+  return map[category] || category || '-'
+}
+
 async function submitForm() {
   if (!form.name.trim()) {
     ElMessage.warning('请输入作品名称')
@@ -173,9 +237,17 @@ async function submitForm() {
     await adminStore.saveArtwork(editingId.value, {
       name: form.name.trim(),
       artistId: form.artistId,
+      category: form.category,
       price: Number(form.price),
       stock: Number(form.stock || 0),
       status: form.status,
+      material: form.material.trim(),
+      creationYear: form.creationYear,
+      widthCm: form.widthCm ? Number(form.widthCm) : null,
+      heightCm: form.heightCm ? Number(form.heightCm) : null,
+      depthCm: form.depthCm ? Number(form.depthCm) : null,
+      adminWeight: form.adminWeight ? Number(form.adminWeight) : 1,
+      tag: form.tag.trim(),
       description: form.description.trim(),
       coverUrl: form.coverUrl
     })

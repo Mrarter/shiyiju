@@ -99,6 +99,7 @@ Page({
     heroVisual: null,
     followed: true,
     liked: false,
+    favorited: false,
     tags: [],
     stats: [],
     infoRows: [],
@@ -138,6 +139,10 @@ Page({
         dynamicHint: detail.priceStatus === "DYNAMIC" ? "动态价格，每日10点更新" : "价格稳定，可直接入藏"
       }
 
+      // 检查收藏状态
+      const favorites = wx.getStorageSync('favorites') || []
+      const isFavorited = favorites.includes(artworkId)
+
       this.setData({
         detail: enriched,
         heroVisual: {
@@ -149,6 +154,7 @@ Page({
         infoRows: this.buildInfoRows(detail),
         optionRows: this.buildOptionRows(detail),
         primaryActionText: detail.groupEnabled ? "发起拼团" : (detail.resaleEnabled ? "查看转售" : "立即入藏"),
+        favorited: isFavorited,
         loading: false,
         error: ""
       })
@@ -168,6 +174,9 @@ Page({
           dynamicHint: detail.priceStatus === "DYNAMIC" ? "动态价格，每日10点更新" : "价格稳定，可直接入藏"
         }
 
+        const favorites = wx.getStorageSync('favorites') || []
+        const isFavorited = favorites.includes(artworkId)
+
         this.setData({
           detail: enriched,
           heroVisual: {
@@ -179,6 +188,7 @@ Page({
           infoRows: this.buildInfoRows(detail),
           optionRows: this.buildOptionRows(detail),
           primaryActionText: detail.groupEnabled ? "发起拼团" : (detail.resaleEnabled ? "查看转售" : "立即入藏"),
+          favorited: isFavorited,
           loading: false,
           error: ""
         })
@@ -237,6 +247,30 @@ Page({
 
   handleLikeTap() {
     this.setData({ liked: !this.data.liked })
+  },
+
+  handleFavoriteTap() {
+    const artworkId = this.data.artworkId
+    const favorites = wx.getStorageSync('favorites') || []
+    const index = favorites.indexOf(artworkId)
+    
+    if (index > -1) {
+      favorites.splice(index, 1)
+      wx.showToast({ title: '已取消收藏', icon: 'success' })
+    } else {
+      favorites.push(artworkId)
+      wx.showToast({ title: '收藏成功', icon: 'success' })
+    }
+    
+    wx.setStorageSync('favorites', favorites)
+    this.setData({ favorited: !this.data.favorited })
+    
+    // 同步到服务器
+    api.request({
+      url: `/works/${artworkId}/favorite`,
+      method: "POST",
+      data: { favorite: index === -1 }
+    }).catch(() => {})
   },
 
   handleFollowTap() {

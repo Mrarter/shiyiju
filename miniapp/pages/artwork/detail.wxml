@@ -19,6 +19,7 @@
         <view class="tool-right">
           <view class="tool-btn" bindtap="handleShareTap">↗</view>
           <view class="tool-btn {{liked ? 'tool-btn-active' : ''}}" bindtap="handleLikeTap">♡</view>
+          <view class="tool-btn {{favorited ? 'tool-btn-active' : ''}}" bindtap="handleFavoriteTap">★</view>
         </view>
       </view>
     </view>
