@@ -5,5 +5,4 @@ com/shiyiju/modules/artist/ArtistControllerTest.class
 com/shiyiju/modules/user/UserControllerTest.class
 com/shiyiju/modules/user/AuthServiceTest.class
 com/shiyiju/modules/artist/ArtistServiceTest.class
-com/shiyiju/modules/artwork/ArtworkServiceTest.class
 com/shiyiju/modules/user/service/WechatSessionServiceTest.class
