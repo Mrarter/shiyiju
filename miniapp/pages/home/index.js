@@ -204,6 +204,7 @@ Page({
 
   onLoad() {
     this.loadFavorites()
+    this.loadHome()
   },
 
   onShow() {
