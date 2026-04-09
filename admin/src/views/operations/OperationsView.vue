@@ -8,7 +8,7 @@
       <el-button type="primary" @click="startCreate">新增推荐位</el-button>
     </div>
 
-    <div class="section-card" style="padding: 20px; margin-bottom: 16px;">
+    <div class="section-card" style="padding: 20px;">
       <div class="toolbar">
         <el-input v-model="keyword" placeholder="搜索标题/关联对象" style="max-width: 260px;" />
       </div>
@@ -39,12 +39,18 @@
       </el-table>
     </div>
 
-    <div class="section-card" style="padding: 24px;">
-      <div class="page-title" style="font-size: 18px;">{{ editingId ? '编辑推荐位' : '新增推荐位' }}</div>
-      <div style="margin-top: 16px;">
+    <!-- 新建/编辑推荐位对话框 -->
+    <el-dialog
+      v-model="dialogVisible"
+      :title="editingId ? '编辑推荐位' : '新增推荐位'"
+      width="640px"
+      :close-on-click-modal="false"
+      destroy-on-close
+    >
+      <div style="margin-bottom: 16px;">
         <UploadImageField v-model="form.imageUrl" placeholder="Banner / 推荐图" tip="建议上传横图，保存后会用于后台配置" />
       </div>
-      <div class="form-grid" style="margin-top: 16px;">
+      <div class="form-grid">
         <el-input v-model="form.title" placeholder="标题" />
         <el-input v-model="form.target" placeholder="关联对象/说明" />
         <el-select v-model="form.type" placeholder="类型">
@@ -59,14 +65,17 @@
           <el-option label="草稿" value="DRAFT" />
           <el-option label="停用" value="DISABLED" />
         </el-select>
-        <el-input v-model.number="form.sortNo" placeholder="排序" />
       </div>
       <div style="margin-top: 16px;">
-        <el-button @click="resetForm">取消</el-button>
-        <el-button type="primary" :loading="saving" @click="submitForm">保存并发布</el-button>
+        <el-input v-model.number="form.sortNo" placeholder="排序值（越小越靠前）" />
       </div>
-    </div>
+      <template #footer>
+        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="saving" @click="submitForm">保存并发布</el-button>
+      </template>
+    </el-dialog>
 
+    <!-- 预览对话框 -->
     <el-dialog v-model="previewVisible" title="推荐位预览" width="520px">
       <div v-if="previewItem" style="display: grid; gap: 16px;">
         <el-image
@@ -98,6 +107,7 @@ const { operations } = storeToRefs(adminStore)
 const keyword = ref('')
 const saving = ref(false)
 const editingId = ref(null)
+const dialogVisible = ref(false)
 const previewVisible = ref(false)
 const previewItem = ref(null)
 const form = reactive({
@@ -128,6 +138,7 @@ function resetForm() {
 
 function startCreate() {
   resetForm()
+  dialogVisible.value = true
 }
 
 function fillFrom(row) {
@@ -142,6 +153,7 @@ function fillFrom(row) {
 function startEdit(row) {
   editingId.value = row.id
   fillFrom(row)
+  dialogVisible.value = true
 }
 
 function previewOperation(row) {
@@ -187,6 +199,7 @@ async function submitForm() {
       await adminStore.createOperation(payload)
       ElMessage.success('推荐位已创建')
     }
+    dialogVisible.value = false
     resetForm()
   } catch (error) {
     ElMessage.error(error.message || '保存失败')
