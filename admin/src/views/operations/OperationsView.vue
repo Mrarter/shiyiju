@@ -15,14 +15,17 @@
       <el-table :data="filteredItems">
         <el-table-column label="图片" width="120">
           <template #default="{ row }">
-            <el-image
-              v-if="row.imageUrl"
-              :src="row.imageUrl"
-              fit="cover"
-              style="width: 72px; height: 48px; border-radius: 10px;"
-              preview-teleported
-            />
-            <span v-else>未上传</span>
+            <div v-if="row.imageUrl" class="table-image-box" @click="startEdit(row)">
+              <el-image
+                :src="row.imageUrl"
+                fit="cover"
+                style="width: 72px; height: 48px; border-radius: 10px;"
+              />
+              <div class="table-image-edit-icon">
+                <el-icon size="12"><Edit /></el-icon>
+              </div>
+            </div>
+            <span v-else class="table-image-empty" @click="startEdit(row)">+ 添加图片</span>
           </template>
         </el-table-column>
         <el-table-column prop="title" label="标题" min-width="180" />
@@ -378,5 +381,37 @@ onMounted(async () => {
   margin-top: 8px;
   color: var(--el-text-color-secondary);
   font-size: 13px;
+}
+
+/* 表格图片样式 */
+.table-image-box {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  border-radius: 10px;
+}
+.table-image-box:hover .table-image-edit-icon {
+  opacity: 1;
+}
+.table-image-edit-icon {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.table-image-empty {
+  color: var(--el-text-color-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 8px 4px;
+}
+.table-image-empty:hover {
+  color: var(--el-color-primary);
 }
 </style>
