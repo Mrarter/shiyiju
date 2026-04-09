@@ -315,7 +315,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 20rpx 24rpx;
-  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom) + 100rpx);
   background: #fff;
   border-top: 1rpx solid #eee;
   transform: translateY(100%);
@@ -388,7 +388,7 @@
 }
 
 .bottom-spacer.show {
-  height: 140rpx;
+  height: 240rpx;
 }
 
 /* 推荐作品区域 */
