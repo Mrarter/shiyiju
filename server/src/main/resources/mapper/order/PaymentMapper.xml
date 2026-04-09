@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shiyiju.modules.order.mapper.PaymentMapper">
+
+    <insert id="insertPaymentRecord" parameterType="com.shiyiju.modules.order.entity.PaymentRecordEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO payment_record (
+            order_id,
+            payment_no,
+            payment_channel,
+            amount,
+            payment_status
+        ) VALUES (
+            #{payment.orderId},
+            #{payment.paymentNo},
+            #{payment.paymentChannel},
+            #{payment.amount},
+            #{payment.paymentStatus}
+        )
+    </insert>
+
+    <select id="findByPaymentNo" resultType="com.shiyiju.modules.order.entity.PaymentRecordEntity">
+        SELECT * FROM payment_record WHERE payment_no = #{paymentNo} LIMIT 1
+    </select>
+
+    <select id="findLatestByOrderId" resultType="com.shiyiju.modules.order.entity.PaymentRecordEntity">
+        SELECT * FROM payment_record WHERE order_id = #{orderId} ORDER BY created_at DESC LIMIT 1
+    </select>
+
+    <update id="updatePaymentPrepayId">
+        UPDATE payment_record 
+        SET payment_status = 'PENDING',
+            updated_at = NOW()
+        WHERE payment_no = #{paymentNo}
+    </update>
+
+    <update id="updatePaymentSuccess">
+        UPDATE payment_record 
+        SET payment_status = 'SUCCESS',
+            transaction_no = #{transactionNo},
+            paid_at = NOW(),
+            callback_at = NOW(),
+            updated_at = NOW()
+        WHERE payment_no = #{paymentNo}
+    </update>
+
+    <delete id="deletePendingPayment">
+        DELETE FROM payment_record 
+        WHERE order_id = #{orderId} AND payment_status = 'PENDING'
+    </delete>
+
+    <update id="updateOrderPaid">
+        UPDATE trade_order 
+        SET payment_status = 'PAID',
+            order_status = 'PENDING_SHIPMENT',
+            paid_at = NOW(),
+            updated_at = NOW()
+        WHERE id = #{orderId}
+    </update>
+
+    <update id="updateOrderCancelled">
+        UPDATE trade_order 
+        SET order_status = 'CANCELLED',
+            cancelled_at = NOW(),
+            updated_at = NOW()
+        WHERE id = #{orderId} AND payment_status = 'UNPAID'
+    </update>
+
+    <update id="restoreArtworkInventory">
+        UPDATE artwork a
+        INNER JOIN trade_order_item oi ON oi.artwork_id = a.id
+        SET a.inventory_available = a.inventory_available + 1,
+            a.status = CASE WHEN a.inventory_available + 1 > 0 THEN 'PUBLISHED' ELSE a.status END,
+            a.updated_at = NOW()
+        WHERE oi.order_id = #{orderId}
+    </update>
+
+    <insert id="insertShipmentOrder">
+        INSERT INTO shipment_order (
+            order_id,
+            shipment_no,
+            shipment_type,
+            shipment_status
+        ) 
+        SELECT 
+            #{orderId},
+            CONCAT('S', DATE_FORMAT(NOW(), '%Y%m%d%H%i%s'), #{orderId}),
+            'ARTWORK',
+            'TO_BE_SHIPPED'
+        FROM DUAL
+        WHERE NOT EXISTS (
+            SELECT 1 FROM shipment_order WHERE order_id = #{orderId}
+        )
+    </insert>
+
+</mapper>

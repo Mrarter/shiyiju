@@ -7,6 +7,8 @@ import com.shiyiju.modules.order.entity.ShippingAddressEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 @Mapper
 public interface OrderMapper {
 
@@ -36,4 +38,9 @@ public interface OrderMapper {
     ShippingAddressEntity findOrderAddress(@Param("addressId") Long addressId);
 
     ShipmentEntity findShipmentByOrderId(@Param("orderId") Long orderId);
+
+    List<OrderEntity> findOrderList(@Param("buyerUserId") Long buyerUserId, 
+                                    @Param("status") String status,
+                                    @Param("page") Integer page, 
+                                    @Param("pageSize") Integer pageSize);
 }

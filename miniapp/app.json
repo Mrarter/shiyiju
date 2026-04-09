@@ -11,7 +11,10 @@
     "pages/blindbox/index",
     "pages/group/detail",
     "pages/exclusive/index",
-    "pages/collection/index"
+    "pages/collection/index",
+    "pages/order/confirm",
+    "pages/order/success/index",
+    "pages/order/list"
   ],
   "window": {
     "navigationStyle": "custom",

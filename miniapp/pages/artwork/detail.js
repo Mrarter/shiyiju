@@ -282,7 +282,22 @@ Page({
   },
 
   handlePrimaryTap() {
-    wx.showToast({ title: this.data.primaryActionText, icon: "none" })
+    const { artworkId, detail, primaryActionText } = this.data
+    
+    if (primaryActionText === "发起拼团") {
+      wx.showToast({ title: "拼团功能开发中", icon: "none" })
+      return
+    }
+    
+    if (primaryActionText === "查看转售") {
+      wx.showToast({ title: "转售功能开发中", icon: "none" })
+      return
+    }
+    
+    // 立即购买 - 跳转到订单确认页
+    wx.navigateTo({
+      url: `/pages/order/confirm?artworkId=${artworkId}`
+    })
   },
 
   handleRetry() {

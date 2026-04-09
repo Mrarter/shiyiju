@@ -208,4 +208,27 @@
         WHERE order_id = #{orderId}
         LIMIT 1
     </select>
+
+    <select id="findOrderList" resultType="com.shiyiju.modules.order.entity.OrderEntity">
+        SELECT
+            o.id AS order_id,
+            o.order_no,
+            o.order_status,
+            o.payment_status,
+            o.delivery_type,
+            o.pay_amount,
+            oi.cover_url,
+            oi.item_title,
+            o.paid_at,
+            o.created_at
+        FROM trade_order o
+        INNER JOIN trade_order_item oi ON oi.order_id = o.id
+        WHERE o.buyer_user_id = #{buyerUserId}
+        <if test="status != null and status != ''">
+            AND o.order_status = #{status}
+        </if>
+        ORDER BY o.created_at DESC
+        LIMIT #{pageSize}
+        OFFSET #{pageSize} * (#{page} - 1)
+    </select>
 </mapper>

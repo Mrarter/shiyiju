@@ -1,0 +1,38 @@
+<view class="container">
+  <view class="success-header">
+    <view class="icon">✓</view>
+    <view class="title">支付成功</view>
+    <view class="subtitle">感谢您的购买</view>
+  </view>
+
+  <view class="order-info" wx:if="{{order}}">
+    <view class="info-row">
+      <text class="label">订单号</text>
+      <text class="value">{{order.orderNo}}</text>
+    </view>
+    <view class="info-row">
+      <text class="label">支付金额</text>
+      <text class="value price">¥{{order.payAmount}}</text>
+    </view>
+    <view class="info-row">
+      <text class="label">支付方式</text>
+      <text class="value">微信支付</text>
+    </view>
+    <view class="info-row">
+      <text class="label">订单状态</text>
+      <text class="value status">待发货</text>
+    </view>
+  </view>
+
+  <view class="tips">
+    <view class="tip-title">温馨提示</view>
+    <view class="tip-item">1. 作品将在1-3个工作日内发出</view>
+    <view class="tip-item">2. 发货后可在"我的-我的订单"查看物流</view>
+    <view class="tip-item">3. 收藏证书可在"我的-我的收藏"中查看</view>
+  </view>
+
+  <view class="actions">
+    <view class="btn secondary" bindtap="goHome">返回首页</view>
+    <view class="btn primary" bindtap="goOrders">查看订单</view>
+  </view>
+</view>

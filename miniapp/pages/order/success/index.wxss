@@ -1,0 +1,118 @@
+page {
+  background: #f5f5f5;
+}
+
+.container {
+  padding: 40rpx 30rpx;
+}
+
+.success-header {
+  text-align: center;
+  padding: 60rpx 0;
+  background: #fff;
+  border-radius: 16rpx;
+  margin-bottom: 20rpx;
+}
+
+.icon {
+  width: 120rpx;
+  height: 120rpx;
+  line-height: 120rpx;
+  background: #07c160;
+  color: #fff;
+  font-size: 60rpx;
+  border-radius: 50%;
+  margin: 0 auto 30rpx;
+}
+
+.title {
+  font-size: 40rpx;
+  font-weight: bold;
+  margin-bottom: 16rpx;
+}
+
+.subtitle {
+  font-size: 28rpx;
+  color: #999;
+}
+
+.order-info {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 20rpx 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.label {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.value {
+  font-size: 28rpx;
+  color: #333;
+}
+
+.value.price {
+  color: #ff6b00;
+  font-weight: bold;
+}
+
+.value.status {
+  color: #07c160;
+}
+
+.tips {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 40rpx;
+}
+
+.tip-title {
+  font-size: 28rpx;
+  font-weight: 500;
+  margin-bottom: 20rpx;
+}
+
+.tip-item {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.8;
+}
+
+.actions {
+  display: flex;
+  gap: 24rpx;
+}
+
+.btn {
+  flex: 1;
+  height: 88rpx;
+  line-height: 88rpx;
+  text-align: center;
+  border-radius: 44rpx;
+  font-size: 30rpx;
+}
+
+.btn.secondary {
+  background: #fff;
+  border: 1px solid #ddd;
+  color: #666;
+}
+
+.btn.primary {
+  background: linear-gradient(135deg, #07c160 0%, #06ad56 100%);
+  color: #fff;
+}

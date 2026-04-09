@@ -10,6 +10,7 @@ import com.shiyiju.modules.order.mapper.OrderMapper;
 import com.shiyiju.modules.order.vo.OrderAddressVO;
 import com.shiyiju.modules.order.vo.OrderDetailVO;
 import com.shiyiju.modules.order.vo.OrderItemVO;
+import com.shiyiju.modules.order.vo.OrderListVO;
 import com.shiyiju.modules.order.vo.ShipmentVO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ import org.springframework.util.StringUtils;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Service
 public class OrderService {
@@ -152,5 +154,23 @@ public class OrderService {
 
     private String normalizeRemark(String remark) {
         return StringUtils.hasText(remark) ? remark.trim() : null;
+    }
+
+    public List<OrderListVO> getOrderList(Long currentUserId, String status, Integer page, Integer pageSize) {
+        List<OrderEntity> orders = orderMapper.findOrderList(currentUserId, status, page, pageSize);
+        return orders.stream().map(order -> {
+            OrderListVO vo = new OrderListVO();
+            vo.setOrderId(order.getOrderId());
+            vo.setOrderNo(order.getOrderNo());
+            vo.setOrderStatus(order.getOrderStatus());
+            vo.setPaymentStatus(order.getPaymentStatus());
+            vo.setDeliveryType(order.getDeliveryType());
+            vo.setPayAmount(order.getPayAmount());
+            vo.setCoverUrl(order.getCoverUrl());
+            vo.setItemTitle(order.getItemTitle());
+            vo.setCreatedAt(order.getCreatedAt());
+            vo.setPaidAt(order.getPaidAt());
+            return vo;
+        }).toList();
     }
 }
