@@ -30,7 +30,8 @@ public class HomeController {
         // 获取启用的 Banner 配置
         List<AdminOperationVO> operations = adminContentService.listOperations();
         List<AdminOperationVO> banners = operations.stream()
-                .filter(op -> "启用".equals(op.getStatus()))
+                .filter(op -> "ENABLED".equals(op.getStatus()) || "启用".equals(op.getStatus()))
+                .filter(op -> "BANNER".equals(op.getType()) || "Banner".equals(op.getType()))
                 .map(op -> {
                     AdminOperationVO banner = new AdminOperationVO();
                     banner.setId(op.getId());

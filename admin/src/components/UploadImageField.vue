@@ -40,7 +40,7 @@ defineProps({
   },
   tip: {
     type: String,
-    default: '支持 JPG、PNG、WEBP、GIF'
+    default: '支持 JPG/JPEG、PNG、WEBP、GIF（大图）'
   }
 })
 
