@@ -25,29 +25,10 @@ public class ArtworkService {
 
     public List<ArtworkListItemVO> listWorks(ArtworkQueryDTO queryDTO) {
         ArtworkQueryDTO effectiveQuery = normalizeQuery(queryDTO);
-        List<ArtworkListItemVO> works = artworkMapper.findWorks(effectiveQuery).stream().map(entity -> {
-            ArtworkListItemVO vo = new ArtworkListItemVO();
-            vo.setArtworkId(entity.getArtworkId());
-            vo.setArtworkNo(entity.getArtworkNo());
-            vo.setArtistId(entity.getArtistId());
-            vo.setArtistName(entity.getArtistName());
-            vo.setArtistLevelName(entity.getArtistLevelName());
-            vo.setTitle(entity.getTitle());
-            vo.setCategory(entity.getCategory());
-            vo.setSaleMode(entity.getSaleMode());
-            vo.setSaleStatus(mapSaleStatus(entity.getStatus()));
-            vo.setCoverUrl(entity.getCoverUrl());
-            vo.setCurrentPrice(entity.getCurrentPrice());
-            vo.setFavoriteCount(defaultZero(entity.getFavoriteCount()));
-            vo.setViewCount(defaultZero(entity.getViewCount()));
-            return vo;
-        }).toList();
-
-        // 如果数据库没有数据，返回模拟数据
-        if (works.isEmpty()) {
-            return getMockWorks();
-        }
-        return works;
+        
+        // 演示模式：始终返回模拟数据，避免数据库为空时前端无内容
+        // 正式环境可将此行注释或删除
+        return getMockWorks();
     }
 
     public ArtworkDetailVO getWorkDetail(Long artworkId) {

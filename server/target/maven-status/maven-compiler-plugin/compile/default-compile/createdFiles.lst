@@ -53,6 +53,7 @@ com/shiyiju/bootstrap/ShiyijuApplication.class
 com/shiyiju/modules/admin/vo/AdminUserVO.class
 com/shiyiju/modules/admin/controller/AdminDashboardController.class
 com/shiyiju/modules/admin/vo/AdminArtistVO.class
+com/shiyiju/modules/artwork/service/ArtworkService.class
 com/shiyiju/modules/artist/vo/ArtistCardVO.class
 com/shiyiju/modules/admin/entity/AdminUserEntity.class
 com/shiyiju/modules/artist/service/ArtistService.class
