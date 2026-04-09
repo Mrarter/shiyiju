@@ -25,15 +25,83 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class AdminContentService {
 
     private final AdminMapper adminMapper;
+    
+    // 可变的模拟数据列表
+    private static List<AdminArtistVO> mockArtists = new ArrayList<>();
+    private static List<AdminArtworkVO> mockArtworks = new ArrayList<>();
+    private static boolean mockDataInitialized = false;
 
     public AdminContentService(AdminMapper adminMapper) {
         this.adminMapper = adminMapper;
+    }
+    
+    // 初始化模拟数据
+    private void initMockData() {
+        if (mockDataInitialized) return;
+        synchronized (AdminContentService.class) {
+            if (mockDataInitialized) return;
+            initMockArtists();
+            initMockArtworks();
+            mockDataInitialized = true;
+        }
+    }
+    
+    private void initMockArtists() {
+        String[][] artists = {
+            {"林观山", "杭州", "油画, 当代", "5B8C5A"},
+            {"周岚", "上海", "版画, 新锐", "8B5A8B"},
+            {"陈河", "苏州", "水墨, 山水", "5A7B8C"},
+            {"李明", "北京", "油画, 抽象", "8C7A5B"},
+            {"王芳", "广州", "版画, 丝网", "8B5B5B"},
+            {"张伟", "成都", "水墨, 写意", "5B8B8B"},
+            {"陈静", "深圳", "油画, 风景", "7A5B8C"},
+            {"赵磊", "西安", "雕塑, 青铜", "8C5A6A"},
+            {"孙丽", "南京", "版画, 铜版", "5A6A8C"},
+            {"周杰", "武汉", "水墨, 山水", "8C7A6A"},
+            {"吴敏", "重庆", "油画, 人物", "6A8C5A"},
+            {"郑强", "天津", "雕塑, 陶瓷", "8C5A8C"},
+            {"林立", "青岛", "油画, 静物", "5A8C7A"},
+            {"黄丽", "大连", "版画, 石版", "8B7A5A"},
+            {"杨帆", "厦门", "水墨, 花鸟", "5B5B8C"}
+        };
+        mockArtists = new ArrayList<>();
+        for (int i = 0; i < artists.length; i++) {
+            mockArtists.add(artist(3001L + i, artists[i][0], artists[i][1], artists[i][2], 
+                genAvatarUrl(artists[i][0], artists[i][3]), 10 + i, "上线", i + 1));
+        }
+    }
+    
+    private void initMockArtworks() {
+        String[] coverUrls = new String[50];
+        for (int i = 0; i < 50; i++) {
+            coverUrls[i] = "https://picsum.photos/seed/art" + (i + 1) + "/400/500";
+        }
+        String[][] artworks = {
+            {"静谧的山谷", "1001", "李明", "¥12,800", "特价"}, {"城市光影系列", "1002", "王芳", "¥6,800", ""},
+            {"水墨山水", "1003", "张伟", "¥28,000", "新品"}, {"抽象艺术 No.7", "1001", "李明", "¥15,800", "特价"},
+            {"海边日落", "1004", "陈静", "¥8,800", ""}, {"雕塑作品 #3", "1005", "赵磊", "¥45,000", "独家"},
+            {"花卉系列", "1002", "王芳", "¥5,200", ""}, {"竹林深处", "1003", "张伟", "¥19,800", "热卖"},
+            {"星空之下", "1006", "吴敏", "¥22,800", ""}, {"现代都市", "1007", "郑强", "¥7,800", "新品"},
+            {"秋日私语", "1008", "林立", "¥16,800", ""}, {"铜版画 #12", "1009", "黄丽", "¥9,800", "限量"},
+            {"烟雨江南", "1010", "杨帆", "¥32,000", ""}, {"粉色幻想", "1011", "马超", "¥12,800", ""},
+            {"青铜器系列", "1012", "徐磊", "¥58,000", "新品"}, {"黑白摄影", "1013", "钟华", "¥4,200", ""},
+            {"黄山云海", "1010", "杨帆", "¥45,000", "热卖"}, {"晨曦微露", "1014", "曾伟", "¥15,800", ""},
+            {"丝网版画", "1009", "黄丽", "¥6,800", ""}, {"木雕艺术", "1015", "梁勇", "¥36,000", ""}
+        };
+        mockArtworks = new ArrayList<>();
+        for (int i = 0; i < 50; i++) {
+            int artistIdx = i < artworks.length ? i : artworks.length - 1;
+            mockArtworks.add(artwork(1L + i, Long.parseLong(artworks[artistIdx][1]), artworks[artistIdx][0],
+                artworks[artistIdx][2], artworks[artistIdx][3], 1, "上架", artworks[artistIdx][4],
+                "作品描述", coverUrls[i]));
+        }
     }
 
     public List<AdminOperationVO> listOperations() {
@@ -90,43 +158,8 @@ public class AdminContentService {
     }
 
     public List<AdminArtistVO> listArtists() {
-        // 艺术家名字和对应配色
-        String[][] artists = {
-            {"林观山", "杭州", "油画, 当代", "5B8C5A"},
-            {"周岚", "上海", "版画, 新锐", "8B5A8B"},
-            {"陈河", "苏州", "水墨, 山水", "5A7B8C"},
-            {"李明", "北京", "油画, 抽象", "8C7A5B"},
-            {"王芳", "广州", "版画, 丝网", "8B5B5B"},
-            {"张伟", "成都", "水墨, 写意", "5B8B8B"},
-            {"陈静", "深圳", "油画, 风景", "7A5B8C"},
-            {"赵磊", "西安", "雕塑, 青铜", "8C5A6A"},
-            {"孙丽", "南京", "版画, 铜版", "5A6A8C"},
-            {"周杰", "武汉", "水墨, 山水", "8C7A6A"},
-            {"吴敏", "重庆", "油画, 人物", "6A8C5A"},
-            {"郑强", "天津", "雕塑, 陶瓷", "8C5A8C"},
-            {"林立", "青岛", "油画, 静物", "5A8C7A"},
-            {"黄丽", "大连", "版画, 石版", "8B7A5A"},
-            {"杨帆", "厦门", "水墨, 花鸟", "5B5B8C"}
-        };
-        
-        // 演示模式：始终返回 15 名艺术家
-        return List.of(
-            artist(3001L, artists[0][0], artists[0][1], artists[0][2], genAvatarUrl(artists[0][0], artists[0][3]), 12, "上线", 1),
-            artist(3002L, artists[1][0], artists[1][1], artists[1][2], genAvatarUrl(artists[1][0], artists[1][3]), 8, "上线", 2),
-            artist(3003L, artists[2][0], artists[2][1], artists[2][2], genAvatarUrl(artists[2][0], artists[2][3]), 15, "上线", 3),
-            artist(3004L, artists[3][0], artists[3][1], artists[3][2], genAvatarUrl(artists[3][0], artists[3][3]), 25, "上线", 4),
-            artist(3005L, artists[4][0], artists[4][1], artists[4][2], genAvatarUrl(artists[4][0], artists[4][3]), 18, "上线", 5),
-            artist(3006L, artists[5][0], artists[5][1], artists[5][2], genAvatarUrl(artists[5][0], artists[5][3]), 20, "上线", 6),
-            artist(3007L, artists[6][0], artists[6][1], artists[6][2], genAvatarUrl(artists[6][0], artists[6][3]), 14, "上线", 7),
-            artist(3008L, artists[7][0], artists[7][1], artists[7][2], genAvatarUrl(artists[7][0], artists[7][3]), 10, "上线", 8),
-            artist(3009L, artists[8][0], artists[8][1], artists[8][2], genAvatarUrl(artists[8][0], artists[8][3]), 16, "上线", 9),
-            artist(3010L, artists[9][0], artists[9][1], artists[9][2], genAvatarUrl(artists[9][0], artists[9][3]), 22, "上线", 10),
-            artist(3011L, artists[10][0], artists[10][1], artists[10][2], genAvatarUrl(artists[10][0], artists[10][3]), 12, "上线", 11),
-            artist(3012L, artists[11][0], artists[11][1], artists[11][2], genAvatarUrl(artists[11][0], artists[11][3]), 8, "上线", 12),
-            artist(3013L, artists[12][0], artists[12][1], artists[12][2], genAvatarUrl(artists[12][0], artists[12][3]), 19, "上线", 13),
-            artist(3014L, artists[13][0], artists[13][1], artists[13][2], genAvatarUrl(artists[13][0], artists[13][3]), 11, "上线", 14),
-            artist(3015L, artists[14][0], artists[14][1], artists[14][2], genAvatarUrl(artists[14][0], artists[14][3]), 17, "上线", 15)
-        );
+        initMockData();
+        return new ArrayList<>(mockArtists);
     }
     
     // 生成艺术家头像URL（使用ui-avatars带名字的彩色头像）
@@ -153,39 +186,61 @@ public class AdminContentService {
         AdminArtistEntity entity = new AdminArtistEntity();
         entity.setUserId(user.getId());
         entity.setName(request.getName());
+        entity.setCity(request.getCity());
         entity.setTags(request.getTags());
         entity.setAvatarUrl(request.getAvatarUrl());
         entity.setWorks(request.getWorks());
         entity.setStatus(toArtistStatus(request.getStatus()));
+        entity.setSort(request.getSort() != null ? request.getSort() : 0);
         adminMapper.insertArtist(entity);
-        return artist(entity.getId(), request.getName(), "", request.getTags(), request.getAvatarUrl(), request.getWorks(), displayArtistStatus(entity.getStatus()), entity.getId().intValue());
+        return artist(entity.getId(), request.getName(), request.getCity() != null ? request.getCity() : "", request.getTags(), request.getAvatarUrl(), request.getWorks(), displayArtistStatus(entity.getStatus()), entity.getSort());
     }
 
     public AdminArtistVO updateArtist(Long id, AdminArtistSaveDTO request) {
-        // 演示模式：模拟数据直接返回更新后的数据
+        initMockData();
+        // 演示模式：更新mock数据并返回
         if (isMockArtistId(id)) {
-            return artist(id, request.getName(), "", request.getTags(), request.getAvatarUrl(), 
-                request.getWorks(), displayArtistStatus(toArtistStatus(request.getStatus())), id.intValue());
+            String city = request.getCity() != null ? request.getCity() : "";
+            Integer sort = request.getSort() != null ? request.getSort() : id.intValue();
+            AdminArtistVO updated = artist(id, request.getName(), city, request.getTags(), request.getAvatarUrl(), 
+                request.getWorks(), displayArtistStatus(toArtistStatus(request.getStatus())), sort);
+            // 更新mock列表中的数据
+            for (int i = 0; i < mockArtists.size(); i++) {
+                if (mockArtists.get(i).getId().equals(id)) {
+                    mockArtists.set(i, updated);
+                    break;
+                }
+            }
+            return updated;
         }
         
         AdminArtistEntity entity = new AdminArtistEntity();
         entity.setId(id);
         entity.setName(request.getName());
+        entity.setCity(request.getCity());
         entity.setTags(request.getTags());
         entity.setAvatarUrl(request.getAvatarUrl());
         entity.setWorks(request.getWorks());
         entity.setStatus(toArtistStatus(request.getStatus()));
+        entity.setSort(request.getSort() != null ? request.getSort() : id.intValue());
         if (adminMapper.updateArtist(entity) <= 0) {
             throw new BusinessException(40404, "艺术家不存在");
         }
         adminMapper.updateArtistUserAvatar(id, "艺术家" + request.getName(), request.getAvatarUrl());
-        return artist(id, request.getName(), "", request.getTags(), request.getAvatarUrl(), request.getWorks(), displayArtistStatus(entity.getStatus()), id.intValue());
+        return artist(id, request.getName(), request.getCity() != null ? request.getCity() : "", request.getTags(), request.getAvatarUrl(), request.getWorks(), displayArtistStatus(entity.getStatus()), entity.getSort());
     }
 
     public void updateArtistStatus(Long id, String status) {
+        initMockData();
         String targetStatus = toArtistStatus(status);
-        // 演示模式：检查是否是模拟数据的ID范围
+        // 演示模式：更新mock数据
         if (isMockArtistId(id)) {
+            for (AdminArtistVO artist : mockArtists) {
+                if (artist.getId().equals(id)) {
+                    artist.setStatus(displayArtistStatus(targetStatus));
+                    break;
+                }
+            }
             return;
         }
         if (adminMapper.updateArtistStatus(id, targetStatus) <= 0) {
@@ -194,119 +249,21 @@ public class AdminContentService {
     }
 
     public List<AdminArtworkVO> listArtworks() {
-        // 占位图URL（使用 picsum.photos 提供可靠的可访问图片）
-        String[] coverUrls = {
-            "https://picsum.photos/seed/art1/400/500",
-            "https://picsum.photos/seed/art2/400/500",
-            "https://picsum.photos/seed/art3/400/500",
-            "https://picsum.photos/seed/art4/400/500",
-            "https://picsum.photos/seed/art5/400/500",
-            "https://picsum.photos/seed/art6/400/500",
-            "https://picsum.photos/seed/art7/400/500",
-            "https://picsum.photos/seed/art8/400/500",
-            "https://picsum.photos/seed/art9/400/500",
-            "https://picsum.photos/seed/art10/400/500",
-            "https://picsum.photos/seed/art11/400/500",
-            "https://picsum.photos/seed/art12/400/500",
-            "https://picsum.photos/seed/art13/400/500",
-            "https://picsum.photos/seed/art14/400/500",
-            "https://picsum.photos/seed/art15/400/500",
-            "https://picsum.photos/seed/art16/400/500",
-            "https://picsum.photos/seed/art17/400/500",
-            "https://picsum.photos/seed/art18/400/500",
-            "https://picsum.photos/seed/art19/400/500",
-            "https://picsum.photos/seed/art20/400/500",
-            "https://picsum.photos/seed/art21/400/500",
-            "https://picsum.photos/seed/art22/400/500",
-            "https://picsum.photos/seed/art23/400/500",
-            "https://picsum.photos/seed/art24/400/500",
-            "https://picsum.photos/seed/art25/400/500",
-            "https://picsum.photos/seed/art26/400/500",
-            "https://picsum.photos/seed/art27/400/500",
-            "https://picsum.photos/seed/art28/400/500",
-            "https://picsum.photos/seed/art29/400/500",
-            "https://picsum.photos/seed/art30/400/500",
-            "https://picsum.photos/seed/art31/400/500",
-            "https://picsum.photos/seed/art32/400/500",
-            "https://picsum.photos/seed/art33/400/500",
-            "https://picsum.photos/seed/art34/400/500",
-            "https://picsum.photos/seed/art35/400/500",
-            "https://picsum.photos/seed/art36/400/500",
-            "https://picsum.photos/seed/art37/400/500",
-            "https://picsum.photos/seed/art38/400/500",
-            "https://picsum.photos/seed/art39/400/500",
-            "https://picsum.photos/seed/art40/400/500",
-            "https://picsum.photos/seed/art41/400/500",
-            "https://picsum.photos/seed/art42/400/500",
-            "https://picsum.photos/seed/art43/400/500",
-            "https://picsum.photos/seed/art44/400/500",
-            "https://picsum.photos/seed/art45/400/500",
-            "https://picsum.photos/seed/art46/400/500",
-            "https://picsum.photos/seed/art47/400/500",
-            "https://picsum.photos/seed/art48/400/500",
-            "https://picsum.photos/seed/art49/400/500",
-            "https://picsum.photos/seed/art50/400/500"
-        };
-        
-        // 演示模式：始终返回 50 个模拟作品
-        return List.of(
-            artwork(1L, 1001L, "静谧的山谷", "李明", "¥12,800", 1, "上架", "特价", "当代绘画作品", coverUrls[0]),
-            artwork(2L, 1002L, "城市光影系列", "王芳", "¥6,800", 2, "上架", "", "城市风光系列", coverUrls[1]),
-            artwork(3L, 1003L, "水墨山水", "张伟", "¥28,000", 1, "上架", "新品", "传统水墨画", coverUrls[2]),
-            artwork(4L, 1001L, "抽象艺术 No.7", "李明", "¥15,800", 1, "上架", "特价", "抽象油画", coverUrls[3]),
-            artwork(5L, 1004L, "海边日落", "陈静", "¥8,800", 1, "上架", "", "风景油画", coverUrls[4]),
-            artwork(6L, 1005L, "雕塑作品 #3", "赵磊", "¥45,000", 1, "上架", "独家", "青铜雕塑", coverUrls[5]),
-            artwork(7L, 1002L, "花卉系列", "王芳", "¥5,200", 3, "上架", "", "花卉版画", coverUrls[6]),
-            artwork(8L, 1003L, "竹林深处", "张伟", "¥19,800", 1, "上架", "热卖", "水墨山水", coverUrls[7]),
-            artwork(9L, 1006L, "星空之下", "吴敏", "¥22,800", 1, "上架", "", "星空主题画", coverUrls[8]),
-            artwork(10L, 1007L, "现代都市", "郑强", "¥7,800", 2, "上架", "新品", "都市版画", coverUrls[9]),
-            artwork(11L, 1008L, "秋日私语", "林立", "¥16,800", 1, "上架", "", "风景油画", coverUrls[10]),
-            artwork(12L, 1009L, "铜版画 #12", "黄丽", "¥9,800", 1, "上架", "限量", "铜版画", coverUrls[11]),
-            artwork(13L, 1010L, "烟雨江南", "杨帆", "¥32,000", 1, "上架", "", "水墨画", coverUrls[12]),
-            artwork(14L, 1011L, "粉色幻想", "马超", "¥12,800", 1, "上架", "", "抽象油画", coverUrls[13]),
-            artwork(15L, 1012L, "青铜器系列", "徐磊", "¥58,000", 1, "上架", "新品", "青铜雕塑", coverUrls[14]),
-            artwork(16L, 1013L, "黑白摄影", "钟华", "¥4,200", 5, "上架", "", "摄影版画", coverUrls[15]),
-            artwork(17L, 1010L, "黄山云海", "杨帆", "¥45,000", 1, "上架", "热卖", "水墨山水", coverUrls[16]),
-            artwork(18L, 1014L, "晨曦微露", "曾伟", "¥15,800", 1, "上架", "", "风景油画", coverUrls[17]),
-            artwork(19L, 1009L, "丝网版画", "黄丽", "¥6,800", 2, "上架", "", "丝网版画", coverUrls[18]),
-            artwork(20L, 1015L, "木雕艺术", "梁勇", "¥36,000", 1, "上架", "", "木雕摆件", coverUrls[19]),
-            artwork(21L, 1016L, "落日晚霞", "宋涛", "¥18,800", 1, "上架", "特价", "风景油画", coverUrls[20]),
-            artwork(22L, 1017L, "古韵新风", "卢敏", "¥22,000", 1, "上架", "", "水墨画", coverUrls[21]),
-            artwork(23L, 1018L, "石版画 #5", "许刚", "¥12,000", 1, "上架", "新品", "石版画", coverUrls[22]),
-            artwork(24L, 1019L, "夜的旋律", "钱丽", "¥9,800", 1, "上架", "", "夜景油画", coverUrls[23]),
-            artwork(25L, 1020L, "陶瓷雕塑", "蒋伟", "¥28,000", 1, "上架", "", "陶瓷艺术", coverUrls[24]),
-            artwork(26L, 1021L, "春意盎然", "沈明", "¥14,800", 1, "上架", "热卖", "风景油画", coverUrls[25]),
-            artwork(27L, 1022L, "书法小品", "韩静", "¥8,500", 1, "上架", "", "书法作品", coverUrls[26]),
-            artwork(28L, 1023L, "综合版画", "冯强", "¥5,600", 3, "上架", "", "综合版画", coverUrls[27]),
-            artwork(29L, 1024L, "雪山之巅", "曹磊", "¥32,000", 1, "上架", "", "风景油画", coverUrls[28]),
-            artwork(30L, 1025L, "装置艺术", "张莉", "¥68,000", 1, "上架", "独家", "装置艺术", coverUrls[29]),
-            artwork(31L, 1026L, "金色年华", "程伟", "¥18,800", 1, "上架", "", "人物油画", coverUrls[30]),
-            artwork(32L, 1027L, "水乡印象", "傅丽", "¥25,800", 1, "上架", "新品", "水墨画", coverUrls[31]),
-            artwork(33L, 1028L, "限量复刻", "段勇", "¥18,000", 1, "上架", "", "限量版画", coverUrls[32]),
-            artwork(34L, 1029L, "梦幻泡影", "夏敏", "¥12,800", 1, "上架", "", "抽象油画", coverUrls[33]),
-            artwork(35L, 1030L, "玉雕摆件", "钟刚", "¥88,000", 1, "上架", "热卖", "玉雕艺术", coverUrls[34]),
-            artwork(36L, 1031L, "暮色苍茫", "乔磊", "¥15,800", 1, "上架", "", "风景油画", coverUrls[35]),
-            artwork(37L, 1032L, "行书书法", "翟丽", "¥12,800", 1, "上架", "", "书法作品", coverUrls[36]),
-            artwork(38L, 1033L, "数字版画", "方伟", "¥3,800", 5, "上架", "特价", "数字艺术", coverUrls[37]),
-            artwork(39L, 1034L, "荷塘月色", "康静", "¥16,800", 1, "上架", "", "水墨画", coverUrls[38]),
-            artwork(40L, 1035L, "铁艺雕塑", "史强", "¥42,000", 1, "上架", "", "铁艺艺术", coverUrls[39]),
-            artwork(41L, 1036L, "都市喧嚣", "薛磊", "¥22,800", 1, "上架", "新品", "都市油画", coverUrls[40]),
-            artwork(42L, 1037L, "草书长卷", "叶丽", "¥38,000", 1, "上架", "", "书法长卷", coverUrls[41]),
-            artwork(43L, 1038L, "石版艺术", "蒋伟", "¥15,800", 1, "上架", "", "石版艺术", coverUrls[42]),
-            artwork(44L, 1039L, "童趣天真", "许静", "¥8,800", 2, "上架", "", "儿童画", coverUrls[43]),
-            artwork(45L, 1040L, "玻璃艺术", "陆强", "¥35,000", 1, "上架", "热卖", "玻璃雕塑", coverUrls[44]),
-            artwork(46L, 1041L, "四季如歌", "杜磊", "¥19,800", 1, "上架", "", "风景油画", coverUrls[45]),
-            artwork(47L, 1042L, "写意山水", "苏丽", "¥42,000", 1, "上架", "精品", "写意山水", coverUrls[46]),
-            artwork(48L, 1043L, "木刻版画", "韩伟", "¥9,800", 2, "上架", "", "木刻艺术", coverUrls[47]),
-            artwork(49L, 1044L, "生命之树", "杨静", "¥25,800", 1, "上架", "", "生命主题画", coverUrls[48]),
-            artwork(50L, 1045L, "玉雕挂件", "朱强", "¥58,000", 1, "上架", "限量", "玉雕挂件", coverUrls[49])
-        );
+        initMockData();
+        return new ArrayList<>(mockArtworks);
     }
 
     public AdminArtworkVO createArtwork(AdminArtworkSaveDTO request) {
+        initMockData();
         AdminArtworkEntity entity = new AdminArtworkEntity();
         entity.setArtistId(request.getArtistId());
         entity.setName(request.getName());
+        entity.setCategory(request.getCategory());
+        entity.setMaterial(request.getMaterial());
+        entity.setCreationYear(request.getCreationYear());
+        entity.setWidthCm(request.getWidthCm());
+        entity.setHeightCm(request.getHeightCm());
+        entity.setDepthCm(request.getDepthCm());
         entity.setPrice(request.getPrice().toPlainString());
         entity.setStock(request.getStock());
         entity.setStatus(toArtworkStatus(request.getStatus()));
@@ -315,24 +272,45 @@ public class AdminContentService {
         entity.setTag(generateArtworkNo());
         adminMapper.insertArtwork(entity);
         syncArtworkCover(entity.getId(), request.getCoverUrl());
-        return findArtworkVO(entity.getId());
+        // 直接构建返回VO
+        return artwork(entity.getId(), request.getArtistId(), request.getName(),
+            getArtistName(request.getArtistId()),
+            "¥" + request.getPrice().toPlainString(),
+            request.getStock(),
+            displayArtworkStatus(toArtworkStatus(request.getStatus())),
+            "", request.getDescription(), request.getCoverUrl());
     }
 
     public AdminArtworkVO updateArtwork(Long id, AdminArtworkSaveDTO request) {
-        // 演示模式：模拟数据直接返回更新后的数据
+        initMockData();
+        // 演示模式：更新mock数据
         if (isMockArtworkId(id)) {
-            return artwork(id, request.getArtistId(), request.getName(), 
+            AdminArtworkVO updated = artwork(id, request.getArtistId(), request.getName(), 
                 getArtistName(request.getArtistId()),
                 "¥" + request.getPrice().toPlainString(),
                 request.getStock(), 
                 displayArtworkStatus(toArtworkStatus(request.getStatus())),
-                request.getTag(), request.getDescription(), request.getCoverUrl());
+                "", request.getDescription(), request.getCoverUrl());
+            // 更新mock列表中的数据
+            for (int i = 0; i < mockArtworks.size(); i++) {
+                if (mockArtworks.get(i).getId().equals(id)) {
+                    mockArtworks.set(i, updated);
+                    break;
+                }
+            }
+            return updated;
         }
         
         AdminArtworkEntity entity = new AdminArtworkEntity();
         entity.setId(id);
         entity.setArtistId(request.getArtistId());
         entity.setName(request.getName());
+        entity.setCategory(request.getCategory());
+        entity.setMaterial(request.getMaterial());
+        entity.setCreationYear(request.getCreationYear());
+        entity.setWidthCm(request.getWidthCm());
+        entity.setHeightCm(request.getHeightCm());
+        entity.setDepthCm(request.getDepthCm());
         entity.setPrice(request.getPrice().toPlainString());
         entity.setStock(request.getStock());
         entity.setStatus(toArtworkStatus(request.getStatus()));
@@ -342,7 +320,13 @@ public class AdminContentService {
             throw new BusinessException(40404, "作品不存在");
         }
         syncArtworkCover(id, request.getCoverUrl());
-        return findArtworkVO(id);
+        // 非模拟数据：直接构建返回VO
+        return artwork(id, request.getArtistId(), request.getName(),
+            getArtistName(request.getArtistId()),
+            "¥" + request.getPrice().toPlainString(),
+            request.getStock(),
+            displayArtworkStatus(toArtworkStatus(request.getStatus())),
+            "", request.getDescription(), request.getCoverUrl());
     }
 
     public void updateArtworkStatus(Long id, String status) {
@@ -749,20 +733,19 @@ public class AdminContentService {
     private String getArtistName(Long artistId) {
         if (artistId == null) return "";
         // 模拟艺术家ID到名字的映射
-        java.util.Map<Long, String> artistNames = java.util.Map.of(
-            1001L, "李明", 1002L, "王芳", 1003L, "张伟", 1004L, "陈静",
-            1005L, "赵磊", 1006L, "吴敏", 1007L, "郑强", 1008L, "林立",
-            1009L, "黄丽", 1010L, "杨帆", 1011L, "马超", 1012L, "徐磊",
-            1013L, "钟华", 1014L, "曾伟", 1015L, "梁勇", 1016L, "宋涛",
-            1017L, "卢敏", 1018L, "许刚", 1019L, "钱丽", 1020L, "蒋伟",
-            1021L, "沈明", 1022L, "韩静", 1023L, "冯强", 1024L, "曹磊",
-            1025L, "张莉", 1026L, "程伟", 1027L, "傅丽", 1028L, "段勇",
-            1029L, "夏敏", 1030L, "钟刚", 1031L, "乔磊", 1032L, "翟丽",
-            1033L, "方伟", 1034L, "康静", 1035L, "史强", 1036L, "薛磊",
-            1037L, "叶丽", 1038L, "蒋伟", 1039L, "许静", 1040L, "陆强",
-            1041L, "杜磊", 1042L, "苏丽", 1043L, "韩伟", 1044L, "杨静",
-            1045L, "朱强"
-        );
+        java.util.Map<Long, String> artistNames = new java.util.HashMap<>();
+        artistNames.put(1001L, "李明"); artistNames.put(1002L, "王芳"); artistNames.put(1003L, "张伟"); artistNames.put(1004L, "陈静");
+        artistNames.put(1005L, "赵磊"); artistNames.put(1006L, "吴敏"); artistNames.put(1007L, "郑强"); artistNames.put(1008L, "林立");
+        artistNames.put(1009L, "黄丽"); artistNames.put(1010L, "杨帆"); artistNames.put(1011L, "马超"); artistNames.put(1012L, "徐磊");
+        artistNames.put(1013L, "钟华"); artistNames.put(1014L, "曾伟"); artistNames.put(1015L, "梁勇"); artistNames.put(1016L, "宋涛");
+        artistNames.put(1017L, "卢敏"); artistNames.put(1018L, "许刚"); artistNames.put(1019L, "钱丽"); artistNames.put(1020L, "蒋伟");
+        artistNames.put(1021L, "沈明"); artistNames.put(1022L, "韩静"); artistNames.put(1023L, "冯强"); artistNames.put(1024L, "曹磊");
+        artistNames.put(1025L, "张莉"); artistNames.put(1026L, "程伟"); artistNames.put(1027L, "傅丽"); artistNames.put(1028L, "段勇");
+        artistNames.put(1029L, "夏敏"); artistNames.put(1030L, "钟刚"); artistNames.put(1031L, "乔磊"); artistNames.put(1032L, "翟丽");
+        artistNames.put(1033L, "方伟"); artistNames.put(1034L, "康静"); artistNames.put(1035L, "史强"); artistNames.put(1036L, "薛磊");
+        artistNames.put(1037L, "叶丽"); artistNames.put(1038L, "蒋伟"); artistNames.put(1039L, "许静"); artistNames.put(1040L, "陆强");
+        artistNames.put(1041L, "杜磊"); artistNames.put(1042L, "苏丽"); artistNames.put(1043L, "韩伟"); artistNames.put(1044L, "杨静");
+        artistNames.put(1045L, "朱强");
         return artistNames.getOrDefault(artistId, "");
     }
 

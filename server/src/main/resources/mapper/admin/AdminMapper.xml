@@ -45,14 +45,14 @@
             id,
             user_id AS userId,
             artist_name AS name,
-            '' AS city,
+            COALESCE(city, '') AS city,
             COALESCE(style_tags, '') AS tags,
             avatar_url AS avatarUrl,
             COALESCE(work_count, 0) AS works,
             CASE WHEN status = 'ACTIVE' THEN '上线' ELSE '下线' END AS status,
-            id AS sort
+            COALESCE(sort_no, id) AS sort
         FROM artist_profile
-        ORDER BY is_signed DESC, id DESC
+        ORDER BY sort_no ASC, is_signed DESC, id DESC
         LIMIT 100
     </select>
 
@@ -64,18 +64,20 @@
     </insert>
 
     <insert id="insertArtist" parameterType="com.shiyiju.modules.admin.entity.AdminArtistEntity" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO artist_profile (user_id, artist_name, real_name, style_tags, avatar_url, work_count, is_signed, status)
-        VALUES (#{userId}, #{name}, #{name}, #{tags}, #{avatarUrl}, #{works}, 0, #{status})
+        INSERT INTO artist_profile (user_id, artist_name, city, real_name, style_tags, avatar_url, work_count, is_signed, status, sort_no)
+        VALUES (#{userId}, #{name}, #{city}, #{name}, #{tags}, #{avatarUrl}, #{works}, 0, #{status}, #{sort})
     </insert>
 
     <update id="updateArtist" parameterType="com.shiyiju.modules.admin.entity.AdminArtistEntity">
         UPDATE artist_profile
         SET artist_name = #{name},
+            city = #{city},
             real_name = #{name},
             style_tags = #{tags},
             avatar_url = #{avatarUrl},
             work_count = #{works},
-            status = #{status}
+            status = #{status},
+            sort_no = #{sort}
         WHERE id = #{id}
     </update>
 
@@ -127,11 +129,13 @@
 
     <insert id="insertArtwork" parameterType="com.shiyiju.modules.admin.entity.AdminArtworkEntity" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO artwork (
-            artwork_no, artist_id, title, category, style, description, base_price, current_price,
+            artwork_no, artist_id, title, category, style, width_cm, height_cm, depth_cm, creation_year,
+            description, base_price, current_price,
             inventory_total, inventory_available, status, published_at
         )
         VALUES (
-            #{tag}, #{artistId}, #{name}, 'OTHER', '后台录入', #{description}, #{price}, #{price},
+            #{tag}, #{artistId}, #{name}, #{category}, #{material}, #{widthCm}, #{heightCm}, #{depthCm}, #{creationYear},
+            #{description}, #{price}, #{price},
             #{stock}, #{stock}, #{status},
             CASE WHEN #{status} = 'PUBLISHED' THEN NOW() ELSE NULL END
         )
@@ -141,6 +145,12 @@
         UPDATE artwork
         SET artist_id = #{artistId},
             title = #{name},
+            category = #{category},
+            style = #{material},
+            width_cm = #{widthCm},
+            height_cm = #{heightCm},
+            depth_cm = #{depthCm},
+            creation_year = #{creationYear},
             description = #{description},
             base_price = #{price},
             current_price = #{price},

@@ -4,7 +4,7 @@
       <el-image
         v-if="modelValue"
         :src="modelValue"
-        fit="cover"
+        fit="contain"
         style="width: 100%; height: 100%;"
         preview-teleported
       />
@@ -14,6 +14,7 @@
       <el-upload
         :show-file-list="false"
         accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp,.gif"
+        :before-upload="beforeUpload"
         :http-request="handleUpload"
       >
         <el-button type="primary" plain :loading="uploading">{{ modelValue ? '更换图片' : '上传图片' }}</el-button>
@@ -40,13 +41,22 @@ defineProps({
   },
   tip: {
     type: String,
-    default: '支持 JPG/JPEG、PNG、WEBP、GIF（大图）'
+    default: '支持 JPG/JPEG、PNG、WEBP、GIF，不限制尺寸，最大 20MB'
   }
 })
 
 const emit = defineEmits(['update:modelValue'])
 
 const uploading = ref(false)
+const MAX_SIZE = 20 * 1024 * 1024 // 20MB
+
+function beforeUpload(file) {
+  if (file.size > MAX_SIZE) {
+    ElMessage.error('图片体积不能超过 20MB')
+    return false
+  }
+  return true
+}
 
 async function handleUpload(options) {
   uploading.value = true
@@ -73,13 +83,19 @@ async function handleUpload(options) {
 }
 
 .upload-preview {
-  width: 120px;
-  height: 120px;
+  min-width: 120px;
+  min-height: 120px;
+  max-width: 300px;
+  height: auto;
+  aspect-ratio: auto;
   border-radius: 14px;
   overflow: hidden;
   border: 1px solid var(--el-border-color);
   background: var(--el-fill-color-light);
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .upload-placeholder {

@@ -79,12 +79,23 @@ export async function getArtworks() {
 }
 
 export async function createArtwork(payload) {
-  if (useMock) return { id: Date.now(), ...payload }
+  if (useMock) {
+    const newArtwork = { id: Date.now(), ...payload }
+    artworks.push(newArtwork)
+    return newArtwork
+  }
   return http.post(`${ADMIN_API_PREFIX}/artworks`, payload)
 }
 
 export async function updateArtwork(id, payload) {
-  if (useMock) return { id, ...payload }
+  if (useMock) {
+    const index = artworks.findIndex(a => a.id === id)
+    if (index !== -1) {
+      artworks[index] = { ...artworks[index], ...payload }
+      return artworks[index]
+    }
+    return { id, ...payload }
+  }
   return http.put(`${ADMIN_API_PREFIX}/artworks/${id}`, payload)
 }
 

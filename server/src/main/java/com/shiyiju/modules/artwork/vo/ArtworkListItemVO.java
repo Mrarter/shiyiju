@@ -9,6 +9,7 @@ public class ArtworkListItemVO {
     private Long artistId;
     private String artistName;
     private String artistLevelName;
+    private String artistAvatar;
     private String title;
     private String category;
     private String saleStatus;

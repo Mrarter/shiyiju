@@ -20,7 +20,7 @@
       <el-table :data="filteredDistributors" style="margin-top: 16px;">
         <el-table-column label="头像" width="80">
           <template #default="{ row }">
-            <el-avatar v-if="row.avatarUrl" :src="row.avatarUrl" :size="40" />
+            <el-avatar v-if="row.avatarUrl" :src="row.avatarUrl" :size="40" class="clickable-avatar" @click="showDetail(row)" />
             <span v-else class="text-muted">无</span>
           </template>
         </el-table-column>
@@ -39,13 +39,12 @@
           </template>
         </el-table-column>
         <el-table-column prop="createdAt" label="创建时间" width="120" />
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column label="操作" width="160" fixed="right">
           <template #default="{ row }">
             <el-button link type="primary" @click="startEdit(row)">编辑</el-button>
             <el-button link :type="row.status === 'ACTIVE' ? 'danger' : 'success'" @click="toggleStatus(row)">
               {{ row.status === 'ACTIVE' ? '禁用' : '启用' }}
             </el-button>
-            <el-button link type="primary" @click="showDetail(row)">详情</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -94,7 +93,7 @@
     </el-dialog>
 
     <!-- 详情弹窗 -->
-    <el-dialog v-model="detailVisible" title="艺荐官详情" width="700px">
+    <el-dialog v-model="detailVisible" title="艺荐官详情" width="700px" :close-on-click-modal="true">
       <el-descriptions :column="2" border v-if="currentRow">
         <el-descriptions-item label="用户昵称">{{ currentRow.nickname }}</el-descriptions-item>
         <el-descriptions-item label="艺荐官名称">{{ currentRow.displayName }}</el-descriptions-item>
@@ -104,13 +103,45 @@
             {{ currentRow.statusName }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="直属下级">{{ currentRow.directCount }} 人</el-descriptions-item>
-        <el-descriptions-item label="团队人数">{{ currentRow.teamCount }} 人</el-descriptions-item>
+        <el-descriptions-item label="直属上级">
+          <span v-if="currentRow.parentDistributorId">
+            {{ currentRow.parentDistributorId }} - {{ currentRow.parentDistributorName || '未知' }}
+          </span>
+          <span v-else>-</span>
+        </el-descriptions-item>
         <el-descriptions-item label="累计佣金">{{ currentRow.totalCommission }}</el-descriptions-item>
-        <el-descriptions-item label="可提现">{{ currentRow.availableCommission }}</el-descriptions-item>
         <el-descriptions-item label="邀请码" :span="2">{{ currentRow.invitationCode }}</el-descriptions-item>
         <el-descriptions-item label="简介" :span="2">{{ currentRow.bio || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="直属下级" :span="2">
+          <div class="member-list" v-if="currentRow.directCount > 0">
+            <div class="member-count clickable-text" @click="toggleDirectMembers">
+              {{ currentRow.directCount }} 人
+              <el-icon :class="{ 'is-expand': showDirectMembers }"><ArrowRight /></el-icon>
+            </div>
+            <div v-if="showDirectMembers" class="member-detail">
+              <div v-for="member in directMembers" :key="member.id" class="member-item">
+                {{ member.id }} - {{ member.displayName }}
+              </div>
+            </div>
+          </div>
+          <span v-else>0 人</span>
+        </el-descriptions-item>
+        <el-descriptions-item label="团队人数" :span="2">
+          <div class="member-list" v-if="currentRow.teamCount > 0">
+            <div class="member-count clickable-text" @click="toggleTeamMembers">
+              {{ currentRow.teamCount }} 人
+              <el-icon :class="{ 'is-expand': showTeamMembers }"><ArrowRight /></el-icon>
+            </div>
+            <div v-if="showTeamMembers" class="member-detail">
+              <div v-for="member in teamMembers" :key="member.id" class="member-item">
+                {{ member.id }} - {{ member.displayName }}
+              </div>
+            </div>
+          </div>
+          <span v-else>0 人</span>
+        </el-descriptions-item>
         <el-descriptions-item label="创建时间">{{ currentRow.createdAt }}</el-descriptions-item>
+        <el-descriptions-item label="可提现">{{ currentRow.availableCommission }}</el-descriptions-item>
       </el-descriptions>
     </el-dialog>
   </div>
@@ -119,6 +150,7 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
+import { ArrowRight } from '@element-plus/icons-vue'
 import { http } from '../../api/http'
 import { ADMIN_API_PREFIX } from '../../config/env'
 
@@ -131,6 +163,10 @@ const saving = ref(false)
 const editingId = ref(null)
 const currentRow = ref(null)
 const availableUsers = ref([])
+const showDirectMembers = ref(false)
+const showTeamMembers = ref(false)
+const directMembers = ref([])
+const teamMembers = ref([])
 
 const form = reactive({
   userId: null,
@@ -183,7 +219,45 @@ function startEdit(row) {
 
 function showDetail(row) {
   currentRow.value = row
+  showDirectMembers.value = false
+  showTeamMembers.value = false
+  directMembers.value = []
+  teamMembers.value = []
   detailVisible.value = true
+}
+
+function toggleDirectMembers() {
+  if (showDirectMembers.value) {
+    showDirectMembers.value = false
+    return
+  }
+  // 获取直属下级（同一 parentDistributorId 的艺荐官）
+  const parentId = currentRow.value?.id
+  directMembers.value = distributors.value.filter(d => d.parentDistributorId === parentId)
+  showDirectMembers.value = true
+  showTeamMembers.value = false
+}
+
+function toggleTeamMembers() {
+  if (showTeamMembers.value) {
+    showTeamMembers.value = false
+    return
+  }
+  // 获取团队成员（所有层级）
+  const parentId = currentRow.value?.id
+  teamMembers.value = getAllTeamMembers(parentId)
+  showTeamMembers.value = true
+  showDirectMembers.value = false
+}
+
+function getAllTeamMembers(parentId) {
+  const result = []
+  const children = distributors.value.filter(d => d.parentDistributorId === parentId)
+  for (const child of children) {
+    result.push(child)
+    result.push(...getAllTeamMembers(child.id))
+  }
+  return result
 }
 
 async function submitForm() {
@@ -254,5 +328,49 @@ onMounted(async () => {
 .text-muted {
   color: var(--el-text-color-secondary);
   font-size: 12px;
+}
+.clickable-avatar {
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.clickable-avatar:hover {
+  opacity: 0.8;
+}
+.clickable-text {
+  cursor: pointer;
+  color: var(--el-color-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.clickable-text:hover {
+  text-decoration: underline;
+}
+.member-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.member-count {
+  font-weight: 500;
+}
+.member-count .el-icon {
+  transition: transform 0.2s;
+}
+.member-count .el-icon.is-expand {
+  transform: rotate(90deg);
+}
+.member-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 12px;
+  background: var(--el-fill-color-light);
+  border-radius: 6px;
+  margin-top: 4px;
+}
+.member-item {
+  font-size: 13px;
+  color: var(--el-text-color-regular);
 }
 </style>

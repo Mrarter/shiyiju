@@ -30,8 +30,8 @@ public class HomeController {
         // 获取启用的 Banner 配置
         List<AdminOperationVO> operations = adminContentService.listOperations();
         List<AdminOperationVO> banners = operations.stream()
-                .filter(op -> "ENABLED".equals(op.getStatus()) || "启用".equals(op.getStatus()))
-                .filter(op -> "BANNER".equals(op.getType()) || "Banner".equals(op.getType()))
+                .filter(op -> "ENABLED".equalsIgnoreCase(op.getStatus()))
+                .filter(op -> "BANNER".equalsIgnoreCase(op.getType()))
                 .sorted((a, b) -> {
                     // 按权重 sortNo 降序排序（值越大越靠前）
                     int sortA = a.getSortNo() != null ? a.getSortNo() : 0;

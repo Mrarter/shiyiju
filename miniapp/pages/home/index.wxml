@@ -17,10 +17,14 @@
     <view class="banner-section" wx:if="{{bannerItems.length > 0}}">
       <swiper class="banner-swiper" indicator-dots="true" autoplay="true" interval="5000" duration="500">
         <swiper-item wx:for="{{bannerItems}}" wx:key="id">
-          <view class="banner-item" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
-            <image wx:if="{{item.coverUrl}}" src="{{item.coverUrl}}" mode="aspectFill" class="banner-image"></image>
-            <view wx:else class="banner-image fallback-art" style="background: {{item.coverStyle.background}};">
-              <view class="art-glow" style="background: {{item.coverStyle.glow}};"></view>
+          <view class="banner-item {{item.coverUrl ? '' : 'fallback-bg'}}" 
+                style="{{item.coverUrl ? '' : 'background: ' + item.fallbackBg}}"
+                bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
+            <!-- 有图片URL时显示图片 -->
+            <image wx:if="{{item.coverUrl}}" src="{{item.coverUrl}}" mode="widthFix" class="banner-image"></image>
+            <!-- 无图片时显示渐变背景+发光效果 -->
+            <view wx:if="{{!item.coverUrl}}" class="fallback-art">
+              <view class="art-glow" style="background: {{item.fallbackGlow}};"></view>
             </view>
             <view class="banner-tag" wx:if="{{item.tag}}">{{item.tag}}</view>
             <view class="banner-info">

@@ -74,6 +74,7 @@
         <el-upload
           :show-file-list="false"
           accept="image/jpeg,image/jpg,image/png,image/webp"
+          :before-upload="beforeDialogUpload"
           :http-request="handleDialogUpload"
           class="dialog-image-uploader"
         >
@@ -81,7 +82,7 @@
             <el-image
               v-if="form.imageUrl"
               :src="form.imageUrl"
-              fit="cover"
+              fit="contain"
               style="width: 100%; height: 100%;"
             />
             <div v-else class="dialog-image-placeholder">
@@ -94,7 +95,7 @@
             </div>
           </div>
         </el-upload>
-        <div class="dialog-image-tip">建议上传横图，建议尺寸 750×400</div>
+        <div class="dialog-image-tip">不限制尺寸，最大 20MB</div>
       </div>
       <div class="form-fields">
         <div class="form-field">
@@ -168,6 +169,16 @@ const { operations } = storeToRefs(adminStore)
 const keyword = ref('')
 const saving = ref(false)
 const imageUploading = ref(false)
+const MAX_SIZE = 20 * 1024 * 1024 // 20MB
+
+function beforeDialogUpload(file) {
+  if (file.size > MAX_SIZE) {
+    ElMessage.error('图片体积不能超过 20MB')
+    return false
+  }
+  return true
+}
+
 const editingId = ref(null)
 const dialogVisible = ref(false)
 const previewVisible = ref(false)

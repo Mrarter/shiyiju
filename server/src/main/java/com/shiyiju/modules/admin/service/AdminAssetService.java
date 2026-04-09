@@ -22,10 +22,14 @@ import java.util.UUID;
 public class AdminAssetService {
 
     private static final Set<String> ALLOWED_EXTENSIONS = Set.of("jpg", "jpeg", "png", "webp", "gif");
+    private static final long MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
 
     public AdminUploadVO uploadImage(MultipartFile file) {
         if (file == null || file.isEmpty()) {
             throw new BusinessException(40001, "请选择图片文件");
+        }
+        if (file.getSize() > MAX_FILE_SIZE) {
+            throw new BusinessException(40001, "图片体积不能超过 20MB");
         }
         String contentType = file.getContentType();
         if (!StringUtils.hasText(contentType) || !contentType.startsWith("image/")) {

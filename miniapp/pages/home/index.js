@@ -169,13 +169,26 @@ function normalizeBanner(item) {
     { background: "linear-gradient(135deg, #7c665c, #2d231f)", glow: "#d9cec0" },
     { background: "linear-gradient(135deg, #a0785c, #3f2e27)", glow: "#e2c39e" }
   ]
+  // 默认 banner 图片
+  const defaultBannerUrls = [
+    "https://picsum.photos/seed/banner1/750/400",
+    "https://picsum.photos/seed/banner2/750/400",
+    "https://picsum.photos/seed/banner3/750/400"
+  ]
+  // 确保 coverUrl 有值，否则使用 imageUrl 或默认图片
+  const coverUrl = item.coverUrl || item.imageUrl || ""
+  const hasValidImage = coverUrl && coverUrl.startsWith("http")
+  const presetIdx = (item.id || 1) % presets.length
   return {
     id: item.id,
-    title: item.title,
-    subtitle: item.subtitle || item.target || "查看详情",
+    title: item.title || "",
+    subtitle: item.subtitle || item.target || item.title || "查看详情",
     date: item.date || item.updatedAt || "",
-    coverUrl: item.coverUrl || item.imageUrl || "",
-    coverStyle: presets[item.id % presets.length]
+    // 如果有有效图片URL就用它，否则用默认图片
+    coverUrl: hasValidImage ? coverUrl : defaultBannerUrls[presetIdx],
+    coverStyle: presets[presetIdx],
+    fallbackBg: presets[presetIdx].background,
+    fallbackGlow: presets[presetIdx].glow
   }
 }
 
