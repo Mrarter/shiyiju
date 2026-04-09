@@ -1,179 +1,163 @@
 <view class="home-page">
   <view class="safe-top"></view>
 
+  <!-- 顶部导航 -->
+  <view class="nav-header">
+    <view class="nav-brand">拾艺局</view>
+    <view class="nav-search" bindtap="handleSearch">
+      <text class="search-icon">🔍</text>
+      <text class="search-text">搜索艺术家或作品</text>
+    </view>
+  </view>
+
   <view class="home-wrap" wx:if="{{!loading && !error}}">
-    <view class="home-header">
-      <view class="brand">拾艺局</view>
-      <view class="subtitle">艺术品流通与收藏</view>
-      <view class="desc">发现值得收藏的作品与艺术家</view>
+    <!-- 分类导航 -->
+    <view class="category-strip">
+      <view class="category-item {{currentCategory === index ? 'active' : ''}}" 
+            wx:for="{{categories}}" 
+            wx:key="id" 
+            data-index="{{index}}"
+            bindtap="switchCategory">{{item.name}}</view>
     </view>
 
-    <view wx:if="{{hasAnyContent}}">
-      <view class="banner-strip" wx:if="{{bannerItems.length}}">
-        <view class="banner-pill" wx:for="{{bannerItems}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
-          <view class="banner-eyebrow">{{item.eyebrow}}</view>
-          <view class="banner-title">{{item.title}}</view>
-          <view class="banner-subtitle">{{item.subtitle}}</view>
-        </view>
+    <!-- 精选推荐 -->
+    <view class="section">
+      <view class="section-head">
+        <view class="section-title">精选推荐</view>
+        <view class="section-more">更多 ›</view>
       </view>
-
-      <view class="headline-strip" wx:if="{{headlineMetrics.length}}">
-        <view class="headline-card" wx:for="{{headlineMetrics}}" wx:key="label">
-          <view class="headline-value">{{item.value}}</view>
-          <view class="headline-label">{{item.label}}</view>
-        </view>
-      </view>
-
-      <view class="hero-card" wx:if="{{featuredWork}}" bindtap="goArtworkDetail" data-artwork-id="{{featuredWork.id}}">
-        <view class="hero-image-wrap">
-          <image wx:if="{{featuredWork.coverUrl}}" src="{{featuredWork.coverUrl}}" mode="aspectFill" class="hero-image"></image>
-          <view wx:else class="hero-image fallback-art" style="background: {{featuredWork.coverStyle.background}};">
-            <view class="art-glow" style="background: {{featuredWork.coverStyle.glow}};"></view>
-            <view class="art-mountain left" style="background: {{featuredWork.coverStyle.mountain}};"></view>
-            <view class="art-mountain center" style="background: {{featuredWork.coverStyle.mountain}};"></view>
-            <view class="art-mountain right" style="background: {{featuredWork.coverStyle.mountain}};"></view>
-            <view class="art-line"></view>
+      
+      <view class="featured-grid" wx:if="{{featuredWorks.length > 0}}">
+        <view class="featured-card main" bindtap="goArtworkDetail" data-artwork-id="{{featuredWorks[0].id}}" wx:if="{{featuredWorks[0]}}">
+          <image wx:if="{{featuredWorks[0].coverUrl}}" src="{{featuredWorks[0].coverUrl}}" mode="aspectFill" class="featured-image"></image>
+          <view wx:else class="featured-image fallback-art" style="background: {{featuredWorks[0].coverStyle.background}};">
+            <view class="art-glow" style="background: {{featuredWorks[0].coverStyle.glow}};"></view>
+          </view>
+          <view class="featured-overlay">
+            <view class="featured-badge">精选</view>
+            <view class="featured-title">{{featuredWorks[0].title}}</view>
+            <view class="featured-artist">{{featuredWorks[0].artistName}}</view>
+            <view class="featured-price">{{featuredWorks[0].priceText}}</view>
           </view>
         </view>
-        <view class="hero-body">
-          <view class="hero-chip">本期推荐</view>
-          <view class="hero-title">{{featuredWork.title}}</view>
-          <view class="hero-meta">{{featuredWork.artistName}} · {{featuredWork.categoryText}}</view>
-          <view class="hero-insight">
-            <view class="hero-insight-item">{{featuredWork.artistLevelName}}</view>
-            <view class="hero-insight-item">{{featuredWork.viewCountText}}</view>
-            <view class="hero-insight-item">{{featuredWork.favoriteCountText}}</view>
-          </view>
-          <view class="hero-bottom">
-            <view class="hero-price">{{featuredWork.priceText}}</view>
-            <view class="hero-status">{{featuredWork.statusText}}</view>
-          </view>
-        </view>
-      </view>
-
-      <view class="summary-grid">
-        <view class="summary-card">
-          <view class="summary-title">热门藏品</view>
-          <view class="summary-desc">{{hotWorks.length}} 件精选</view>
-        </view>
-        <view class="summary-card">
-          <view class="summary-title">正在升值</view>
-          <view class="summary-desc">{{risingWorks.length}} 件可关注</view>
-        </view>
-      </view>
-
-      <view class="module" wx:if="{{recommendedArtists.length}}">
-        <view class="module-head">
-          <view class="module-title">推荐艺术家</view>
-          <view class="module-count">{{recommendedArtists.length}}位</view>
-        </view>
-        <scroll-view class="artist-scroll" scroll-x="true" enhanced show-scrollbar="false">
-          <view class="artist-row">
-            <view
-              class="artist-card"
-              wx:for="{{recommendedArtists}}"
-              wx:key="id"
-              bindtap="goArtistProfile"
-              data-artist-id="{{item.id}}"
-            >
-              <image wx:if="{{item.avatarUrl}}" src="{{item.avatarUrl}}" mode="aspectFill" class="artist-avatar"></image>
-              <view wx:else class="artist-avatar fallback-art" style="background: {{item.badgeStyle.background}};">
-                <view class="art-glow small" style="background: {{item.badgeStyle.glow}};"></view>
-                <view class="art-mountain left small" style="background: {{item.badgeStyle.mountain}};"></view>
-                <view class="art-mountain center small" style="background: {{item.badgeStyle.mountain}};"></view>
-                <view class="art-mountain right small" style="background: {{item.badgeStyle.mountain}};"></view>
-              </view>
-              <view class="artist-name">{{item.name}}</view>
-              <view class="artist-level">{{item.levelName}}</view>
-              <view class="artist-slogan">{{item.slogan}}</view>
+        
+        <view class="featured-sub">
+          <view class="sub-card" bindtap="goArtworkDetail" data-artwork-id="{{featuredWorks[1].id}}" wx:if="{{featuredWorks[1]}}">
+            <image wx:if="{{featuredWorks[1].coverUrl}}" src="{{featuredWorks[1].coverUrl}}" mode="aspectFill" class="sub-image"></image>
+            <view wx:else class="sub-image fallback-art small" style="background: {{featuredWorks[1].coverStyle.background}};">
+              <view class="art-glow small" style="background: {{featuredWorks[1].coverStyle.glow}};"></view>
+            </view>
+            <view class="sub-info">
+              <view class="sub-title">{{featuredWorks[1].title}}</view>
+              <view class="sub-price">{{featuredWorks[1].priceText}}</view>
             </view>
           </view>
-        </scroll-view>
-      </view>
-
-      <view class="module" wx:if="{{hotWorks.length}}">
-        <view class="module-head">
-          <view class="module-title">热门藏品</view>
-          <view class="module-count">{{hotWorks.length}}件</view>
-        </view>
-        <view class="hot-grid">
-          <view class="hot-card" wx:for="{{hotWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
-            <view class="hot-image-wrap">
-              <image wx:if="{{item.coverUrl}}" src="{{item.coverUrl}}" mode="aspectFill" class="hot-image"></image>
-              <view wx:else class="hot-image fallback-art" style="background: {{item.coverStyle.background}};">
-                <view class="art-glow small" style="background: {{item.coverStyle.glow}};"></view>
-                <view class="art-mountain left small" style="background: {{item.coverStyle.mountain}};"></view>
-                <view class="art-mountain center small" style="background: {{item.coverStyle.mountain}};"></view>
-                <view class="art-mountain right small" style="background: {{item.coverStyle.mountain}};"></view>
-                <view class="art-line small"></view>
-              </view>
+          
+          <view class="sub-card" bindtap="goArtworkDetail" data-artwork-id="{{featuredWorks[2].id}}" wx:if="{{featuredWorks[2]}}">
+            <image wx:if="{{featuredWorks[2].coverUrl}}" src="{{featuredWorks[2].coverUrl}}" mode="aspectFill" class="sub-image"></image>
+            <view wx:else class="sub-image fallback-art small" style="background: {{featuredWorks[2].coverStyle.background}};">
+              <view class="art-glow small" style="background: {{featuredWorks[2].coverStyle.glow}};"></view>
             </view>
+            <view class="sub-info">
+              <view class="sub-title">{{featuredWorks[2].title}}</view>
+              <view class="sub-price">{{featuredWorks[2].priceText}}</view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 热门作品 -->
+    <view class="section" wx:if="{{hotWorks.length > 0}}">
+      <view class="section-head">
+        <view class="section-title">热门作品</view>
+        <view class="section-more">查看全部 ›</view>
+      </view>
+      
+      <view class="hot-scroll">
+        <view class="hot-card" wx:for="{{hotWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
+          <view class="hot-image-wrap">
+            <image wx:if="{{item.coverUrl}}" src="{{item.coverUrl}}" mode="aspectFill" class="hot-image"></image>
+            <view wx:else class="hot-image fallback-art small" style="background: {{item.coverStyle.background}};">
+              <view class="art-glow small" style="background: {{item.coverStyle.glow}};"></view>
+              <view class="art-mountain left small" style="background: {{item.coverStyle.mountain}};"></view>
+              <view class="art-mountain center small" style="background: {{item.coverStyle.mountain}};"></view>
+            </view>
+          </view>
+          <view class="hot-info">
             <view class="hot-title">{{item.title}}</view>
-            <view class="hot-meta">{{item.artistName}}</view>
-            <view class="hot-tags">
-              <view class="hot-tag">{{item.categoryText}}</view>
-              <view class="hot-tag subtle">{{item.statusText}}</view>
-            </view>
-            <view class="hot-price">{{item.priceText}}</view>
-          </view>
-        </view>
-      </view>
-
-      <view class="module" wx:if="{{risingWorks.length}}">
-        <view class="module-head">
-          <view class="module-title">正在升值</view>
-          <view class="module-count">{{risingWorks.length}}件</view>
-        </view>
-        <view class="rise-list">
-          <view class="rise-card" wx:for="{{risingWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
-            <view class="rise-main">
-              <view class="rise-title">{{item.title}}</view>
-              <view class="rise-meta">{{item.artistName}}</view>
-            </view>
-            <view class="rise-side">
-              <view class="rise-price">{{item.priceText}}</view>
-              <view class="rise-status">{{item.statusText}}</view>
-            </view>
-          </view>
-        </view>
-      </view>
-
-      <view class="module" wx:if="{{onlineWorks.length}}">
-        <view class="module-head">
-          <view class="module-title">在线作品</view>
-          <view class="module-count">{{onlineWorks.length}}件</view>
-        </view>
-        <view class="fresh-list">
-          <view class="fresh-card" wx:for="{{onlineWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
-            <view class="fresh-main">
-              <view class="fresh-title">{{item.title}}</view>
-              <view class="fresh-meta">{{item.artistName}} · {{item.artistLevelName}}</view>
-            </view>
-            <view class="fresh-side">
-              <view class="fresh-price">{{item.priceText}}</view>
-              <view class="fresh-tag">{{item.categoryText}}</view>
+            <view class="hot-artist">{{item.artistName}}</view>
+            <view class="hot-bottom">
+              <view class="hot-price">{{item.priceText}}</view>
+              <view class="hot-cart" catchtap="addToCart" data-id="{{item.id}}">🛒</view>
             </view>
           </view>
         </view>
       </view>
     </view>
 
-    <view class="empty-state" wx:else>
-      <view class="empty-title">首页内容准备中</view>
-      <view class="empty-desc">当前还没有可展示的作品，先去发现页看看其他入口。</view>
-      <view class="hero-actions">
-        <view class="hero-action primary" bindtap="goDiscover">去发现</view>
-        <view class="hero-action" bindtap="goPublish">发布作品</view>
+    <!-- 推荐艺术家 -->
+    <view class="section" wx:if="{{recommendedArtists.length > 0}}">
+      <view class="section-head">
+        <view class="section-title">推荐艺术家</view>
+        <view class="section-more">更多 ›</view>
       </view>
+      
+      <view class="artist-grid">
+        <view class="artist-card" wx:for="{{recommendedArtists}}" wx:key="id" bindtap="goArtistProfile" data-artist-id="{{item.id}}">
+          <image wx:if="{{item.avatarUrl}}" src="{{item.avatarUrl}}" mode="aspectFill" class="artist-avatar"></image>
+          <view wx:else class="artist-avatar fallback-art small" style="background: {{item.badgeStyle.background}};">
+            <view class="art-glow small" style="background: {{item.badgeStyle.glow}};"></view>
+          </view>
+          <view class="artist-name">{{item.name}}</view>
+          <view class="artist-level">{{item.levelName}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 新品上市 -->
+    <view class="section" wx:if="{{newWorks.length > 0}}">
+      <view class="section-head">
+        <view class="section-title">新品上市</view>
+        <view class="section-more">查看全部 ›</view>
+      </view>
+      
+      <view class="new-list">
+        <view class="new-card" wx:for="{{newWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
+          <view class="new-image-wrap">
+            <image wx:if="{{item.coverUrl}}" src="{{item.coverUrl}}" mode="aspectFill" class="new-image"></image>
+            <view wx:else class="new-image fallback-art small" style="background: {{item.coverStyle.background}};">
+              <view class="art-glow small" style="background: {{item.coverStyle.glow}};"></view>
+            </view>
+          </view>
+          <view class="new-info">
+            <view class="new-title">{{item.title}}</view>
+            <view class="new-meta">{{item.artistName}}</view>
+            <view class="new-tags">
+              <view class="new-tag">{{item.categoryText}}</view>
+            </view>
+            <view class="new-bottom">
+              <view class="new-price">{{item.priceText}}</view>
+              <view class="new-btn">立即购买</view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{!hasAnyContent}}">
+      <view class="empty-icon">🎨</view>
+      <view class="empty-title">暂无内容</view>
+      <view class="empty-desc">平台内容准备中，敬请期待</view>
     </view>
   </view>
 
   <view class="home-wrap" wx:elif="{{loading}}">
-    <view class="state-card">首页加载中...</view>
+    <view class="loading-state">加载中...</view>
   </view>
 
   <view class="home-wrap" wx:elif="{{error}}">
-    <view class="state-card">{{error}}</view>
+    <view class="error-state">{{error}}</view>
     <view class="retry-btn" bindtap="handleRetry">重试</view>
   </view>
 

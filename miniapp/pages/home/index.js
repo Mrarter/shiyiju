@@ -87,12 +87,12 @@ function buildEmptyState() {
     error: "",
     allWorks: [],
     onlineWorks: [],
-    featuredWork: null,
+    featuredWorks: [],
     hotWorks: [],
-    risingWorks: [],
+    newWorks: [],
     recommendedArtists: [],
-    bannerItems: [],
-    headlineMetrics: [],
+    categories: [],
+    currentCategory: 0,
     hasAnyContent: false
   }
 }
@@ -103,12 +103,18 @@ Page({
     error: "",
     allWorks: [],
     onlineWorks: [],
-    featuredWork: null,
+    featuredWorks: [],
     hotWorks: [],
-    risingWorks: [],
+    newWorks: [],
     recommendedArtists: [],
-    bannerItems: [],
-    headlineMetrics: [],
+    categories: [
+      { id: 0, name: "全部" },
+      { id: 1, name: "绘画" },
+      { id: 2, name: "版画" },
+      { id: 3, name: "雕塑" },
+      { id: 4, name: "水墨" }
+    ],
+    currentCategory: 0,
     hasAnyContent: false
   },
 
@@ -121,7 +127,7 @@ Page({
     try {
       const [works, artists] = await Promise.all([
         api.request({ url: "/works", method: "GET" }),
-        api.request({ url: "/artists/recommend?limit=3", method: "GET" })
+        api.request({ url: "/artists/recommend?limit=4", method: "GET" })
       ])
       const workPool = (works || []).map(normalizeWork)
       const artistPool = (artists || []).map(normalizeArtist)
@@ -137,22 +143,10 @@ Page({
         error: "",
         allWorks: workPool,
         onlineWorks: workPool,
-        featuredWork: workPool[0] || null,
-        hotWorks: workPool.slice(0, 4),
-        risingWorks: workPool.slice(1, 4),
+        featuredWorks: workPool.slice(0, 3),
+        hotWorks: workPool.slice(0, 6),
+        newWorks: workPool.slice(0, 2),
         recommendedArtists: artistPool,
-        bannerItems: workPool.slice(0, 3).map((item, index) => ({
-          id: item.id,
-          eyebrow: index === 0 ? "主推" : index === 1 ? "热卖" : "上新",
-          title: item.title,
-          subtitle: `${item.artistName} · ${item.categoryText}`,
-          priceText: item.priceText
-        })),
-        headlineMetrics: [
-          { label: "在线作品", value: `${workPool.length}` },
-          { label: "签约艺术家", value: `${new Set(workPool.map((item) => item.artistName)).size}` },
-          { label: "本周推荐", value: `${Math.min(workPool.length, 3)}` }
-        ],
         hasAnyContent
       })
     } catch (error) {
@@ -164,14 +158,19 @@ Page({
     }
   },
 
+  switchCategory(event) {
+    const index = event.currentTarget.dataset.index
+    this.setData({ currentCategory: index })
+  },
+
+  handleSearch() {
+    wx.showToast({ title: "搜索功能开发中", icon: "none" })
+  },
+
   goArtworkDetail(event) {
     const artworkId = event.currentTarget.dataset.artworkId
     if (!artworkId) return
     wx.navigateTo({ url: `/pages/artwork/detail?id=${artworkId}` })
-  },
-
-  goDiscover() {
-    wx.switchTab({ url: "/pages/discover/index" })
   },
 
   goArtistProfile(event) {
@@ -180,8 +179,10 @@ Page({
     wx.navigateTo({ url: `/pages/artist/profile?id=${artistId}` })
   },
 
-  goPublish() {
-    wx.switchTab({ url: "/pages/publish/index" })
+  addToCart(event) {
+    event.stopPropagation()
+    const id = event.currentTarget.dataset.id
+    wx.showToast({ title: "已加入购物车", icon: "success" })
   },
 
   handleRetry() {

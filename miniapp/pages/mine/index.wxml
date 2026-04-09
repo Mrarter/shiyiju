@@ -73,14 +73,10 @@
         </view>
         <view class="feature-desc">{{item.desc}}</view>
 
-        <block wx:if="{{item.key === 'carbon'}}">
-          <view class="carbon-dot" wx:if="{{item.badge}}"></view>
-          <view class="carbon-panel">
-            <view class="carbon-row">
-              <view class="carbon-label">{{item.valueLabel}}</view>
-              <view class="carbon-action">{{item.actionText}} ›</view>
-            </view>
-            <view class="carbon-value">{{item.value}}</view>
+        <block wx:if="{{item.key === 'collection'}}">
+          <view class="collection-preview">
+            <view class="collection-icon">{{item.icon}}</view>
+            <view class="collection-count">{{item.count || 0}} 件作品</view>
           </view>
         </block>
 

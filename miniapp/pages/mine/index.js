@@ -101,13 +101,11 @@ Page({
   buildFeatureCards() {
     return [
       {
-        key: "carbon",
-        title: "签到得炭粒",
-        desc: "快来领取今日炭粒",
-        valueLabel: "炭粒余额",
-        value: 0,
-        actionText: "明细",
-        badge: true
+        key: "collection",
+        title: "我的藏品",
+        desc: "查看你已收藏与持有的作品",
+        icon: "藏",
+        badge: false
       },
       {
         key: "certificate",
@@ -153,11 +151,15 @@ Page({
 
   handleFeatureTap(event) {
     const key = event.currentTarget.dataset.key
+    if (key === "collection") {
+      wx.navigateTo({ url: "/pages/collection/index" })
+      return
+    }
     if (key === "certificate") {
       wx.navigateTo({ url: "/pages/collection/index" })
       return
     }
-    wx.showToast({ title: "签到功能规划中", icon: "none" })
+    wx.showToast({ title: "功能开发中", icon: "none" })
   },
 
   handleQuickLinkTap(event) {

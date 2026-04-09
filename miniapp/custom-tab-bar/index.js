@@ -10,19 +10,14 @@ Component({
         icon: "首"
       },
       {
-        pagePath: "/pages/discover/index",
-        text: "发现",
-        icon: "寻"
-      },
-      {
         pagePath: "/pages/publish/index",
         text: "发布",
         icon: "发"
       },
       {
-        pagePath: "/pages/collection/index",
-        text: "藏品",
-        icon: "藏"
+        pagePath: "/pages/cart/index",
+        text: "购物车",
+        icon: "购"
       },
       {
         pagePath: "/pages/mine/index",
