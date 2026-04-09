@@ -54,7 +54,7 @@ public class AdminContentService {
     }
     
     private void initMockArtists() {
-        String[][] artists = {
+        Object[][] artists = {
             {"林观山", "杭州", "油画, 当代", "5B8C5A", "中央美术学院", "2020年青年艺术展金奖", 38},
             {"周岚", "上海", "版画, 新锐", "8B5A8B", "中国美术学院", "2022年新锐艺术家奖", 32},
             {"陈河", "苏州", "水墨, 山水", "5A7B8C", "南京艺术学院", "2019年当代水墨提名奖", 45},
@@ -73,10 +73,10 @@ public class AdminContentService {
         };
         mockArtists = new ArrayList<>();
         for (int i = 0; i < artists.length; i++) {
-            mockArtists.add(artist(3001L + i, artists[i][0], artists[i][1], artists[i][2], 
-                genAvatarUrl(artists[i][0], artists[i][3]), 10 + i, "上线", i + 1, 
+            mockArtists.add(artist(3001L + i, (String)artists[i][0], (String)artists[i][1], (String)artists[i][2], 
+                genAvatarUrl((String)artists[i][0], (String)artists[i][3]), 10 + i, "上线", i + 1, 
                 artists[i][0] + "是当代知名的艺术家，作品风格独特，在国内外多次举办个人展览。", 
-                artists[i][4], artists[i][5], Integer.parseInt(artists[i][6])));
+                (String)artists[i][4], (String)artists[i][5], (Integer)artists[i][6]));
         }
     }
     
@@ -161,7 +161,11 @@ public class AdminContentService {
 
     public List<AdminArtistVO> listArtists() {
         initMockData();
-        return new ArrayList<>(mockArtists);
+        List<AdminArtistEntity> entities = adminMapper.findArtists();
+        if (entities == null || entities.isEmpty()) {
+            return new ArrayList<>(mockArtists);
+        }
+        return entities.stream().map(this::toArtistVO).collect(java.util.stream.Collectors.toList());
     }
     
     // 生成艺术家头像URL（使用ui-avatars带名字的彩色头像）
@@ -260,7 +264,11 @@ public class AdminContentService {
 
     public List<AdminArtworkVO> listArtworks() {
         initMockData();
-        return new ArrayList<>(mockArtworks);
+        List<AdminArtworkEntity> entities = adminMapper.findArtworks();
+        if (entities == null || entities.isEmpty()) {
+            return new ArrayList<>(mockArtworks);
+        }
+        return entities.stream().map(this::toArtworkVO).collect(java.util.stream.Collectors.toList());
     }
 
     public AdminArtworkVO createArtwork(AdminArtworkSaveDTO request) {
@@ -539,7 +547,7 @@ public class AdminContentService {
     }
 
     private AdminArtistVO toArtistVO(AdminArtistEntity entity) {
-        return artist(entity.getId(), entity.getName(), entity.getCity(), entity.getTags(), entity.getAvatarUrl(), entity.getWorks(), entity.getStatus(), entity.getSort());
+        return artist(entity.getId(), entity.getName(), entity.getCity(), entity.getTags(), entity.getAvatarUrl(), entity.getWorks(), entity.getStatus(), entity.getSort(), entity.getBio(), entity.getGraduatedFrom(), entity.getAwards(), entity.getAge());
     }
 
     private AdminArtworkVO toArtworkVO(AdminArtworkEntity entity) {
