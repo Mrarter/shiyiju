@@ -220,6 +220,7 @@
         SELECT
             id,
             nickname,
+            avatar_url AS avatarUrl,
             user_no AS userNo,
             CASE gender
                 WHEN 1 THEN '男'

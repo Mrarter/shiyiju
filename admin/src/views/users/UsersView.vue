@@ -18,6 +18,12 @@
         </el-select>
       </div>
       <el-table :data="filteredUsers">
+        <el-table-column label="头像" width="80">
+          <template #default="{ row }">
+            <el-avatar v-if="row.avatarUrl" :src="row.avatarUrl" :size="40" style="cursor: pointer;" />
+            <el-avatar v-else :size="40">{{ (row.nickname || 'U').slice(0, 1) }}</el-avatar>
+          </template>
+        </el-table-column>
         <el-table-column prop="nickname" label="昵称" min-width="140" />
         <el-table-column prop="userNo" label="用户编号" min-width="160" />
         <el-table-column prop="gender" label="性别" width="100" />
@@ -36,6 +42,10 @@
 
     <el-drawer v-model="detailVisible" title="用户详情" size="420px">
       <div v-if="activeUser" style="display: grid; gap: 14px;">
+        <div style="text-align: center;">
+          <el-avatar v-if="activeUser.avatarUrl" :src="activeUser.avatarUrl" :size="80" />
+          <el-avatar v-else :size="80">{{ (activeUser.nickname || 'U').slice(0, 1) }}</el-avatar>
+        </div>
         <div><strong>昵称：</strong>{{ activeUser.nickname }}</div>
         <div><strong>用户编号：</strong>{{ activeUser.userNo }}</div>
         <div><strong>性别：</strong>{{ activeUser.gender }}</div>
