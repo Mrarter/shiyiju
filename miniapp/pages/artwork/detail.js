@@ -131,6 +131,7 @@ Page({
       const enriched = {
         ...detail,
         artistInitial: (detail.artistName || "艺").slice(0, 1),
+        artistAvatar: detail.artistAvatar || "",
         saleStatusText: mapSaleStatus(detail.saleStatus),
         saleModeText: mapSaleMode(detail.saleMode),
         categoryText: mapCategory(detail.category),
@@ -166,6 +167,7 @@ Page({
         const enriched = {
           ...detail,
           artistInitial: (detail.artistName || "艺").slice(0, 1),
+          artistAvatar: detail.artistAvatar || "",
           saleStatusText: mapSaleStatus(detail.saleStatus),
           saleModeText: mapSaleMode(detail.saleMode),
           categoryText: mapCategory(detail.category),

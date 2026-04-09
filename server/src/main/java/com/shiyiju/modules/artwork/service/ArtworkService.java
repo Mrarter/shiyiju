@@ -92,6 +92,7 @@ public class ArtworkService {
         vo.setArtistId(entity.getArtistId());
         vo.setArtistName(entity.getArtistName());
         vo.setArtistLevelName(entity.getArtistLevelName());
+        vo.setArtistAvatar(entity.getArtistAvatar());
         vo.setTitle(entity.getTitle());
         vo.setCategory(entity.getCategory());
         vo.setStyle(entity.getStyle());
@@ -132,6 +133,7 @@ public class ArtworkService {
         vo.setArtistId(1000L + artworkId);
         vo.setArtistName(getArtistNameForDetail(artworkId));
         vo.setArtistLevelName(artworkId % 3 == 0 ? "资深艺术家" : "签约艺术家");
+        vo.setArtistAvatar(getArtistAvatarForDetail(artworkId));
         vo.setTitle(getTitleForDetail(artworkId));
         vo.setCategory(getCategoryForDetail(artworkId));
         vo.setStyle("当代艺术");
@@ -165,6 +167,13 @@ public class ArtworkService {
                           "程伟", "傅丽", "段勇", "夏敏", "钟刚", "乔磊", "翟丽", "方伟", "康静", "史强",
                           "薛磊", "叶丽", "蒋伟", "许静", "陆强", "杜磊", "苏丽", "韩伟", "杨静", "朱强"};
         return names[(artworkId.intValue() - 1) % names.length];
+    }
+
+    // 艺术家头像 - 使用占位头像
+    private String getArtistAvatarForDetail(Long artworkId) {
+        // 使用 ui-avatars.com 生成带名字的头像
+        String name = getArtistNameForDetail(artworkId);
+        return "https://ui-avatars.com/api/?name=" + java.net.URLEncoder.encode(name) + "&background=c9a96d&color=fff&size=128&font-size=0.4&bold=true";
     }
     
     private String getTitleForDetail(Long artworkId) {

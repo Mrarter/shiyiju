@@ -207,8 +207,9 @@ Page({
   },
 
   onShow() {
-    this.loadHome()
+    // 只刷新收藏状态，保留当前位置和列表
     this.loadFavorites()
+    // 不再刷新整个首页，避免丢失滚动位置
   },
 
   onPullDownRefresh() {

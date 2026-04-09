@@ -34,7 +34,8 @@
 
       <view class="artist-row">
         <view class="artist-main">
-          <view class="artist-avatar">{{detail.artistInitial}}</view>
+          <image wx:if="{{detail.artistAvatar}}" src="{{detail.artistAvatar}}" mode="aspectFill" class="artist-avatar-img"></image>
+          <view wx:else class="artist-avatar">{{detail.artistInitial}}</view>
           <view class="artist-name">{{detail.artistName}}</view>
           <view class="artist-level">{{detail.artistLevelName}}</view>
         </view>

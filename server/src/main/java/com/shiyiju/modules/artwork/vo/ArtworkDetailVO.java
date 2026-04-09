@@ -10,6 +10,7 @@ public class ArtworkDetailVO {
     private Long artistId;
     private String artistName;
     private String artistLevelName;
+    private String artistAvatar;
     private String title;
     private String category;
     private String style;
@@ -44,6 +45,8 @@ public class ArtworkDetailVO {
     public void setArtistName(String artistName) { this.artistName = artistName; }
     public String getArtistLevelName() { return artistLevelName; }
     public void setArtistLevelName(String artistLevelName) { this.artistLevelName = artistLevelName; }
+    public String getArtistAvatar() { return artistAvatar; }
+    public void setArtistAvatar(String artistAvatar) { this.artistAvatar = artistAvatar; }
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
     public String getCategory() { return category; }

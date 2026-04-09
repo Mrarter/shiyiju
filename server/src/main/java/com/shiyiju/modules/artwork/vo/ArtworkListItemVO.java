@@ -31,6 +31,8 @@ public class ArtworkListItemVO {
     public void setArtistName(String artistName) { this.artistName = artistName; }
     public String getArtistLevelName() { return artistLevelName; }
     public void setArtistLevelName(String artistLevelName) { this.artistLevelName = artistLevelName; }
+    public String getArtistAvatar() { return artistAvatar; }
+    public void setArtistAvatar(String artistAvatar) { this.artistAvatar = artistAvatar; }
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
     public String getCategory() { return category; }
