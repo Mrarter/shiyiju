@@ -55,26 +55,28 @@ public class AdminContentService {
     
     private void initMockArtists() {
         String[][] artists = {
-            {"林观山", "杭州", "油画, 当代", "5B8C5A"},
-            {"周岚", "上海", "版画, 新锐", "8B5A8B"},
-            {"陈河", "苏州", "水墨, 山水", "5A7B8C"},
-            {"李明", "北京", "油画, 抽象", "8C7A5B"},
-            {"王芳", "广州", "版画, 丝网", "8B5B5B"},
-            {"张伟", "成都", "水墨, 写意", "5B8B8B"},
-            {"陈静", "深圳", "油画, 风景", "7A5B8C"},
-            {"赵磊", "西安", "雕塑, 青铜", "8C5A6A"},
-            {"孙丽", "南京", "版画, 铜版", "5A6A8C"},
-            {"周杰", "武汉", "水墨, 山水", "8C7A6A"},
-            {"吴敏", "重庆", "油画, 人物", "6A8C5A"},
-            {"郑强", "天津", "雕塑, 陶瓷", "8C5A8C"},
-            {"林立", "青岛", "油画, 静物", "5A8C7A"},
-            {"黄丽", "大连", "版画, 石版", "8B7A5A"},
-            {"杨帆", "厦门", "水墨, 花鸟", "5B5B8C"}
+            {"林观山", "杭州", "油画, 当代", "5B8C5A", "中央美术学院", "2020年青年艺术展金奖", 38},
+            {"周岚", "上海", "版画, 新锐", "8B5A8B", "中国美术学院", "2022年新锐艺术家奖", 32},
+            {"陈河", "苏州", "水墨, 山水", "5A7B8C", "南京艺术学院", "2019年当代水墨提名奖", 45},
+            {"李明", "北京", "油画, 抽象", "8C7A5B", "清华大学美术学院", "", 40},
+            {"王芳", "广州", "版画, 丝网", "8B5B5B", "广州美术学院", "2021年青年版画家奖", 35},
+            {"张伟", "成都", "水墨, 写意", "5B8B8B", "四川美术学院", "", 50},
+            {"陈静", "深圳", "油画, 风景", "7A5B8C", "湖北美术学院", "2023年风景画大展银奖", 42},
+            {"赵磊", "西安", "雕塑, 青铜", "8C5A6A", "西安美术学院", "", 48},
+            {"孙丽", "南京", "版画, 铜版", "5A6A8C", "中央美术学院", "2018年全国美展入选", 36},
+            {"周杰", "武汉", "水墨, 山水", "8C7A6A", "湖北美术学院", "", 44},
+            {"吴敏", "重庆", "油画, 人物", "6A8C5A", "四川美术学院", "2022年人物画展优秀奖", 33},
+            {"郑强", "天津", "雕塑, 陶瓷", "8C5A8C", "天津美术学院", "", 52},
+            {"林立", "青岛", "油画, 静物", "5A8C7A", "山东艺术学院", "", 39},
+            {"黄丽", "大连", "版画, 石版", "8B7A5A", "鲁迅美术学院", "2020年石版画展提名", 37},
+            {"杨帆", "厦门", "水墨, 花鸟", "5B5B8C", "福建师范大学", "", 41}
         };
         mockArtists = new ArrayList<>();
         for (int i = 0; i < artists.length; i++) {
             mockArtists.add(artist(3001L + i, artists[i][0], artists[i][1], artists[i][2], 
-                genAvatarUrl(artists[i][0], artists[i][3]), 10 + i, "上线", i + 1));
+                genAvatarUrl(artists[i][0], artists[i][3]), 10 + i, "上线", i + 1, 
+                artists[i][0] + "是当代知名的艺术家，作品风格独特，在国内外多次举办个人展览。", 
+                artists[i][4], artists[i][5], Integer.parseInt(artists[i][6])));
         }
     }
     
@@ -192,8 +194,12 @@ public class AdminContentService {
         entity.setWorks(request.getWorks());
         entity.setStatus(toArtistStatus(request.getStatus()));
         entity.setSort(request.getSort() != null ? request.getSort() : 0);
+        entity.setBio(request.getBio());
+        entity.setGraduatedFrom(request.getGraduatedFrom());
+        entity.setAwards(request.getAwards());
+        entity.setAge(request.getAge());
         adminMapper.insertArtist(entity);
-        return artist(entity.getId(), request.getName(), request.getCity() != null ? request.getCity() : "", request.getTags(), request.getAvatarUrl(), request.getWorks(), displayArtistStatus(entity.getStatus()), entity.getSort());
+        return artist(entity.getId(), request.getName(), request.getCity() != null ? request.getCity() : "", request.getTags(), request.getAvatarUrl(), request.getWorks(), displayArtistStatus(entity.getStatus()), entity.getSort(), request.getBio(), request.getGraduatedFrom(), request.getAwards(), request.getAge());
     }
 
     public AdminArtistVO updateArtist(Long id, AdminArtistSaveDTO request) {
@@ -203,7 +209,7 @@ public class AdminContentService {
             String city = request.getCity() != null ? request.getCity() : "";
             Integer sort = request.getSort() != null ? request.getSort() : id.intValue();
             AdminArtistVO updated = artist(id, request.getName(), city, request.getTags(), request.getAvatarUrl(), 
-                request.getWorks(), displayArtistStatus(toArtistStatus(request.getStatus())), sort);
+                request.getWorks(), displayArtistStatus(toArtistStatus(request.getStatus())), sort, request.getBio(), request.getGraduatedFrom(), request.getAwards(), request.getAge());
             // 更新mock列表中的数据
             for (int i = 0; i < mockArtists.size(); i++) {
                 if (mockArtists.get(i).getId().equals(id)) {
@@ -223,11 +229,15 @@ public class AdminContentService {
         entity.setWorks(request.getWorks());
         entity.setStatus(toArtistStatus(request.getStatus()));
         entity.setSort(request.getSort() != null ? request.getSort() : id.intValue());
+        entity.setBio(request.getBio());
+        entity.setGraduatedFrom(request.getGraduatedFrom());
+        entity.setAwards(request.getAwards());
+        entity.setAge(request.getAge());
         if (adminMapper.updateArtist(entity) <= 0) {
             throw new BusinessException(40404, "艺术家不存在");
         }
         adminMapper.updateArtistUserAvatar(id, "艺术家" + request.getName(), request.getAvatarUrl());
-        return artist(id, request.getName(), request.getCity() != null ? request.getCity() : "", request.getTags(), request.getAvatarUrl(), request.getWorks(), displayArtistStatus(entity.getStatus()), entity.getSort());
+        return artist(id, request.getName(), request.getCity() != null ? request.getCity() : "", request.getTags(), request.getAvatarUrl(), request.getWorks(), displayArtistStatus(entity.getStatus()), entity.getSort(), request.getBio(), request.getGraduatedFrom(), request.getAwards(), request.getAge());
     }
 
     public void updateArtistStatus(Long id, String status) {
@@ -631,7 +641,7 @@ public class AdminContentService {
         return item;
     }
 
-    private AdminArtistVO artist(Long id, String name, String city, String tags, String avatarUrl, Integer works, String status, Integer sort) {
+    private AdminArtistVO artist(Long id, String name, String city, String tags, String avatarUrl, Integer works, String status, Integer sort, String bio, String graduatedFrom, String awards, Integer age) {
         AdminArtistVO item = new AdminArtistVO();
         item.setId(id);
         item.setName(name);
@@ -641,6 +651,10 @@ public class AdminContentService {
         item.setWorks(works);
         item.setStatus(status);
         item.setSort(sort);
+        item.setBio(bio);
+        item.setGraduatedFrom(graduatedFrom);
+        item.setAwards(awards);
+        item.setAge(age);
         return item;
     }
 

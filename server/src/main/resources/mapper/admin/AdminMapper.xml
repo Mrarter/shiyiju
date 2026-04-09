@@ -50,7 +50,11 @@
             avatar_url AS avatarUrl,
             COALESCE(work_count, 0) AS works,
             CASE WHEN status = 'ACTIVE' THEN '上线' ELSE '下线' END AS status,
-            COALESCE(sort_no, id) AS sort
+            COALESCE(sort_no, id) AS sort,
+            COALESCE(bio, '') AS bio,
+            COALESCE(graduated_from, '') AS graduatedFrom,
+            COALESCE(awards, '') AS awards,
+            age
         FROM artist_profile
         ORDER BY sort_no ASC, is_signed DESC, id DESC
         LIMIT 100
@@ -64,8 +68,8 @@
     </insert>
 
     <insert id="insertArtist" parameterType="com.shiyiju.modules.admin.entity.AdminArtistEntity" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO artist_profile (user_id, artist_name, city, real_name, style_tags, avatar_url, work_count, is_signed, status, sort_no)
-        VALUES (#{userId}, #{name}, #{city}, #{name}, #{tags}, #{avatarUrl}, #{works}, 0, #{status}, #{sort})
+        INSERT INTO artist_profile (user_id, artist_name, city, real_name, style_tags, avatar_url, work_count, is_signed, status, sort_no, bio, graduated_from, awards, age)
+        VALUES (#{userId}, #{name}, #{city}, #{name}, #{tags}, #{avatarUrl}, #{works}, 0, #{status}, #{sort}, #{bio}, #{graduatedFrom}, #{awards}, #{age})
     </insert>
 
     <update id="updateArtist" parameterType="com.shiyiju.modules.admin.entity.AdminArtistEntity">
@@ -77,7 +81,11 @@
             avatar_url = #{avatarUrl},
             work_count = #{works},
             status = #{status},
-            sort_no = #{sort}
+            sort_no = #{sort},
+            bio = #{bio},
+            graduated_from = #{graduatedFrom},
+            awards = #{awards},
+            age = #{age}
         WHERE id = #{id}
     </update>
 

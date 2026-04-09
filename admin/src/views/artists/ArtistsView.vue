@@ -47,17 +47,51 @@
         <UploadImageField v-model="form.avatarUrl" placeholder="艺术家头像图片URL" tip="建议上传 1:1 正方形头像图" />
       </div>
       <div class="form-grid">
-        <el-input v-model="form.name" placeholder="请输入艺术家真实姓名或艺名" />
-        <el-input v-model="form.city" placeholder="请输入所在城市，如：杭州、上海" />
-        <el-input v-model="form.tags" placeholder="请输入风格标签，多个用逗号分隔，如：油画,当代,抽象" />
-        <el-select v-model="form.status" placeholder="请选择状态" style="width: 100%;">
-          <el-option label="上线（在平台展示）" value="ONLINE" />
-          <el-option label="下线（暂停展示）" value="OFFLINE" />
-        </el-select>
+        <div class="form-field">
+          <div class="form-label">艺术家姓名</div>
+          <el-input v-model="form.name" placeholder="请输入艺术家真实姓名或艺名" />
+        </div>
+        <div class="form-field">
+          <div class="form-label">所在城市</div>
+          <el-input v-model="form.city" placeholder="如：杭州、上海" />
+        </div>
+        <div class="form-field">
+          <div class="form-label">风格标签</div>
+          <el-input v-model="form.tags" placeholder="多个用逗号分隔，如：油画,当代,抽象" />
+        </div>
+        <div class="form-field">
+          <div class="form-label">状态</div>
+          <el-select v-model="form.status" placeholder="请选择状态" style="width: 100%;">
+            <el-option label="上线（在平台展示）" value="ONLINE" />
+            <el-option label="下线（暂停展示）" value="OFFLINE" />
+          </el-select>
+        </div>
       </div>
       <div class="form-grid" style="margin-top: 16px;">
-        <el-input v-model.number="form.works" placeholder="请输入该艺术家已收录的作品数量" />
-        <el-input v-model.number="form.sort" placeholder="排序值，数字越小排名越靠前" />
+        <div class="form-field">
+          <div class="form-label">作品数量</div>
+          <el-input-number v-model="form.works" :min="0" placeholder="已收录作品数量" />
+        </div>
+        <div class="form-field">
+          <div class="form-label">排序权重</div>
+          <el-input-number v-model="form.sort" :min="0" placeholder="数字越小越靠前" />
+        </div>
+        <div class="form-field">
+          <div class="form-label">年龄</div>
+          <el-input-number v-model="form.age" :min="0" :max="120" placeholder="艺术家年龄" />
+        </div>
+        <div class="form-field">
+          <div class="form-label">毕业院校</div>
+          <el-input v-model="form.graduatedFrom" placeholder="如：中央美术学院" />
+        </div>
+      </div>
+      <div style="margin-top: 16px;">
+        <div class="form-label">艺术家简介</div>
+        <el-input v-model="form.bio" type="textarea" :rows="3" placeholder="请输入艺术家简介、创作理念等" />
+      </div>
+      <div style="margin-top: 16px;">
+        <div class="form-label">获奖经历</div>
+        <el-input v-model="form.awards" type="textarea" :rows="2" placeholder="请输入主要获奖经历，如：2020年获XX奖" />
       </div>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
@@ -87,7 +121,11 @@ const form = reactive({
   avatarUrl: '',
   works: 0,
   sort: 0,
-  status: 'ONLINE'
+  status: 'ONLINE',
+  bio: '',
+  graduatedFrom: '',
+  awards: '',
+  age: null
 })
 
 // 未保存内容暂存键名
@@ -157,6 +195,10 @@ function resetForm() {
   form.works = 0
   form.sort = 0
   form.status = 'ONLINE'
+  form.bio = ''
+  form.graduatedFrom = ''
+  form.awards = ''
+  form.age = null
 }
 
 function startCreate() {
@@ -177,6 +219,10 @@ function startEdit(row) {
   form.works = Number(row.works || 0)
   form.sort = Number(row.sort || 0)
   form.status = normalizeArtistStatus(row.status)
+  form.bio = row.bio || ''
+  form.graduatedFrom = row.graduatedFrom || ''
+  form.awards = row.awards || ''
+  form.age = row.age || null
   dialogVisible.value = true
 }
 
@@ -190,22 +236,32 @@ async function submitForm() {
     ElMessage.warning('请输入艺术家名称')
     return
   }
+  if (!form.status) {
+    form.status = 'ONLINE'
+  }
   saving.value = true
   try {
-    await adminStore.saveArtist(editingId.value, {
+    const payload = {
       name: form.name.trim(),
-      city: form.city.trim(),
-      tags: form.tags.trim(),
-      avatarUrl: form.avatarUrl,
-      works: Number(form.works || 0),
-      sort: Number(form.sort || 0),
-      status: form.status
-    })
+      city: form.city?.trim() || '',
+      tags: form.tags?.trim() || '',
+      avatarUrl: form.avatarUrl || '',
+      works: Number(form.works ?? 0),
+      sort: Number(form.sort ?? 0),
+      status: form.status || 'ONLINE',
+      bio: form.bio?.trim() || '',
+      graduatedFrom: form.graduatedFrom?.trim() || '',
+      awards: form.awards?.trim() || '',
+      age: form.age ?? null
+    }
+    console.log('保存艺术家:', editingId.value ? '更新' : '新建', payload)
+    await adminStore.saveArtist(editingId.value, payload)
     ElMessage.success(editingId.value ? '艺术家已更新' : '艺术家已创建')
-    clearDraft() // 保存成功后清除草稿
+    clearDraft()
     dialogVisible.value = false
     resetForm()
   } catch (error) {
+    console.error('保存失败:', error)
     ElMessage.error(error.message || '保存失败')
   } finally {
     saving.value = false
@@ -245,5 +301,20 @@ onMounted(async () => {
 }
 .clickable-text:hover {
   text-decoration: underline;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.form-label {
+  font-size: 13px;
+  color: #606266;
+  font-weight: 500;
 }
 </style>

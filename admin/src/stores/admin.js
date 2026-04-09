@@ -136,20 +136,27 @@ export const useAdminStore = defineStore('admin', {
       await this.loadArtists()
     },
     async saveArtist(id, payload) {
+      let result
       if (id) {
-        await updateArtist(id, payload)
+        result = await updateArtist(id, payload)
       } else {
-        await createArtist(payload)
+        result = await createArtist(payload)
       }
       await this.loadArtists()
+      return result
     },
     async saveArtwork(id, payload) {
+      let result
       if (id) {
-        await updateArtwork(id, payload)
+        result = await updateArtwork(id, payload)
       } else {
-        await createArtwork(payload)
+        result = await createArtwork(payload)
       }
       await this.loadArtworks()
+      return result
+    },
+    async updateArtwork(id, payload) {
+      await updateArtwork(id, payload)
     },
     async saveOrderShipment(id, payload) {
       await updateOrderShipment(id, payload)

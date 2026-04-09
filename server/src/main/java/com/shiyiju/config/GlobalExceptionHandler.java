@@ -8,9 +8,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 @Order(1)
@@ -26,16 +29,32 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
         MethodArgumentNotValidException.class,
         BindException.class,
-        ConstraintViolationException.class,
-        HttpMessageNotReadableException.class
+        ConstraintViolationException.class
     })
-    public ApiResponse<Void> handleValidation() {
-        return ApiResponse.fail(40001, "请求参数不合法");
+    public ApiResponse<Void> handleValidation(Exception e) {
+        String message = "请求参数不合法";
+        if (e instanceof MethodArgumentNotValidException ex) {
+            message = ex.getBindingResult().getFieldErrors().stream()
+                .map(FieldError::getDefaultMessage)
+                .collect(Collectors.joining("; "));
+        } else if (e instanceof ConstraintViolationException ex) {
+            message = ex.getConstraintViolations().stream()
+                .map(v -> v.getPropertyPath() + ": " + v.getMessage())
+                .collect(Collectors.joining("; "));
+        }
+        log.warn("Validation error: {}", message);
+        return ApiResponse.fail(40001, message);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ApiResponse<Void> handleHttpMessageNotReadable() {
+        return ApiResponse.fail(40001, "请求体格式错误");
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ApiResponse<Void> handleIllegalArgument() {
-        return ApiResponse.fail(40001, "请求参数不合法");
+    public ApiResponse<Void> handleIllegalArgument(IllegalArgumentException e) {
+        log.warn("Illegal argument: {}", e.getMessage());
+        return ApiResponse.fail(40001, e.getMessage() != null ? e.getMessage() : "请求参数不合法");
     }
 
     @ExceptionHandler(Exception.class)

@@ -10,6 +10,10 @@ public class AdminArtistVO {
     private Integer works;
     private String status;
     private Integer sort;
+    private String bio;
+    private String graduatedFrom;
+    private String awards;
+    private Integer age;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -27,4 +31,12 @@ public class AdminArtistVO {
     public void setStatus(String status) { this.status = status; }
     public Integer getSort() { return sort; }
     public void setSort(Integer sort) { this.sort = sort; }
+    public String getBio() { return bio; }
+    public void setBio(String bio) { this.bio = bio; }
+    public String getGraduatedFrom() { return graduatedFrom; }
+    public void setGraduatedFrom(String graduatedFrom) { this.graduatedFrom = graduatedFrom; }
+    public String getAwards() { return awards; }
+    public void setAwards(String awards) { this.awards = awards; }
+    public Integer getAge() { return age; }
+    public void setAge(Integer age) { this.age = age; }
 }

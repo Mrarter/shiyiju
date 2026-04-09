@@ -40,12 +40,29 @@
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="50" />
-        <el-table-column prop="adminWeight" label="权重" width="80" align="center">
+        <el-table-column prop="adminWeight" label="权重" width="100" align="center">
           <template #default="{ row }">
-            <el-tag v-if="row.adminWeight && row.adminWeight > 0" type="warning" size="small">
-              {{ row.adminWeight }}
+            <div v-if="editingWeightId === row.id" class="weight-edit-cell">
+              <el-input-number
+                v-model="editingWeightValue"
+                :min="0"
+                :max="9999"
+                size="small"
+                controls-position="right"
+                style="width: 70px;"
+                @blur="saveWeight(row)"
+                @keyup.enter="saveWeight(row)"
+              />
+            </div>
+            <el-tag
+              v-else
+              type="warning"
+              size="small"
+              style="cursor: pointer; min-width: 40px; text-align: center;"
+              @click="startEditWeight(row)"
+            >
+              {{ row.adminWeight || '-' }}
             </el-tag>
-            <span v-else class="weight-default">-</span>
           </template>
         </el-table-column>
         <el-table-column label="封面" width="120">
@@ -363,6 +380,8 @@ const { artworks: artworksState, artists: artistsState } = storeToRefs(adminStor
 const keyword = ref('')
 const saving = ref(false)
 const editingId = ref(null)
+const editingWeightId = ref(null)
+const editingWeightValue = ref(0)
 const dialogVisible = ref(false)
 const artistDialogVisible = ref(false)
 const selectedArtist = ref(null)
@@ -517,6 +536,31 @@ function showDialog() {
   dialogVisible.value = true
 }
 
+function startEditWeight(row) {
+  editingWeightId.value = row.id
+  editingWeightValue.value = row.adminWeight || 0
+}
+
+async function saveWeight(row) {
+  const newWeight = editingWeightValue.value
+  editingWeightId.value = null
+  
+  if (newWeight === (row.adminWeight || 0)) {
+    return // 没有变化
+  }
+  
+  saving.value = true
+  try {
+    await adminStore.updateArtwork(row.id, { adminWeight: newWeight })
+    row.adminWeight = newWeight
+    ElMessage.success('权重已更新')
+  } catch (err) {
+    ElMessage.error('权重更新失败')
+  } finally {
+    saving.value = false
+  }
+}
+
 function startEdit(row) {
   editingId.value = row.id
   form.name = row.name || ''
@@ -609,34 +653,38 @@ async function submitForm() {
     ElMessage.warning('请选择所属艺术家')
     return
   }
-  if (Number(form.price || 0) <= 0) {
+  const price = Number(form.price || 0)
+  if (price <= 0) {
     ElMessage.warning('请输入有效价格')
     return
   }
   saving.value = true
   try {
-    await adminStore.saveArtwork(editingId.value, {
+    const payload = {
       name: form.name.trim(),
       artistId: form.artistId,
-      category: form.category,
-      price: Number(form.price),
-      stock: Number(form.stock || 0),
-      status: form.status,
-      material: form.material.trim(),
-      creationYear: form.creationYear,
+      category: form.category || 'PAINTING',
+      price: price,
+      stock: Number(form.stock ?? 0),
+      status: form.status || 'DRAFT',
+      material: form.material?.trim() || '',
+      creationYear: form.creationYear || null,
       widthCm: form.widthCm ? Number(form.widthCm) : null,
       heightCm: form.heightCm ? Number(form.heightCm) : null,
       depthCm: form.depthCm ? Number(form.depthCm) : null,
-      adminWeight: form.adminWeight ? Number(form.adminWeight) : 1,
-      tag: form.tag.trim(),
-      description: form.description.trim(),
-      coverUrl: form.coverUrl
-    })
+      adminWeight: Number(form.adminWeight ?? 0),
+      tag: form.tag?.trim() || '',
+      description: form.description?.trim() || '',
+      coverUrl: form.coverUrl || ''
+    }
+    console.log('保存作品:', editingId.value ? '更新' : '新建', payload)
+    await adminStore.saveArtwork(editingId.value, payload)
     ElMessage.success(editingId.value ? '作品已更新' : '作品已创建')
-    clearDraft() // 保存成功后清除草稿
+    clearDraft()
     dialogVisible.value = false
     resetForm()
   } catch (error) {
+    console.error('保存失败:', error)
     ElMessage.error(error.message || '保存失败')
   } finally {
     saving.value = false
@@ -1017,5 +1065,10 @@ onMounted(async () => {
 }
 .weight-default {
   color: #c0c4cc;
+}
+.weight-edit-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>
