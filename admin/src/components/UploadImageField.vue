@@ -13,7 +13,7 @@
     <div class="upload-actions">
       <el-upload
         :show-file-list="false"
-        accept="image/*"
+        accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp,.gif"
         :http-request="handleUpload"
       >
         <el-button type="primary" plain :loading="uploading">{{ modelValue ? '更换图片' : '上传图片' }}</el-button>

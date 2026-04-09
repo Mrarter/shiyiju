@@ -64,12 +64,22 @@ public class AdminAssetService {
                 return normalized;
             }
         }
+        // 根据 MIME 类型推断扩展名
         return switch (contentType) {
-            case "image/jpeg" -> "jpg";
+            case "image/jpeg", "image/jpg" -> "jpg";
             case "image/png" -> "png";
             case "image/webp" -> "webp";
             case "image/gif" -> "gif";
-            default -> throw new BusinessException(40001, "不支持的图片格式");
+            default -> {
+                // 尝试从文件名中提取扩展名并转小写匹配
+                if (extension != null) {
+                    String lower = extension.toLowerCase();
+                    if (ALLOWED_EXTENSIONS.contains(lower)) {
+                        yield lower;
+                    }
+                }
+                throw new BusinessException(40001, "不支持的图片格式，仅支持 JPG/JPEG、PNG、WEBP、GIF");
+            }
         };
     }
 }
