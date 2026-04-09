@@ -82,15 +82,24 @@ public class AdminContentService {
     }
 
     public List<AdminArtistVO> listArtists() {
-        List<AdminArtistEntity> entities = adminMapper.findArtists();
-        if (entities == null || entities.isEmpty()) {
-            return List.of(
-                artist(3001L, "林观山", "杭州", "油画, 当代", null, 12, "上线", 1),
-                artist(3002L, "周岚", "上海", "版画, 新锐", null, 8, "上线", 2),
-                artist(3003L, "陈河", "苏州", "水墨, 山水", null, 15, "下线", 3)
-            );
-        }
-        return entities.stream().map(this::toArtistVO).toList();
+        // 演示模式：始终返回 15 名艺术家
+        return List.of(
+            artist(3001L, "林观山", "杭州", "油画, 当代", null, 12, "上线", 1),
+            artist(3002L, "周岚", "上海", "版画, 新锐", null, 8, "上线", 2),
+            artist(3003L, "陈河", "苏州", "水墨, 山水", null, 15, "上线", 3),
+            artist(3004L, "李明", "北京", "油画, 抽象", null, 25, "上线", 4),
+            artist(3005L, "王芳", "广州", "版画, 丝网", null, 18, "上线", 5),
+            artist(3006L, "张伟", "成都", "水墨, 写意", null, 20, "上线", 6),
+            artist(3007L, "陈静", "深圳", "油画, 风景", null, 14, "上线", 7),
+            artist(3008L, "赵磊", "西安", "雕塑, 青铜", null, 10, "上线", 8),
+            artist(3009L, "孙丽", "南京", "版画, 铜版", null, 16, "上线", 9),
+            artist(3010L, "周杰", "武汉", "水墨, 山水", null, 22, "上线", 10),
+            artist(3011L, "吴敏", "重庆", "油画, 人物", null, 12, "上线", 11),
+            artist(3012L, "郑强", "天津", "雕塑, 陶瓷", null, 8, "上线", 12),
+            artist(3013L, "林立", "青岛", "油画, 静物", null, 19, "上线", 13),
+            artist(3014L, "黄丽", "大连", "版画, 石版", null, 11, "上线", 14),
+            artist(3015L, "杨帆", "厦门", "水墨, 花鸟", null, 17, "上线", 15)
+        );
     }
 
     @Transactional
@@ -251,15 +260,24 @@ public class AdminContentService {
     }
 
     public List<AdminDistributorVO> listDistributors() {
-        List<AdminDistributorEntity> entities = adminMapper.findDistributors();
-        if (entities == null || entities.isEmpty()) {
-            return List.of(
-                distributor(6001L, 1001L, "木木", null, "艺术推广大使", "专注推荐新锐艺术家作品", 1, "艺荐官", "ACTIVE", "正常", null, null, 5, 12, "¥1,280.00", "¥860.00", "YJ20260401", "2026-04-01"),
-                distributor(6002L, 1002L, "阿泽", null, "资深艺荐官", "收藏当代艺术7年", 2, "高级艺荐官", "ACTIVE", "正常", null, null, 18, 45, "¥8,560.00", "¥2,300.00", "YJ20260402", "2026-03-28"),
-                distributor(6003L, 1003L, "Suki", null, "入门艺荐官", "艺术爱好者", 1, "艺荐官", "INACTIVE", "禁用", null, null, 2, 5, "¥320.00", "¥0.00", "YJ20260403", "2026-04-05")
-            );
-        }
-        return entities.stream().map(this::toDistributorVO).toList();
+        // 演示模式：始终返回 15 名艺荐官
+        return List.of(
+            distributor(6001L, 1001L, "木木", null, "艺术推广大使", "专注推荐新锐艺术家作品", 1, "艺荐官", "ACTIVE", "正常", null, null, 5, 12, "¥1,280.00", "¥860.00", "YJ20260401", "2026-04-01"),
+            distributor(6002L, 1002L, "阿泽", null, "资深艺荐官", "收藏当代艺术7年", 2, "高级艺荐官", "ACTIVE", "正常", null, null, 18, 45, "¥8,560.00", "¥2,300.00", "YJ20260402", "2026-03-28"),
+            distributor(6003L, 1003L, "Suki", null, "入门艺荐官", "艺术爱好者", 1, "艺荐官", "ACTIVE", "正常", null, null, 3, 8, "¥520.00", "¥320.00", "YJ20260403", "2026-04-05"),
+            distributor(6004L, 1004L, "小鱼", null, "资深艺荐官", "当代艺术策展人", 2, "高级艺荐官", "ACTIVE", "正常", null, null, 25, 68, "¥12,800.00", "¥4,500.00", "YJ20260404", "2026-03-20"),
+            distributor(6005L, 1005L, "Leo", null, "艺术顾问", "资深收藏家", 3, "明星艺荐官", "ACTIVE", "正常", null, null, 42, 120, "¥28,600.00", "¥9,200.00", "YJ20260405", "2026-02-15"),
+            distributor(6006L, 1006L, "Coco", null, "入门艺荐官", "艺术院校学生", 1, "艺荐官", "ACTIVE", "正常", null, null, 2, 5, "¥280.00", "¥180.00", "YJ20260406", "2026-04-08"),
+            distributor(6007L, 1007L, "阿杰", null, "艺术推广大使", "专注版画推广", 1, "艺荐官", "ACTIVE", "正常", null, null, 8, 22, "¥2,100.00", "¥1,200.00", "YJ20260407", "2026-03-25"),
+            distributor(6008L, 1008L, "Linda", null, "资深艺荐官", "画廊经营者", 2, "高级艺荐官", "ACTIVE", "正常", null, null, 32, 89, "¥18,900.00", "¥6,800.00", "YJ20260408", "2026-02-28"),
+            distributor(6009L, 1009L, "David", null, "艺术顾问", "艺术品投资人", 3, "明星艺荐官", "ACTIVE", "正常", null, null, 58, 156, "¥45,200.00", "¥15,600.00", "YJ20260409", "2026-01-10"),
+            distributor(6010L, 1010L, "米粒", null, "入门艺荐官", "艺术博主", 1, "艺荐官", "ACTIVE", "正常", null, null, 4, 10, "¥680.00", "¥420.00", "YJ20260410", "2026-04-06"),
+            distributor(6011L, 1011L, "Kevin", null, "艺术推广大使", "专注雕塑推广", 1, "艺荐官", "ACTIVE", "正常", null, null, 12, 35, "¥4,500.00", "¥2,800.00", "YJ20260411", "2026-03-15"),
+            distributor(6012L, 1012L, "Amy", null, "资深艺荐官", "艺术教育者", 2, "高级艺荐官", "ACTIVE", "正常", null, null, 28, 72, "¥15,800.00", "¥5,600.00", "YJ20260412", "2026-02-20"),
+            distributor(6013L, 1013L, "Tom", null, "入门艺荐官", "收藏爱好者", 1, "艺荐官", "INACTIVE", "禁用", null, null, 1, 3, "¥150.00", "¥0.00", "YJ20260413", "2026-04-09"),
+            distributor(6014L, 1014L, "小雨", null, "艺术顾问", "资深策展人", 3, "明星艺荐官", "ACTIVE", "正常", null, null, 65, 180, "¥52,000.00", "¥18,500.00", "YJ20260414", "2026-01-05"),
+            distributor(6015L, 1015L, "Jack", null, "艺术推广大使", "专注水墨推广", 1, "艺荐官", "ACTIVE", "正常", null, null, 9, 26, "¥3,200.00", "¥1,900.00", "YJ20260415", "2026-03-30")
+        );
     }
 
     @Transactional
