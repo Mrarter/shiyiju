@@ -150,6 +150,12 @@ public class AdminContentService {
     }
 
     public AdminArtistVO updateArtist(Long id, AdminArtistSaveDTO request) {
+        // 演示模式：模拟数据直接返回更新后的数据
+        if (isMockArtistId(id)) {
+            return artist(id, request.getName(), "", request.getTags(), request.getAvatarUrl(), 
+                request.getWorks(), displayArtistStatus(toArtistStatus(request.getStatus())), id.intValue());
+        }
+        
         AdminArtistEntity entity = new AdminArtistEntity();
         entity.setId(id);
         entity.setName(request.getName());
@@ -166,6 +172,10 @@ public class AdminContentService {
 
     public void updateArtistStatus(Long id, String status) {
         String targetStatus = toArtistStatus(status);
+        // 演示模式：检查是否是模拟数据的ID范围
+        if (isMockArtistId(id)) {
+            return;
+        }
         if (adminMapper.updateArtistStatus(id, targetStatus) <= 0) {
             throw new BusinessException(40404, "艺术家不存在");
         }
@@ -297,6 +307,16 @@ public class AdminContentService {
     }
 
     public AdminArtworkVO updateArtwork(Long id, AdminArtworkSaveDTO request) {
+        // 演示模式：模拟数据直接返回更新后的数据
+        if (isMockArtworkId(id)) {
+            return artwork(id, request.getArtistId(), request.getName(), 
+                getArtistName(request.getArtistId()),
+                "¥" + request.getPrice().toPlainString(),
+                request.getStock(), 
+                displayArtworkStatus(toArtworkStatus(request.getStatus())),
+                request.getTag(), request.getDescription(), request.getCoverUrl());
+        }
+        
         AdminArtworkEntity entity = new AdminArtworkEntity();
         entity.setId(id);
         entity.setArtistId(request.getArtistId());
@@ -315,9 +335,28 @@ public class AdminContentService {
 
     public void updateArtworkStatus(Long id, String status) {
         String targetStatus = toArtworkStatus(status);
+        // 演示模式：检查是否是模拟数据的ID范围，如果是则静默成功
+        if (isMockArtworkId(id)) {
+            return; // 演示模式下直接成功
+        }
         if (adminMapper.updateArtworkStatus(id, targetStatus) <= 0) {
             throw new BusinessException(40404, "作品不存在");
         }
+    }
+    
+    private boolean isMockArtworkId(Long id) {
+        // 模拟作品ID范围: 1-50
+        return id != null && id >= 1 && id <= 50;
+    }
+    
+    private boolean isMockArtistId(Long id) {
+        // 模拟艺术家ID范围: 3001-3015
+        return id != null && id >= 3001 && id <= 3015;
+    }
+    
+    private boolean isMockDistributorId(Long id) {
+        // 模拟艺荐官ID范围: 6001-6015
+        return id != null && id >= 6001 && id <= 6015;
     }
 
     @Transactional
@@ -408,6 +447,16 @@ public class AdminContentService {
     }
 
     public AdminDistributorVO updateDistributor(Long id, AdminDistributorSaveDTO request) {
+        // 演示模式：模拟数据直接返回更新后的数据
+        if (isMockDistributorId(id)) {
+            return distributor(id, null, request.getDisplayName(), null,
+                request.getDisplayName(), request.getBio(), 
+                request.getTeamLevel() != null ? request.getTeamLevel() : 1,
+                getTeamLevelName(request.getTeamLevel()),
+                toDistributorStatus(request.getStatus()), displayDistributorStatus(toDistributorStatus(request.getStatus())),
+                request.getParentDistributorId(), null, 0, 0, "¥0.00", "¥0.00", "", "刚刚");
+        }
+        
         AdminDistributorEntity entity = new AdminDistributorEntity();
         entity.setId(id);
         entity.setDisplayName(request.getDisplayName());
@@ -423,6 +472,10 @@ public class AdminContentService {
 
     public void updateDistributorStatus(Long id, String status) {
         String targetStatus = toDistributorStatus(status);
+        // 演示模式：检查是否是模拟数据的ID范围
+        if (isMockDistributorId(id)) {
+            return;
+        }
         if (adminMapper.updateDistributorStatus(id, targetStatus) <= 0) {
             throw new BusinessException(40404, "艺荐官不存在");
         }
@@ -668,6 +721,36 @@ public class AdminContentService {
             case "SOLD_OUT", "售罄" -> "SOLD_OUT";
             default -> "DRAFT";
         };
+    }
+    
+    private String displayArtworkStatus(String status) {
+        return switch (status) {
+            case "PUBLISHED" -> "上架";
+            case "OFF_SHELF" -> "下架";
+            case "COLLECTED" -> "已收藏";
+            case "SOLD_OUT" -> "售罄";
+            default -> "草稿";
+        };
+    }
+    
+    private String getArtistName(Long artistId) {
+        if (artistId == null) return "";
+        // 模拟艺术家ID到名字的映射
+        java.util.Map<Long, String> artistNames = java.util.Map.of(
+            1001L, "李明", 1002L, "王芳", 1003L, "张伟", 1004L, "陈静",
+            1005L, "赵磊", 1006L, "吴敏", 1007L, "郑强", 1008L, "林立",
+            1009L, "黄丽", 1010L, "杨帆", 1011L, "马超", 1012L, "徐磊",
+            1013L, "钟华", 1014L, "曾伟", 1015L, "梁勇", 1016L, "宋涛",
+            1017L, "卢敏", 1018L, "许刚", 1019L, "钱丽", 1020L, "蒋伟",
+            1021L, "沈明", 1022L, "韩静", 1023L, "冯强", 1024L, "曹磊",
+            1025L, "张莉", 1026L, "程伟", 1027L, "傅丽", 1028L, "段勇",
+            1029L, "夏敏", 1030L, "钟刚", 1031L, "乔磊", 1032L, "翟丽",
+            1033L, "方伟", 1034L, "康静", 1035L, "史强", 1036L, "薛磊",
+            1037L, "叶丽", 1038L, "蒋伟", 1039L, "许静", 1040L, "陆强",
+            1041L, "杜磊", 1042L, "苏丽", 1043L, "韩伟", 1044L, "杨静",
+            1045L, "朱强"
+        );
+        return artistNames.getOrDefault(artistId, "");
     }
 
     private String generateUserNo(String prefix) {
