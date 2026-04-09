@@ -3,6 +3,19 @@
   background: #f6f7f9;
 }
 
+/* 对话框居中显示 */
+.el-dialog {
+  margin-top: 10vh !important;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.el-dialog__body {
+  overflow-y: auto;
+  max-height: calc(80vh - 120px);
+}
+
 * {
   box-sizing: border-box;
 }
