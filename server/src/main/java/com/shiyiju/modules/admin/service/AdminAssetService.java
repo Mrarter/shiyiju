@@ -49,12 +49,10 @@ public class AdminAssetService {
 
         AdminUploadVO upload = new AdminUploadVO();
         upload.setName(fileName);
-        upload.setUrl(ServletUriComponentsBuilder.fromCurrentContextPath()
-            .path("/uploads/images/")
-            .path(LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE))
-            .path("/")
-            .path(fileName)
-            .toUriString());
+        upload.setUrl("/uploads/images/"
+            + LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE)
+            + "/"
+            + fileName);
         return upload;
     }
 
