@@ -1,16 +1,35 @@
 const api = require("../../utils/api")
 
+function mapRole(role) {
+  const map = {
+    COLLECTOR: "收藏家",
+    ARTIST: "艺术家",
+    DISTRIBUTOR: "经纪人"
+  }
+  return map[role] || "收藏家"
+}
+
+function buildAvatarPlaceholder(name) {
+  const title = (name || "拾艺").slice(0, 2)
+  return {
+    title,
+    background: "linear-gradient(135deg, #4a3f39 0%, #241d19 48%, #171210 100%)",
+    glow: "#d9b287",
+    mountain: "#8c5e49"
+  }
+}
+
 Page({
   data: {
     loading: true,
     error: "",
     user: null,
-    stats: [],
-    menus: [
-      { key: "collection", label: "我的藏品", desc: "查看持有作品" },
-      { key: "orders", label: "我的订单", desc: "查看订单与物流" },
-      { key: "service", label: "联系客服", desc: "获取平台帮助" }
-    ]
+    profileSummary: null,
+    assets: [],
+    tradeMenus: [],
+    featureCards: [],
+    quickLinks: [],
+    serviceLinks: []
   },
 
   onShow() {
@@ -25,9 +44,15 @@ Page({
         url: "/users/me",
         method: "GET"
       })
+
       this.setData({
         user,
-        stats: this.buildStats(user),
+        profileSummary: this.buildProfileSummary(user),
+        assets: this.buildAssets(user),
+        tradeMenus: this.buildTradeMenus(),
+        featureCards: this.buildFeatureCards(),
+        quickLinks: this.buildQuickLinks(),
+        serviceLinks: this.buildServiceLinks(user),
         loading: false,
         error: ""
       })
@@ -39,28 +64,130 @@ Page({
     }
   },
 
-  buildStats(user) {
+  buildProfileSummary(user) {
+    return {
+      name: user.nickname || "微信用户",
+      roleText: mapRole(user.defaultRole),
+      profileText: "个人主页",
+      follows: 3,
+      fans: 3,
+      medals: 0,
+      creditScore: 100,
+      authTitle: "在拾艺局出售作品",
+      authDesc: "完成卖家认证后即可发布与流通作品",
+      avatarUrl: user.avatarUrl || "",
+      avatarPlaceholder: buildAvatarPlaceholder(user.nickname)
+    }
+  },
+
+  buildAssets(user) {
     return [
-      { label: "用户编号", value: user.userNo || "待生成" },
-      { label: "默认角色", value: user.defaultRole || "COLLECTOR" },
-      { label: "权限数", value: (user.permissions || []).length }
+      { label: "炭粒", value: 0 },
+      { label: "优惠券", value: 0 },
+      { label: "标记", value: (user.permissions || []).length },
+      { label: "购物车", value: 0 }
     ]
   },
 
-  handleMenuTap(event) {
+  buildTradeMenus() {
+    return [
+      { key: "bought", icon: "¥", label: "我买到的" },
+      { key: "sold", icon: "袋", label: "我卖出的" },
+      { key: "afterSale", icon: "售", label: "退货售后" },
+      { key: "review", icon: "赞", label: "我的评价" }
+    ]
+  },
+
+  buildFeatureCards() {
+    return [
+      {
+        key: "carbon",
+        title: "签到得炭粒",
+        desc: "快来领取今日炭粒",
+        valueLabel: "炭粒余额",
+        value: 0,
+        actionText: "明细",
+        badge: true
+      },
+      {
+        key: "certificate",
+        title: "收藏证书",
+        desc: "查看你已持有作品的收藏认证",
+        imageTitle: "艺术品收藏证书"
+      }
+    ]
+  },
+
+  buildQuickLinks() {
+    return [
+      { key: "history", icon: "迹", label: "浏览记录" },
+      { key: "likes", icon: "赞", label: "我赞" },
+      { key: "medal", icon: "勋", label: "勋章馆" }
+    ]
+  },
+
+  buildServiceLinks(user) {
+    return [
+      { key: "wallet", icon: "¥", label: "钱包" },
+      { key: "settings", icon: "设", label: "设置" },
+      { key: "invoice", icon: "票", label: "发票中心" },
+      { key: "level", icon: "阶", label: "藏家等级" },
+      { key: "feedback", icon: "服", label: "意见反馈" },
+      { key: "follow", icon: "关", label: "关注公众号" },
+      { key: "role", icon: mapRole(user.defaultRole).slice(0, 1), label: mapRole(user.defaultRole) }
+    ]
+  },
+
+  handleTradeTap(event) {
     const key = event.currentTarget.dataset.key
-    if (key === 'collection') {
-      wx.navigateTo({ url: '/pages/collection/index' })
+    if (key === "bought") {
+      wx.showToast({ title: "订单中心整理中", icon: "none" })
       return
     }
-    if (key === 'orders') {
-      wx.showToast({ title: '订单页正在补齐中', icon: 'none' })
+    if (key === "sold") {
+      wx.switchTab({ url: "/pages/publish/index" })
       return
     }
-    wx.showToast({
-      title: '客服入口仍在开发中',
-      icon: 'none'
-    })
+    wx.showToast({ title: "功能正在补齐", icon: "none" })
+  },
+
+  handleFeatureTap(event) {
+    const key = event.currentTarget.dataset.key
+    if (key === "certificate") {
+      wx.navigateTo({ url: "/pages/collection/index" })
+      return
+    }
+    wx.showToast({ title: "签到功能规划中", icon: "none" })
+  },
+
+  handleQuickLinkTap(event) {
+    const key = event.currentTarget.dataset.key
+    if (key === "history") {
+      wx.showToast({ title: "浏览记录整理中", icon: "none" })
+      return
+    }
+    if (key === "likes") {
+      wx.navigateTo({ url: "/pages/collection/index" })
+      return
+    }
+    wx.showToast({ title: "敬请期待", icon: "none" })
+  },
+
+  handleServiceTap(event) {
+    const key = event.currentTarget.dataset.key
+    if (key === "settings") {
+      wx.showToast({ title: "设置页开发中", icon: "none" })
+      return
+    }
+    if (key === "feedback") {
+      wx.showToast({ title: "意见反馈已记录", icon: "none" })
+      return
+    }
+    wx.showToast({ title: "该入口稍后开放", icon: "none" })
+  },
+
+  handleAuthTap() {
+    wx.showToast({ title: "卖家认证流程整理中", icon: "none" })
   },
 
   handleRetry() {

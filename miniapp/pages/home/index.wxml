@@ -9,6 +9,21 @@
     </view>
 
     <view wx:if="{{hasAnyContent}}">
+      <view class="banner-strip" wx:if="{{bannerItems.length}}">
+        <view class="banner-pill" wx:for="{{bannerItems}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
+          <view class="banner-eyebrow">{{item.eyebrow}}</view>
+          <view class="banner-title">{{item.title}}</view>
+          <view class="banner-subtitle">{{item.subtitle}}</view>
+        </view>
+      </view>
+
+      <view class="headline-strip" wx:if="{{headlineMetrics.length}}">
+        <view class="headline-card" wx:for="{{headlineMetrics}}" wx:key="label">
+          <view class="headline-value">{{item.value}}</view>
+          <view class="headline-label">{{item.label}}</view>
+        </view>
+      </view>
+
       <view class="hero-card" wx:if="{{featuredWork}}" bindtap="goArtworkDetail" data-artwork-id="{{featuredWork.id}}">
         <view class="hero-image-wrap">
           <image wx:if="{{featuredWork.coverUrl}}" src="{{featuredWork.coverUrl}}" mode="aspectFill" class="hero-image"></image>
@@ -23,7 +38,12 @@
         <view class="hero-body">
           <view class="hero-chip">本期推荐</view>
           <view class="hero-title">{{featuredWork.title}}</view>
-          <view class="hero-meta">{{featuredWork.artistName}} · 布面综合材料</view>
+          <view class="hero-meta">{{featuredWork.artistName}} · {{featuredWork.categoryText}}</view>
+          <view class="hero-insight">
+            <view class="hero-insight-item">{{featuredWork.artistLevelName}}</view>
+            <view class="hero-insight-item">{{featuredWork.viewCountText}}</view>
+            <view class="hero-insight-item">{{featuredWork.favoriteCountText}}</view>
+          </view>
           <view class="hero-bottom">
             <view class="hero-price">{{featuredWork.priceText}}</view>
             <view class="hero-status">{{featuredWork.statusText}}</view>
@@ -40,6 +60,35 @@
           <view class="summary-title">正在升值</view>
           <view class="summary-desc">{{risingWorks.length}} 件可关注</view>
         </view>
+      </view>
+
+      <view class="module" wx:if="{{recommendedArtists.length}}">
+        <view class="module-head">
+          <view class="module-title">推荐艺术家</view>
+          <view class="module-count">{{recommendedArtists.length}}位</view>
+        </view>
+        <scroll-view class="artist-scroll" scroll-x="true" enhanced show-scrollbar="false">
+          <view class="artist-row">
+            <view
+              class="artist-card"
+              wx:for="{{recommendedArtists}}"
+              wx:key="id"
+              bindtap="goArtistProfile"
+              data-artist-id="{{item.id}}"
+            >
+              <image wx:if="{{item.avatarUrl}}" src="{{item.avatarUrl}}" mode="aspectFill" class="artist-avatar"></image>
+              <view wx:else class="artist-avatar fallback-art" style="background: {{item.badgeStyle.background}};">
+                <view class="art-glow small" style="background: {{item.badgeStyle.glow}};"></view>
+                <view class="art-mountain left small" style="background: {{item.badgeStyle.mountain}};"></view>
+                <view class="art-mountain center small" style="background: {{item.badgeStyle.mountain}};"></view>
+                <view class="art-mountain right small" style="background: {{item.badgeStyle.mountain}};"></view>
+              </view>
+              <view class="artist-name">{{item.name}}</view>
+              <view class="artist-level">{{item.levelName}}</view>
+              <view class="artist-slogan">{{item.slogan}}</view>
+            </view>
+          </view>
+        </scroll-view>
       </view>
 
       <view class="module" wx:if="{{hotWorks.length}}">
@@ -61,6 +110,10 @@
             </view>
             <view class="hot-title">{{item.title}}</view>
             <view class="hot-meta">{{item.artistName}}</view>
+            <view class="hot-tags">
+              <view class="hot-tag">{{item.categoryText}}</view>
+              <view class="hot-tag subtle">{{item.statusText}}</view>
+            </view>
             <view class="hot-price">{{item.priceText}}</view>
           </view>
         </view>
@@ -80,6 +133,25 @@
             <view class="rise-side">
               <view class="rise-price">{{item.priceText}}</view>
               <view class="rise-status">{{item.statusText}}</view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="module" wx:if="{{onlineWorks.length}}">
+        <view class="module-head">
+          <view class="module-title">在线作品</view>
+          <view class="module-count">{{onlineWorks.length}}件</view>
+        </view>
+        <view class="fresh-list">
+          <view class="fresh-card" wx:for="{{onlineWorks}}" wx:key="id" bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
+            <view class="fresh-main">
+              <view class="fresh-title">{{item.title}}</view>
+              <view class="fresh-meta">{{item.artistName}} · {{item.artistLevelName}}</view>
+            </view>
+            <view class="fresh-side">
+              <view class="fresh-price">{{item.priceText}}</view>
+              <view class="fresh-tag">{{item.categoryText}}</view>
             </view>
           </view>
         </view>

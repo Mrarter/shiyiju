@@ -13,6 +13,18 @@
         <el-input v-model="keyword" placeholder="搜索作品名/艺术家" style="max-width: 260px;" />
       </div>
       <el-table :data="filteredArtworks">
+        <el-table-column label="封面" width="120">
+          <template #default="{ row }">
+            <el-image
+              v-if="row.coverUrl"
+              :src="row.coverUrl"
+              fit="cover"
+              style="width: 64px; height: 64px; border-radius: 10px;"
+              preview-teleported
+            />
+            <span v-else>未上传</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="name" label="作品名" min-width="180" />
         <el-table-column prop="artist" label="艺术家" width="140" />
         <el-table-column prop="price" label="价格" width="120" />
@@ -31,6 +43,9 @@
 
     <div class="section-card" style="padding: 24px;">
       <div class="page-title" style="font-size: 18px;">{{ editingId ? '编辑作品' : '新建作品' }}</div>
+      <div style="margin-top: 16px;">
+        <UploadImageField v-model="form.coverUrl" placeholder="作品封面" tip="建议上传竖图或方图作为作品主图" />
+      </div>
       <div class="form-grid" style="margin-top: 16px;">
         <el-input v-model="form.name" placeholder="作品名称" />
         <el-select v-model="form.artistId" placeholder="所属艺术家">
@@ -69,6 +84,7 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { ElMessage } from 'element-plus'
 import { useAdminStore } from '../../stores/admin'
+import UploadImageField from '../../components/UploadImageField.vue'
 
 const adminStore = useAdminStore()
 const { artworks: artworksState, artists: artistsState } = storeToRefs(adminStore)
@@ -81,7 +97,8 @@ const form = reactive({
   status: 'DRAFT',
   price: 0,
   stock: 1,
-  description: ''
+  description: '',
+  coverUrl: ''
 })
 
 const artworks = computed(() => artworksState.value)
@@ -100,6 +117,7 @@ function resetForm() {
   form.price = 0
   form.stock = 1
   form.description = ''
+  form.coverUrl = ''
 }
 
 function startCreate() {
@@ -114,6 +132,7 @@ function startEdit(row) {
   form.price = parsePrice(row.price)
   form.stock = Number(row.stock || 0)
   form.description = row.description || ''
+  form.coverUrl = row.coverUrl || ''
 }
 
 function normalizeArtworkStatus(status) {
@@ -157,7 +176,8 @@ async function submitForm() {
       price: Number(form.price),
       stock: Number(form.stock || 0),
       status: form.status,
-      description: form.description.trim()
+      description: form.description.trim(),
+      coverUrl: form.coverUrl
     })
     ElMessage.success(editingId.value ? '作品已更新' : '作品已创建')
     resetForm()

@@ -1,0 +1,17 @@
+.hold-stat {
+  padding: 24rpx;
+}
+
+.hold-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.hold-card {
+  padding: 18rpx;
+}
+
+.hold-cover {
+  height: 240rpx;
+}

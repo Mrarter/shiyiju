@@ -1,0 +1,8 @@
+Standardized package structure for Shiyiju project.
+docs/backend : backend documents
+docs/UI      : UI deliverables
+docs/testing : testing documents
+sql          : database schema
+prompts      : Codex task prompts
+server       : backend code placeholder
+miniapp      : miniapp code placeholder

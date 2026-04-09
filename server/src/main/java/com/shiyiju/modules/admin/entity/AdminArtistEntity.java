@@ -7,6 +7,7 @@ public class AdminArtistEntity {
     private String name;
     private String city;
     private String tags;
+    private String avatarUrl;
     private Integer works;
     private String status;
     private Integer sort;
@@ -21,6 +22,8 @@ public class AdminArtistEntity {
     public void setCity(String city) { this.city = city; }
     public String getTags() { return tags; }
     public void setTags(String tags) { this.tags = tags; }
+    public String getAvatarUrl() { return avatarUrl; }
+    public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
     public Integer getWorks() { return works; }
     public void setWorks(Integer works) { this.works = works; }
     public String getStatus() { return status; }

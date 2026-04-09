@@ -1,0 +1,11 @@
+<view class="app-shell">
+  <view class="safe-top"></view>
+  <view class="page-body">
+    <view class="page-title">独家发行</view>
+    <view class="page-subtitle">P2 页面已预留预约、发售倒计时和抢购状态模块。</view>
+    <view class="surface-card section placeholder-card">
+      <view class="section-title">发售专题</view>
+      <view class="page-subtitle">后续接独家作品详情、倒计时和预约开售状态。</view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,404 @@
+.mine-page {
+  min-height: 100vh;
+  background: #050505;
+  color: #f2efe9;
+}
+
+.page-body {
+  padding: 28rpx 28rpx 46rpx;
+}
+
+.top-tools {
+  display: flex;
+  gap: 22rpx;
+  align-items: center;
+  padding: 12rpx 0 26rpx;
+}
+
+.tool-badge,
+.tool-frame {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 18rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  color: #f5f2ed;
+}
+
+.tool-badge {
+  background: rgba(255, 206, 79, 0.12);
+}
+
+.tool-frame {
+  border: 1rpx solid rgba(255, 255, 255, 0.18);
+}
+
+.profile-section {
+  display: grid;
+  gap: 22rpx;
+}
+
+.profile-card,
+.auth-card,
+.asset-card,
+.section-card,
+.feature-card,
+.loading-card {
+  background: #1f1f1f;
+  border-radius: 24rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.04);
+  box-sizing: border-box;
+}
+
+.profile-card {
+  padding: 28rpx;
+  display: flex;
+  justify-content: space-between;
+  gap: 20rpx;
+}
+
+.profile-main {
+  display: flex;
+  gap: 22rpx;
+  min-width: 0;
+  flex: 1;
+}
+
+.profile-avatar {
+  width: 132rpx;
+  height: 132rpx;
+  border-radius: 66rpx;
+  display: block;
+  flex-shrink: 0;
+}
+
+.placeholder-avatar {
+  position: relative;
+  overflow: hidden;
+}
+
+.avatar-glow {
+  position: absolute;
+  left: 20rpx;
+  top: 20rpx;
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  opacity: 0.8;
+}
+
+.avatar-title {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 18rpx;
+  text-align: center;
+  font-size: 38rpx;
+  font-weight: 700;
+  color: #fff7ef;
+}
+
+.profile-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-name-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.profile-name {
+  font-size: 60rpx;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.profile-mark {
+  color: #dad1c7;
+  font-size: 24rpx;
+}
+
+.profile-link {
+  margin-top: 12rpx;
+  color: #54b56a;
+  font-size: 26rpx;
+}
+
+.profile-stats {
+  margin-top: 18rpx;
+  display: flex;
+  gap: 12rpx;
+  flex-wrap: wrap;
+  color: #dcd6cd;
+  font-size: 24rpx;
+}
+
+.credit-chip {
+  align-self: center;
+  min-width: 208rpx;
+  height: 78rpx;
+  padding: 0 28rpx;
+  border-radius: 999rpx;
+  background: #2c2b2a;
+  color: #5cb56d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+.auth-card {
+  padding: 28rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.auth-title {
+  font-size: 32rpx;
+  font-weight: 700;
+}
+
+.auth-desc {
+  margin-top: 14rpx;
+  font-size: 24rpx;
+  color: #b7b0a6;
+}
+
+.auth-btn {
+  min-width: 156rpx;
+  height: 82rpx;
+  border-radius: 999rpx;
+  background: linear-gradient(135deg, #6dc578, #4ea95f);
+  color: #f7fff8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
+  font-weight: 700;
+}
+
+.asset-card {
+  margin-top: 24rpx;
+  padding: 28rpx 10rpx;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.asset-item {
+  text-align: center;
+}
+
+.asset-value {
+  font-size: 56rpx;
+  font-weight: 700;
+}
+
+.asset-label {
+  margin-top: 10rpx;
+  color: #bbb3aa;
+  font-size: 24rpx;
+}
+
+.trade-card,
+.quick-card,
+.service-card {
+  margin-top: 24rpx;
+  padding: 28rpx;
+}
+
+.section-title {
+  font-size: 34rpx;
+  font-weight: 700;
+}
+
+.trade-grid,
+.quick-grid,
+.service-grid {
+  display: grid;
+  gap: 20rpx;
+  margin-top: 26rpx;
+}
+
+.trade-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.quick-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.service-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.trade-item,
+.quick-item,
+.service-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.trade-icon,
+.quick-icon,
+.service-icon {
+  width: 82rpx;
+  height: 82rpx;
+  border-radius: 24rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34rpx;
+  color: #6ec279;
+}
+
+.trade-label,
+.quick-label,
+.service-label {
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  color: #ddd5cb;
+}
+
+.feature-grid {
+  margin-top: 24rpx;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20rpx;
+}
+
+.feature-card {
+  position: relative;
+  min-height: 360rpx;
+  padding: 26rpx;
+}
+
+.feature-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.feature-title {
+  font-size: 32rpx;
+  font-weight: 700;
+}
+
+.feature-arrow {
+  color: #b4aca2;
+  font-size: 42rpx;
+  line-height: 1;
+}
+
+.feature-desc {
+  margin-top: 16rpx;
+  color: #8e867e;
+  font-size: 24rpx;
+}
+
+.carbon-dot {
+  position: absolute;
+  right: 58rpx;
+  top: 44rpx;
+  width: 18rpx;
+  height: 18rpx;
+  border-radius: 9rpx;
+  background: #ef382f;
+}
+
+.carbon-panel {
+  margin-top: 42rpx;
+  padding: 24rpx 26rpx;
+  border-radius: 18rpx;
+  background: #2a2a2a;
+}
+
+.carbon-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.carbon-label {
+  color: #d2cac0;
+  font-size: 24rpx;
+}
+
+.carbon-action {
+  color: #56b86d;
+  font-size: 24rpx;
+}
+
+.carbon-value {
+  margin-top: 26rpx;
+  font-size: 64rpx;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.certificate-card {
+  margin-top: 30rpx;
+  display: flex;
+  justify-content: center;
+}
+
+.certificate-inner {
+  width: 180rpx;
+  height: 246rpx;
+  padding: 14rpx;
+  border-radius: 4rpx;
+  background: #f7f7f5;
+  color: #333;
+  box-sizing: border-box;
+  border: 1rpx solid #cfd4db;
+}
+
+.certificate-title {
+  font-size: 16rpx;
+  text-align: center;
+  font-weight: 700;
+}
+
+.certificate-stamp {
+  width: 92rpx;
+  height: 92rpx;
+  border-radius: 46rpx;
+  border: 3rpx solid rgba(34, 64, 112, 0.18);
+  margin: 86rpx auto 0;
+}
+
+.loading-card {
+  padding: 32rpx 28rpx;
+  color: #d6cec4;
+}
+
+.retry-btn {
+  width: 160rpx;
+  height: 82rpx;
+  margin-top: 24rpx;
+  border-radius: 22rpx;
+  background: linear-gradient(135deg, #d5b06a, #a67c33);
+  color: #120f0d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+.version-text {
+  margin: 30rpx 0 10rpx;
+  text-align: center;
+  color: #80786f;
+  font-size: 24rpx;
+}

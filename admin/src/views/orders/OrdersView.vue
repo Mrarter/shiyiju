@@ -5,7 +5,7 @@
         <div class="page-title">订单管理</div>
         <div class="page-subtitle">跟踪订单状态、支付状态和发货进度</div>
       </div>
-      <el-button>导出订单</el-button>
+      <el-button @click="exportOrders">导出订单</el-button>
     </div>
 
     <div class="section-card" style="padding: 20px; margin-bottom: 16px;">
@@ -22,7 +22,7 @@
         <el-table-column prop="shipStatus" label="发货状态" width="120" />
         <el-table-column label="操作" width="220">
           <template #default="{ row }">
-            <el-button link type="primary" @click="selectOrder(row)">详情</el-button>
+            <el-button link type="primary" @click="openDetail(row)">详情</el-button>
             <el-button link @click="prefillShipment(row)">发货</el-button>
           </template>
         </el-table-column>
@@ -43,6 +43,19 @@
         <el-button @click="saveRemark">保存备注</el-button>
       </div>
     </div>
+
+    <el-drawer v-model="detailVisible" title="订单详情" size="460px">
+      <div v-if="currentOrder" style="display: grid; gap: 14px;">
+        <div><strong>订单号：</strong>{{ currentOrder.orderNo }}</div>
+        <div><strong>用户：</strong>{{ currentOrder.user }}</div>
+        <div><strong>作品：</strong>{{ currentOrder.artwork }}</div>
+        <div><strong>金额：</strong>{{ currentOrder.amount }}</div>
+        <div><strong>订单状态：</strong>{{ currentOrder.status }}</div>
+        <div><strong>支付状态：</strong>{{ currentOrder.payStatus }}</div>
+        <div><strong>发货状态：</strong>{{ currentOrder.shipStatus }}</div>
+        <div><strong>备注：</strong>{{ currentOrder.remark || '无' }}</div>
+      </div>
+    </el-drawer>
   </div>
 </template>
 
@@ -51,10 +64,12 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { ElMessage } from 'element-plus'
 import { useAdminStore } from '../../stores/admin'
+import { downloadCsv } from '../../utils/download'
 
 const adminStore = useAdminStore()
 const { orders: ordersState } = storeToRefs(adminStore)
 const keyword = ref('')
+const detailVisible = ref(false)
 const currentOrder = ref(null)
 const shipment = reactive({ company: '顺丰', trackingNo: '' })
 const remark = reactive({ remark: '' })
@@ -69,10 +84,16 @@ function selectOrder(row) {
   currentOrder.value = row
 }
 
+function openDetail(row) {
+  selectOrder(row)
+  detailVisible.value = true
+}
+
 function prefillShipment(row) {
   currentOrder.value = row
   shipment.company = '顺丰'
   shipment.trackingNo = ''
+  remark.remark = row.remark || ''
 }
 
 function resetForms() {
@@ -117,6 +138,15 @@ async function saveRemark() {
   } catch (error) {
     ElMessage.error(error.message || '备注保存失败')
   }
+}
+
+function exportOrders() {
+  downloadCsv(
+    'shiyiju-orders.csv',
+    ['订单号', '用户', '作品', '金额', '订单状态', '支付状态', '发货状态'],
+    filteredOrders.value.map((item) => [item.orderNo, item.user, item.artwork, item.amount, item.status, item.payStatus, item.shipStatus])
+  )
+  ElMessage.success('订单列表已导出')
 }
 
 onMounted(async () => {

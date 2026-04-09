@@ -13,6 +13,12 @@
         <el-input v-model="keyword" placeholder="搜索艺术家姓名/标签" style="max-width: 260px;" />
       </div>
       <el-table :data="filteredArtists">
+        <el-table-column label="头像" width="110">
+          <template #default="{ row }">
+            <el-avatar v-if="row.avatarUrl" :src="row.avatarUrl" :size="44" />
+            <span v-else>未上传</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="name" label="艺术家姓名" min-width="160" />
         <el-table-column prop="city" label="城市" width="120" />
         <el-table-column prop="tags" label="标签" min-width="180" />
@@ -31,6 +37,9 @@
 
     <div class="section-card" style="padding: 24px;">
       <div class="page-title" style="font-size: 18px;">{{ editingId ? '编辑艺术家' : '新建艺术家' }}</div>
+      <div style="margin-top: 16px;">
+        <UploadImageField v-model="form.avatarUrl" placeholder="艺术家头像" tip="建议上传 1:1 头像图" />
+      </div>
       <div class="form-grid" style="margin-top: 16px;">
         <el-input v-model="form.name" placeholder="艺术家名称" />
         <el-input v-model="form.tags" placeholder="风格标签，逗号分隔" />
@@ -53,6 +62,7 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { ElMessage } from 'element-plus'
 import { useAdminStore } from '../../stores/admin'
+import UploadImageField from '../../components/UploadImageField.vue'
 
 const adminStore = useAdminStore()
 const { artists: artistsState } = storeToRefs(adminStore)
@@ -62,6 +72,7 @@ const editingId = ref(null)
 const form = reactive({
   name: '',
   tags: '',
+  avatarUrl: '',
   works: 0,
   status: 'ONLINE'
 })
@@ -77,6 +88,7 @@ function resetForm() {
   editingId.value = null
   form.name = ''
   form.tags = ''
+  form.avatarUrl = ''
   form.works = 0
   form.status = 'ONLINE'
 }
@@ -89,6 +101,7 @@ function startEdit(row) {
   editingId.value = row.id
   form.name = row.name || ''
   form.tags = row.tags || ''
+  form.avatarUrl = row.avatarUrl || ''
   form.works = Number(row.works || 0)
   form.status = normalizeArtistStatus(row.status)
 }
@@ -108,6 +121,7 @@ async function submitForm() {
     await adminStore.saveArtist(editingId.value, {
       name: form.name.trim(),
       tags: form.tags.trim(),
+      avatarUrl: form.avatarUrl,
       works: Number(form.works || 0),
       status: form.status
     })

@@ -6,6 +6,7 @@ public class AdminOperationVO {
     private String title;
     private String type;
     private String target;
+    private String imageUrl;
     private String status;
     private String updatedAt;
 
@@ -17,6 +18,8 @@ public class AdminOperationVO {
     public void setType(String type) { this.type = type; }
     public String getTarget() { return target; }
     public void setTarget(String target) { this.target = target; }
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
     public String getUpdatedAt() { return updatedAt; }

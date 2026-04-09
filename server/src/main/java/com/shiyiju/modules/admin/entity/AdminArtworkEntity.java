@@ -11,6 +11,7 @@ public class AdminArtworkEntity {
     private String status;
     private String tag;
     private String description;
+    private String coverUrl;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -30,4 +31,6 @@ public class AdminArtworkEntity {
     public void setTag(String tag) { this.tag = tag; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+    public String getCoverUrl() { return coverUrl; }
+    public void setCoverUrl(String coverUrl) { this.coverUrl = coverUrl; }
 }

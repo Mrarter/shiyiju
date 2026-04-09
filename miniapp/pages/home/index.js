@@ -15,6 +15,17 @@ function formatSaleStatus(status) {
   return map[status] || "持续更新"
 }
 
+function formatCategory(category) {
+  const map = {
+    PAINTING: "绘画",
+    PRINT: "版画",
+    INK: "水墨",
+    SCULPTURE: "雕塑",
+    OTHER: "精选"
+  }
+  return map[category] || "精选"
+}
+
 function buildCoverStyle(index) {
   const presets = [
     {
@@ -47,11 +58,26 @@ function normalizeWork(item, index) {
     title: item.title,
     artistName: item.artistName,
     artistLevelName: item.artistLevelName || "签约艺术家",
+    categoryText: formatCategory(item.category),
     coverUrl: item.coverUrl || "",
     priceText: formatPrice(item.currentPrice),
     statusText: formatSaleStatus(item.saleStatus),
     coverFallback: (item.title || "作品").slice(0, 2),
-    coverStyle: buildCoverStyle(index)
+    coverStyle: buildCoverStyle(index),
+    viewCountText: `${item.viewCount || 0} 浏览`,
+    favoriteCountText: `${item.favoriteCount || 0} 收藏`
+  }
+}
+
+function normalizeArtist(item, index) {
+  const styles = buildCoverStyle(index)
+  return {
+    id: item.artistId,
+    name: item.artistName,
+    levelName: item.levelName || "签约艺术家",
+    slogan: item.slogan || "持续创作中",
+    avatarUrl: item.avatar || item.avatarUrl || "",
+    badgeStyle: styles
   }
 }
 
@@ -60,9 +86,13 @@ function buildEmptyState() {
     loading: false,
     error: "",
     allWorks: [],
+    onlineWorks: [],
     featuredWork: null,
     hotWorks: [],
     risingWorks: [],
+    recommendedArtists: [],
+    bannerItems: [],
+    headlineMetrics: [],
     hasAnyContent: false
   }
 }
@@ -72,9 +102,13 @@ Page({
     loading: true,
     error: "",
     allWorks: [],
+    onlineWorks: [],
     featuredWork: null,
     hotWorks: [],
     risingWorks: [],
+    recommendedArtists: [],
+    bannerItems: [],
+    headlineMetrics: [],
     hasAnyContent: false
   },
 
@@ -85,8 +119,12 @@ Page({
   async loadHome() {
     this.setData({ loading: true, error: "" })
     try {
-      const works = await api.request({ url: "/works", method: "GET" })
+      const [works, artists] = await Promise.all([
+        api.request({ url: "/works", method: "GET" }),
+        api.request({ url: "/artists/recommend?limit=3", method: "GET" })
+      ])
       const workPool = (works || []).map(normalizeWork)
+      const artistPool = (artists || []).map(normalizeArtist)
       const hasAnyContent = workPool.length > 0
 
       if (!hasAnyContent) {
@@ -98,9 +136,23 @@ Page({
         loading: false,
         error: "",
         allWorks: workPool,
+        onlineWorks: workPool,
         featuredWork: workPool[0] || null,
         hotWorks: workPool.slice(0, 4),
-        risingWorks: workPool.slice(0, 3),
+        risingWorks: workPool.slice(1, 4),
+        recommendedArtists: artistPool,
+        bannerItems: workPool.slice(0, 3).map((item, index) => ({
+          id: item.id,
+          eyebrow: index === 0 ? "主推" : index === 1 ? "热卖" : "上新",
+          title: item.title,
+          subtitle: `${item.artistName} · ${item.categoryText}`,
+          priceText: item.priceText
+        })),
+        headlineMetrics: [
+          { label: "在线作品", value: `${workPool.length}` },
+          { label: "签约艺术家", value: `${new Set(workPool.map((item) => item.artistName)).size}` },
+          { label: "本周推荐", value: `${Math.min(workPool.length, 3)}` }
+        ],
         hasAnyContent
       })
     } catch (error) {
@@ -120,6 +172,12 @@ Page({
 
   goDiscover() {
     wx.switchTab({ url: "/pages/discover/index" })
+  },
+
+  goArtistProfile(event) {
+    const artistId = event.currentTarget.dataset.artistId
+    if (!artistId) return
+    wx.navigateTo({ url: `/pages/artist/profile?id=${artistId}` })
   },
 
   goPublish() {

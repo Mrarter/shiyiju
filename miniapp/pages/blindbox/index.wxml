@@ -1,0 +1,11 @@
+<view class="app-shell">
+  <view class="safe-top"></view>
+  <view class="page-body">
+    <view class="page-title">艺术盲盒</view>
+    <view class="page-subtitle">P2 页面已按设计规范预留专题结构，可继续接概率说明和开盒结果。</view>
+    <view class="hero-card section placeholder-card">
+      <view class="section-title">盲盒列表</view>
+      <view class="page-subtitle">展示盲盒主题、价格、概率说明与开盒入口。</view>
+    </view>
+  </view>
+</view>

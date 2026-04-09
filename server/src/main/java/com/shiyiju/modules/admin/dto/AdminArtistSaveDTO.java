@@ -10,6 +10,7 @@ public class AdminArtistSaveDTO {
     private String name;
 
     private String tags;
+    private String avatarUrl;
 
     @NotNull
     @Min(0)
@@ -22,6 +23,8 @@ public class AdminArtistSaveDTO {
     public void setName(String name) { this.name = name; }
     public String getTags() { return tags; }
     public void setTags(String tags) { this.tags = tags; }
+    public String getAvatarUrl() { return avatarUrl; }
+    public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
     public Integer getWorks() { return works; }
     public void setWorks(Integer works) { this.works = works; }
     public String getStatus() { return status; }

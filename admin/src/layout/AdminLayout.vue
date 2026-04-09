@@ -25,12 +25,14 @@
           <div class="topbar-subtitle">支撑小程序内容运营、商品运营与订单处理</div>
         </div>
         <div class="topbar-actions">
-          <el-button>消息</el-button>
+          <el-badge :value="messageCount" :hidden="messageCount === 0">
+            <el-button @click="messageDrawerVisible = true">消息</el-button>
+          </el-badge>
           <el-dropdown>
             <el-button type="primary">{{ authStore.user?.displayName || '管理员' }}</el-button>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item>个人设置</el-dropdown-item>
+                <el-dropdown-item @click="openProfileDialog">个人设置</el-dropdown-item>
                 <el-dropdown-item @click="handleLogout">退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -42,16 +44,49 @@
       </main>
     </div>
   </div>
+
+  <el-drawer v-model="messageDrawerVisible" title="系统消息" size="420px">
+    <div class="message-list">
+      <div v-if="messages.length" class="message-card" v-for="item in messages" :key="item.title">
+        <div class="message-title">{{ item.title }}</div>
+        <div class="message-body">{{ item.body }}</div>
+      </div>
+      <el-empty v-else description="暂无待处理消息" />
+    </div>
+  </el-drawer>
+
+  <el-dialog v-model="profileDialogVisible" title="个人设置" width="420px">
+    <div style="display: grid; gap: 16px;">
+      <el-input v-model="profileForm.displayName" placeholder="展示名称" />
+      <el-input :model-value="authStore.user?.username || ''" disabled placeholder="登录账号" />
+      <div class="page-subtitle">这里只保存后台展示名称，不影响登录账号。</div>
+    </div>
+    <template #footer>
+      <el-button @click="profileDialogVisible = false">取消</el-button>
+      <el-button type="primary" @click="saveProfile">保存</el-button>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
+import { storeToRefs } from 'pinia'
+import { ElMessage } from 'element-plus'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { useAdminStore } from '../stores/admin'
 
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const adminStore = useAdminStore()
+const { dashboard } = storeToRefs(adminStore)
+const messageDrawerVisible = ref(false)
+const profileDialogVisible = ref(false)
+const profileForm = reactive({
+  displayName: ''
+})
+
 const pageTitle = computed(() => {
   const map = {
     '/dashboard': '控制台',
@@ -64,6 +99,38 @@ const pageTitle = computed(() => {
   }
   return map[route.path] || '拾艺局运营后台'
 })
+
+const messages = computed(() => {
+  const todoMessages = (dashboard.value?.todos || []).map((item, index) => ({
+    title: `待处理事项 ${index + 1}`,
+    body: item
+  }))
+  const systemMessages = authStore.user?.displayName
+    ? [{
+        title: '当前登录身份',
+        body: `你正在以“${authStore.user.displayName}”身份管理后台。`
+      }]
+    : []
+  return [...todoMessages, ...systemMessages]
+})
+
+const messageCount = computed(() => messages.value.length)
+
+function openProfileDialog() {
+  profileForm.displayName = authStore.user?.displayName || ''
+  profileDialogVisible.value = true
+}
+
+function saveProfile() {
+  const displayName = profileForm.displayName.trim()
+  if (!displayName) {
+    ElMessage.warning('请输入展示名称')
+    return
+  }
+  authStore.saveProfile({ displayName })
+  profileDialogVisible.value = false
+  ElMessage.success('个人设置已保存')
+}
 
 async function handleLogout() {
   authStore.clearAuth()
@@ -78,6 +145,9 @@ onMounted(async () => {
       authStore.clearAuth()
       await router.push('/login')
     }
+  }
+  if (!dashboard.value) {
+    await adminStore.loadDashboard()
   }
 })
 </script>
@@ -167,9 +237,33 @@ onMounted(async () => {
 .topbar-actions {
   display: flex;
   gap: 12px;
+  align-items: center;
 }
 
 .content-area {
   margin-top: 20px;
+}
+
+.message-list {
+  display: grid;
+  gap: 12px;
+}
+
+.message-card {
+  border: 1px solid #ebeef5;
+  border-radius: 12px;
+  padding: 14px;
+  background: #fafafa;
+}
+
+.message-title {
+  font-weight: 700;
+  color: #1f2329;
+}
+
+.message-body {
+  margin-top: 8px;
+  color: #646a73;
+  line-height: 1.6;
 }
 </style>

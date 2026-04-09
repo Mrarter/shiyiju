@@ -2,25 +2,38 @@ package com.shiyiju.modules.admin.controller;
 
 import com.shiyiju.common.api.ApiResponse;
 import com.shiyiju.modules.admin.dto.AdminOperationSaveDTO;
+import com.shiyiju.modules.admin.dto.AdminAccountSaveDTO;
 import com.shiyiju.modules.admin.dto.AdminArtistSaveDTO;
 import com.shiyiju.modules.admin.dto.AdminArtworkSaveDTO;
+import com.shiyiju.modules.admin.dto.AdminConfigItemSaveDTO;
 import com.shiyiju.modules.admin.dto.AdminRemarkUpdateDTO;
+import com.shiyiju.modules.admin.dto.AdminRoleSaveDTO;
 import com.shiyiju.modules.admin.dto.AdminShipmentUpdateDTO;
 import com.shiyiju.modules.admin.dto.AdminStatusUpdateDTO;
 import com.shiyiju.modules.admin.service.AdminContentService;
+import com.shiyiju.modules.admin.service.AdminSettingsService;
+import com.shiyiju.modules.admin.vo.AdminAccountVO;
 import com.shiyiju.modules.admin.vo.AdminArtistVO;
 import com.shiyiju.modules.admin.vo.AdminArtworkVO;
+import com.shiyiju.modules.admin.vo.AdminConfigItemVO;
 import com.shiyiju.modules.admin.vo.AdminOperationVO;
 import com.shiyiju.modules.admin.vo.AdminOrderVO;
+import com.shiyiju.modules.admin.vo.AdminRoleVO;
+import com.shiyiju.modules.admin.vo.AdminUploadVO;
 import com.shiyiju.modules.admin.vo.AdminUserVO;
+import com.shiyiju.modules.admin.service.AdminAssetService;
 import jakarta.validation.Valid;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -29,14 +42,23 @@ import java.util.List;
 public class AdminContentController {
 
     private final AdminContentService adminContentService;
+    private final AdminAssetService adminAssetService;
+    private final AdminSettingsService adminSettingsService;
 
-    public AdminContentController(AdminContentService adminContentService) {
+    public AdminContentController(AdminContentService adminContentService, AdminAssetService adminAssetService, AdminSettingsService adminSettingsService) {
         this.adminContentService = adminContentService;
+        this.adminAssetService = adminAssetService;
+        this.adminSettingsService = adminSettingsService;
     }
 
     @GetMapping("/operations")
     public ApiResponse<List<AdminOperationVO>> operations() {
         return ApiResponse.success(adminContentService.listOperations());
+    }
+
+    @PostMapping(value = "/uploads/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<AdminUploadVO> uploadImage(@RequestPart("file") MultipartFile file) {
+        return ApiResponse.success("上传成功", adminAssetService.uploadImage(file));
     }
 
     @PostMapping("/operations")
@@ -100,6 +122,74 @@ public class AdminContentController {
     @GetMapping("/users")
     public ApiResponse<List<AdminUserVO>> users() {
         return ApiResponse.success(adminContentService.listUsers());
+    }
+
+    @PutMapping("/users/{id}/status")
+    public ApiResponse<Void> updateUserStatus(@PathVariable Long id, @Valid @RequestBody AdminStatusUpdateDTO request) {
+        adminContentService.updateUserStatus(id, request.getStatus());
+        return ApiResponse.success("更新成功", null);
+    }
+
+    @GetMapping("/settings/accounts")
+    public ApiResponse<List<AdminAccountVO>> accounts() {
+        return ApiResponse.success(adminSettingsService.listAccounts());
+    }
+
+    @PostMapping("/settings/accounts")
+    public ApiResponse<AdminAccountVO> createAccount(@Valid @RequestBody AdminAccountSaveDTO request) {
+        return ApiResponse.success("创建成功", adminSettingsService.saveAccount(null, request));
+    }
+
+    @PutMapping("/settings/accounts/{id}")
+    public ApiResponse<AdminAccountVO> updateAccount(@PathVariable Long id, @Valid @RequestBody AdminAccountSaveDTO request) {
+        return ApiResponse.success("更新成功", adminSettingsService.saveAccount(id, request));
+    }
+
+    @GetMapping("/settings/roles")
+    public ApiResponse<List<AdminRoleVO>> roles() {
+        return ApiResponse.success(adminSettingsService.listRoles());
+    }
+
+    @PostMapping("/settings/roles")
+    public ApiResponse<AdminRoleVO> createRole(@Valid @RequestBody AdminRoleSaveDTO request) {
+        return ApiResponse.success("创建成功", adminSettingsService.saveRole(null, request));
+    }
+
+    @PutMapping("/settings/roles/{id}")
+    public ApiResponse<AdminRoleVO> updateRole(@PathVariable Long id, @Valid @RequestBody AdminRoleSaveDTO request) {
+        return ApiResponse.success("更新成功", adminSettingsService.saveRole(id, request));
+    }
+
+    @DeleteMapping("/settings/roles/{id}")
+    public ApiResponse<Void> deleteRole(@PathVariable Long id) {
+        adminSettingsService.deleteRole(id);
+        return ApiResponse.success("删除成功", null);
+    }
+
+    @GetMapping("/settings/configs")
+    public ApiResponse<List<AdminConfigItemVO>> configs() {
+        return ApiResponse.success(adminSettingsService.listConfigs());
+    }
+
+    @PostMapping("/settings/configs")
+    public ApiResponse<AdminConfigItemVO> createConfig(@Valid @RequestBody AdminConfigItemSaveDTO request) {
+        return ApiResponse.success("创建成功", adminSettingsService.saveConfig(null, request));
+    }
+
+    @PutMapping("/settings/configs/{id}")
+    public ApiResponse<AdminConfigItemVO> updateConfig(@PathVariable Long id, @Valid @RequestBody AdminConfigItemSaveDTO request) {
+        return ApiResponse.success("更新成功", adminSettingsService.saveConfig(id, request));
+    }
+
+    @PostMapping("/settings/configs/{id}/duplicate")
+    public ApiResponse<AdminConfigItemVO> duplicateConfig(@PathVariable Long id) {
+        return ApiResponse.success("复制成功", adminSettingsService.duplicateConfig(id));
+    }
+
+    @DeleteMapping("/settings/configs/{id}")
+    public ApiResponse<Void> deleteConfig(@PathVariable Long id) {
+        adminSettingsService.deleteConfig(id);
+        return ApiResponse.success("删除成功", null);
     }
 
     @GetMapping("/orders")

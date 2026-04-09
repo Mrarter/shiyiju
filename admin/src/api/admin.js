@@ -33,6 +33,11 @@ export async function updateOperationConfig(id, payload) {
   return http.put(`${ADMIN_API_PREFIX}/operations/${id}`, payload)
 }
 
+export async function uploadAdminImage(file) {
+  if (useMock) return { url: URL.createObjectURL(file), name: file.name }
+  return http.upload(`${ADMIN_API_PREFIX}/uploads/images`, file)
+}
+
 export async function updateArtworkStatus(id, status) {
   if (useMock) return { success: true }
   return http.put(`${ADMIN_API_PREFIX}/artworks/${id}/status`, { status })
@@ -88,6 +93,11 @@ export async function getUsers() {
   return http.get(`${ADMIN_API_PREFIX}/users`)
 }
 
+export async function updateUserStatus(id, status) {
+  if (useMock) return { success: true }
+  return http.put(`${ADMIN_API_PREFIX}/users/${id}/status`, { status })
+}
+
 export async function getOrders() {
   if (useMock) return orders
   return http.get(`${ADMIN_API_PREFIX}/orders`)
@@ -102,4 +112,64 @@ export async function getCurrentMiniappCapabilities() {
     userMeApi: `${API_PREFIX}/users/me`,
     orderDetailApi: `${API_PREFIX}/orders/{id}`
   }
+}
+
+export async function getAdminAccounts() {
+  if (useMock) return []
+  return http.get(`${ADMIN_API_PREFIX}/settings/accounts`)
+}
+
+export async function createAdminAccount(payload) {
+  if (useMock) return { id: Date.now(), ...payload }
+  return http.post(`${ADMIN_API_PREFIX}/settings/accounts`, payload)
+}
+
+export async function updateAdminAccount(id, payload) {
+  if (useMock) return { id, ...payload }
+  return http.put(`${ADMIN_API_PREFIX}/settings/accounts/${id}`, payload)
+}
+
+export async function getAdminRoles() {
+  if (useMock) return []
+  return http.get(`${ADMIN_API_PREFIX}/settings/roles`)
+}
+
+export async function createAdminRole(payload) {
+  if (useMock) return { id: Date.now(), ...payload }
+  return http.post(`${ADMIN_API_PREFIX}/settings/roles`, payload)
+}
+
+export async function updateAdminRole(id, payload) {
+  if (useMock) return { id, ...payload }
+  return http.put(`${ADMIN_API_PREFIX}/settings/roles/${id}`, payload)
+}
+
+export async function deleteAdminRole(id) {
+  if (useMock) return { success: true }
+  return http.delete(`${ADMIN_API_PREFIX}/settings/roles/${id}`)
+}
+
+export async function getSystemConfigs() {
+  if (useMock) return []
+  return http.get(`${ADMIN_API_PREFIX}/settings/configs`)
+}
+
+export async function createSystemConfig(payload) {
+  if (useMock) return { id: Date.now(), ...payload }
+  return http.post(`${ADMIN_API_PREFIX}/settings/configs`, payload)
+}
+
+export async function updateSystemConfig(id, payload) {
+  if (useMock) return { id, ...payload }
+  return http.put(`${ADMIN_API_PREFIX}/settings/configs/${id}`, payload)
+}
+
+export async function duplicateSystemConfig(id) {
+  if (useMock) return { success: true }
+  return http.post(`${ADMIN_API_PREFIX}/settings/configs/${id}/duplicate`, {})
+}
+
+export async function deleteSystemConfig(id) {
+  if (useMock) return { success: true }
+  return http.delete(`${ADMIN_API_PREFIX}/settings/configs/${id}`)
 }

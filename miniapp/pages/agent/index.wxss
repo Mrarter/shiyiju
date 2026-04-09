@@ -1,0 +1,16 @@
+.agent-action {
+  padding: 24rpx;
+  min-height: 160rpx;
+}
+
+.action-icon {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 30rpx;
+  background: linear-gradient(135deg, rgba(214, 176, 116, 0.24), rgba(214, 176, 116, 0.08));
+}
+
+.action-text {
+  margin-top: 24rpx;
+  font-size: 28rpx;
+}

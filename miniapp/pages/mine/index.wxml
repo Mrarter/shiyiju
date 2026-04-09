@@ -1,53 +1,129 @@
-<view class="app-shell">
+<view class="mine-page">
   <view class="safe-top"></view>
-  <view class="page-body" wx:if="{{!loading && user}}">
-    <view class="section">
-      <view class="surface-card hero-card">
-        <view class="hero-top">
-          <view>
-            <view class="eyebrow">我的</view>
-            <view class="hero-title">{{user.nickname || '微信用户'}}</view>
-            <view class="page-subtitle">{{user.status || 'ENABLED'}} · {{user.registerSource || 'WECHAT_MINIAPP'}}</view>
+
+  <view class="page-body" wx:if="{{!loading && user && profileSummary}}">
+    <view class="top-tools">
+      <view class="tool-badge">💡</view>
+      <view class="tool-frame">⌲</view>
+    </view>
+
+    <view class="profile-section">
+      <view class="profile-card">
+        <view class="profile-main">
+          <image wx:if="{{profileSummary.avatarUrl}}" src="{{profileSummary.avatarUrl}}" mode="aspectFill" class="profile-avatar"></image>
+          <view
+            wx:else
+            class="profile-avatar placeholder-avatar"
+            style="background: {{profileSummary.avatarPlaceholder.background}};"
+          >
+            <view class="avatar-glow" style="background: {{profileSummary.avatarPlaceholder.glow}};"></view>
+            <view class="avatar-title">{{profileSummary.avatarPlaceholder.title}}</view>
           </view>
+
+          <view class="profile-meta">
+            <view class="profile-name-row">
+              <view class="profile-name">{{profileSummary.name}}</view>
+              <view class="profile-mark">{{profileSummary.roleText}}</view>
+            </view>
+            <view class="profile-link">{{profileSummary.profileText}} ›</view>
+            <view class="profile-stats">
+              <text>关注 {{profileSummary.follows}}</text>
+              <text>|</text>
+              <text>粉丝 {{profileSummary.fans}}</text>
+              <text>|</text>
+              <text>勋章 {{profileSummary.medals}}</text>
+            </view>
+          </view>
+        </view>
+
+        <view class="credit-chip">信用分{{profileSummary.creditScore}} ›</view>
+      </view>
+
+      <view class="auth-card">
+        <view>
+          <view class="auth-title">{{profileSummary.authTitle}}</view>
+          <view class="auth-desc">{{profileSummary.authDesc}}</view>
+        </view>
+        <view class="auth-btn" bindtap="handleAuthTap">去认证</view>
+      </view>
+    </view>
+
+    <view class="asset-card">
+      <view class="asset-item" wx:for="{{assets}}" wx:key="label">
+        <view class="asset-value">{{item.value}}</view>
+        <view class="asset-label">{{item.label}}</view>
+      </view>
+    </view>
+
+    <view class="section-card trade-card">
+      <view class="section-title">我的交易</view>
+      <view class="trade-grid">
+        <view class="trade-item" wx:for="{{tradeMenus}}" wx:key="key" bindtap="handleTradeTap" data-key="{{item.key}}">
+          <view class="trade-icon">{{item.icon}}</view>
+          <view class="trade-label">{{item.label}}</view>
         </view>
       </view>
     </view>
 
-    <view class="section">
-      <view class="grid-two">
-        <view class="surface-card value-card" wx:for="{{stats}}" wx:key="label">
-          <view class="value-title">{{item.label}}</view>
-          <view class="metric-value">{{item.value}}</view>
+    <view class="feature-grid">
+      <view class="feature-card" wx:for="{{featureCards}}" wx:key="key" bindtap="handleFeatureTap" data-key="{{item.key}}">
+        <view class="feature-head">
+          <view class="feature-title">{{item.title}}</view>
+          <view class="feature-arrow">›</view>
+        </view>
+        <view class="feature-desc">{{item.desc}}</view>
+
+        <block wx:if="{{item.key === 'carbon'}}">
+          <view class="carbon-dot" wx:if="{{item.badge}}"></view>
+          <view class="carbon-panel">
+            <view class="carbon-row">
+              <view class="carbon-label">{{item.valueLabel}}</view>
+              <view class="carbon-action">{{item.actionText}} ›</view>
+            </view>
+            <view class="carbon-value">{{item.value}}</view>
+          </view>
+        </block>
+
+        <block wx:elif="{{item.key === 'certificate'}}">
+          <view class="certificate-card">
+            <view class="certificate-inner">
+              <view class="certificate-title">艺术品收藏证书</view>
+              <view class="certificate-stamp"></view>
+            </view>
+          </view>
+        </block>
+      </view>
+    </view>
+
+    <view class="section-card quick-card">
+      <view class="quick-grid">
+        <view class="quick-item" wx:for="{{quickLinks}}" wx:key="key" bindtap="handleQuickLinkTap" data-key="{{item.key}}">
+          <view class="quick-icon">{{item.icon}}</view>
+          <view class="quick-label">{{item.label}}</view>
         </view>
       </view>
     </view>
 
-    <view class="section">
-      <view class="section-head">
-        <view class="section-title">功能入口</view>
-      </view>
-      <view class="menu-list">
-        <view class="surface-card menu-item" wx:for="{{menus}}" wx:key="key" bindtap="handleMenuTap" data-key="{{item.key}}">
-          <view>
-            <view class="menu-title">{{item.label}}</view>
-            <view class="page-subtitle">{{item.desc}}</view>
-          </view>
-          <view class="menu-arrow">›</view>
+    <view class="section-card service-card">
+      <view class="service-grid">
+        <view class="service-item" wx:for="{{serviceLinks}}" wx:key="key" bindtap="handleServiceTap" data-key="{{item.key}}">
+          <view class="service-icon">{{item.icon}}</view>
+          <view class="service-label">{{item.label}}</view>
         </view>
       </view>
     </view>
+
+    <view class="version-text">版本号：6.13.21</view>
   </view>
 
   <view class="page-body" wx:elif="{{loading}}">
-    <view class="section">
-      <view class="surface-card page-subtitle">我的页面加载中...</view>
-    </view>
+    <view class="section-card loading-card">我的页面加载中...</view>
   </view>
 
   <view class="page-body" wx:elif="{{error}}">
-    <view class="section">
-      <view class="surface-card page-subtitle">{{error}}</view>
-      <view class="gold-button" bindtap="handleRetry">重试</view>
-    </view>
+    <view class="section-card loading-card">{{error}}</view>
+    <view class="retry-btn" bindtap="handleRetry">重试</view>
   </view>
+
+  <view class="bottom-bar-spacer"></view>
 </view>

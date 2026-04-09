@@ -1,0 +1,25 @@
+.artist-header {
+  padding: 28rpx;
+  display: flex;
+  gap: 20rpx;
+}
+
+.artist-avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 60rpx;
+}
+
+.artist-header-meta {
+  flex: 1;
+}
+
+.stat-surface {
+  padding: 22rpx;
+}
+
+.tiny-btn {
+  min-width: 110rpx;
+  height: 58rpx;
+  font-size: 22rpx;
+}

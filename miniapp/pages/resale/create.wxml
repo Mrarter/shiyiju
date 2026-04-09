@@ -1,0 +1,44 @@
+<view class="app-shell">
+  <view class="safe-top"></view>
+  <view class="page-body">
+    <view class="page-title">转售发布</view>
+    <view class="page-subtitle">3 步完成价格填写、交付方式选择与确认发布。</view>
+
+    <view class="grid-three section">
+      <view class="step-card step" wx:for="{{steps}}" wx:key="*this">
+        <view class="tag">{{index + 1}}</view>
+        <view class="step-title">{{item}}</view>
+      </view>
+    </view>
+
+    <view class="surface-card section form-card">
+      <view class="section-title">Step 1 · 转售价</view>
+      <view class="form-line">
+        <view class="metric-label">当前持有成本</view>
+        <view>¥6,200</view>
+      </view>
+      <view class="form-line">
+        <view class="metric-label">建议价格区间</view>
+        <view class="accent">¥7,800 - ¥8,900</view>
+      </view>
+      <view class="form-line">
+        <view class="metric-label">预计到手金额</view>
+        <view class="metric-value">¥8,180</view>
+      </view>
+    </view>
+
+    <view class="surface-card section form-card">
+      <view class="section-title">Step 2 · 交付方式</view>
+      <view class="method-list">
+        <view class="method-item" wx:for="{{methods}}" wx:key="*this">
+          <view class="method-radio"></view>
+          <view>{{item}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="gold-button full-btn">确认发布</view>
+    </view>
+  </view>
+</view>

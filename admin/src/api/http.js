@@ -2,11 +2,12 @@ import { API_BASE_URL } from '../config/env'
 
 async function request(path, options = {}) {
   const token = localStorage.getItem('shiyiju_admin_token')
+  const isFormData = options.body instanceof FormData
   const response = await fetch(`${API_BASE_URL}${path}`, {
     mode: 'cors',
     credentials: 'omit',
     headers: {
-      'Content-Type': 'application/json',
+      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(options.headers || {})
     },
@@ -35,9 +36,17 @@ export const http = {
     return request(path)
   },
   post(path, body) {
-    return request(path, { method: 'POST', body: JSON.stringify(body) })
+    return request(path, { method: 'POST', body: body instanceof FormData ? body : JSON.stringify(body) })
   },
   put(path, body) {
-    return request(path, { method: 'PUT', body: JSON.stringify(body) })
+    return request(path, { method: 'PUT', body: body instanceof FormData ? body : JSON.stringify(body) })
+  },
+  delete(path) {
+    return request(path, { method: 'DELETE' })
+  },
+  upload(path, file) {
+    const formData = new FormData()
+    formData.append('file', file)
+    return request(path, { method: 'POST', body: formData })
   }
 }

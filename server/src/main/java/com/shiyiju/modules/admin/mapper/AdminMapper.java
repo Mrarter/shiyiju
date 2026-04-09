@@ -30,6 +30,10 @@ public interface AdminMapper {
 
     int updateArtist(AdminArtistEntity entity);
 
+    int updateArtistUserAvatar(@Param("artistId") Long artistId,
+                               @Param("nickname") String nickname,
+                               @Param("avatarUrl") String avatarUrl);
+
     int updateArtistStatus(@Param("id") Long id, @Param("status") String status);
 
     List<AdminArtworkEntity> findArtworks();
@@ -38,9 +42,24 @@ public interface AdminMapper {
 
     int updateArtwork(AdminArtworkEntity entity);
 
+    int updateArtworkCover(@Param("artworkId") Long artworkId, @Param("coverUrl") String coverUrl);
+
+    int insertArtworkCover(@Param("artworkId") Long artworkId, @Param("coverUrl") String coverUrl);
+
+    int deleteArtworkCover(@Param("artworkId") Long artworkId);
+
     int updateArtworkStatus(@Param("id") Long id, @Param("status") String status);
 
     List<AdminUserEntity> findUsers();
+
+    int updateUserStatus(@Param("id") Long id, @Param("status") String status);
+
+    String findConfigValue(@Param("configKey") String configKey);
+
+    int upsertConfig(@Param("configKey") String configKey,
+                     @Param("configValue") String configValue,
+                     @Param("configGroup") String configGroup,
+                     @Param("remark") String remark);
 
     List<AdminOrderEntity> findOrders();
 

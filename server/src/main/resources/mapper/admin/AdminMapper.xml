@@ -10,6 +10,7 @@
             title,
             type,
             target,
+            image_url AS imageUrl,
             CASE WHEN status = 'ENABLED' THEN '启用' WHEN status = 'DRAFT' THEN '草稿' ELSE '停用' END AS status,
             sort_no,
             DATE_FORMAT(updated_at, '%Y-%m-%d %H:%i') AS updated_at
@@ -18,8 +19,8 @@
     </select>
 
     <insert id="insertOperation" parameterType="com.shiyiju.modules.admin.entity.AdminOperationEntity" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO admin_operation_config (title, type, target, status, sort_no)
-        VALUES (#{title}, #{type}, #{target}, #{status}, #{sortNo})
+        INSERT INTO admin_operation_config (title, type, target, image_url, status, sort_no)
+        VALUES (#{title}, #{type}, #{target}, #{imageUrl}, #{status}, #{sortNo})
     </insert>
 
     <update id="updateOperation" parameterType="com.shiyiju.modules.admin.entity.AdminOperationEntity">
@@ -27,6 +28,7 @@
         SET title = #{title},
             type = #{type},
             target = #{target},
+            image_url = #{imageUrl},
             status = #{status},
             sort_no = #{sortNo}
         WHERE id = #{id}
@@ -45,6 +47,7 @@
             artist_name AS name,
             '' AS city,
             COALESCE(style_tags, '') AS tags,
+            avatar_url AS avatarUrl,
             COALESCE(work_count, 0) AS works,
             CASE WHEN status = 'ACTIVE' THEN '上线' ELSE '下线' END AS status,
             id AS sort
@@ -61,8 +64,8 @@
     </insert>
 
     <insert id="insertArtist" parameterType="com.shiyiju.modules.admin.entity.AdminArtistEntity" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO artist_profile (user_id, artist_name, real_name, style_tags, work_count, is_signed, status)
-        VALUES (#{userId}, #{name}, #{name}, #{tags}, #{works}, 0, #{status})
+        INSERT INTO artist_profile (user_id, artist_name, real_name, style_tags, avatar_url, work_count, is_signed, status)
+        VALUES (#{userId}, #{name}, #{name}, #{tags}, #{avatarUrl}, #{works}, 0, #{status})
     </insert>
 
     <update id="updateArtist" parameterType="com.shiyiju.modules.admin.entity.AdminArtistEntity">
@@ -70,9 +73,21 @@
         SET artist_name = #{name},
             real_name = #{name},
             style_tags = #{tags},
+            avatar_url = #{avatarUrl},
             work_count = #{works},
             status = #{status}
         WHERE id = #{id}
+    </update>
+
+    <update id="updateArtistUserAvatar">
+        UPDATE user_account
+        SET nickname = #{nickname},
+            avatar_url = #{avatarUrl}
+        WHERE id = (
+            SELECT ap.user_id
+            FROM artist_profile ap
+            WHERE ap.id = #{artistId}
+        )
     </update>
 
     <update id="updateArtistStatus">
@@ -89,6 +104,13 @@
             ap.artist_name AS artist,
             CONCAT('¥', FORMAT(a.current_price, 2)) AS price,
             COALESCE(a.inventory_available, 0) AS stock,
+            (
+                SELECT am.media_url
+                FROM artwork_media am
+                WHERE am.artwork_id = a.id
+                ORDER BY am.is_main DESC, am.sort_no ASC, am.id ASC
+                LIMIT 1
+            ) AS coverUrl,
             CASE
                 WHEN a.status = 'PUBLISHED' THEN '上架'
                 WHEN a.status = 'COLLECTED' THEN '已收藏'
@@ -133,6 +155,34 @@
         WHERE id = #{id}
     </update>
 
+    <update id="updateArtworkCover">
+        UPDATE artwork_media
+        SET media_url = #{coverUrl},
+            media_type = 'IMAGE',
+            sort_no = 1,
+            is_main = 1
+        WHERE id = (
+            SELECT id
+            FROM (
+                SELECT id
+                FROM artwork_media
+                WHERE artwork_id = #{artworkId}
+                ORDER BY is_main DESC, sort_no ASC, id ASC
+                LIMIT 1
+            ) t
+        )
+    </update>
+
+    <insert id="insertArtworkCover">
+        INSERT INTO artwork_media (artwork_id, media_type, media_url, sort_no, is_main)
+        VALUES (#{artworkId}, 'IMAGE', #{coverUrl}, 1, 1)
+    </insert>
+
+    <delete id="deleteArtworkCover">
+        DELETE FROM artwork_media
+        WHERE artwork_id = #{artworkId}
+    </delete>
+
     <update id="updateArtworkStatus">
         UPDATE artwork
         SET status = #{status}
@@ -168,6 +218,7 @@
 
     <select id="findUsers" resultType="com.shiyiju.modules.admin.entity.AdminUserEntity">
         SELECT
+            id,
             nickname,
             user_no AS userNo,
             CASE gender
@@ -181,6 +232,28 @@
         ORDER BY id DESC
         LIMIT 100
     </select>
+
+    <update id="updateUserStatus">
+        UPDATE user_account
+        SET status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <select id="findConfigValue" resultType="string">
+        SELECT config_value
+        FROM sys_config
+        WHERE config_key = #{configKey}
+        LIMIT 1
+    </select>
+
+    <insert id="upsertConfig">
+        INSERT INTO sys_config (config_key, config_value, config_group, remark)
+        VALUES (#{configKey}, #{configValue}, #{configGroup}, #{remark})
+        ON DUPLICATE KEY UPDATE
+            config_value = VALUES(config_value),
+            config_group = VALUES(config_group),
+            remark = VALUES(remark)
+    </insert>
 
     <select id="findOrders" resultType="com.shiyiju.modules.admin.entity.AdminOrderEntity">
         SELECT

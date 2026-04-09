@@ -1,0 +1,24 @@
+<view class="app-shell">
+  <view class="safe-top"></view>
+  <view class="page-body">
+    <view class="page-title">艺荐官中心</view>
+    <view class="page-subtitle">收益、团队、推广入口合并呈现，强化增长效率。</view>
+
+    <view class="grid-two section">
+      <view class="stat-card hold-stat" wx:for="{{kpis}}" wx:key="label">
+        <view class="metric-value accent">{{item.value}}</view>
+        <view class="metric-label">{{item.label}}</view>
+      </view>
+    </view>
+
+    <view class="section-head section">
+      <view class="section-title">常用动作</view>
+    </view>
+    <view class="grid-two">
+      <view class="action-card agent-action" wx:for="{{actions}}" wx:key="*this">
+        <view class="action-icon"></view>
+        <view class="action-text">{{item}}</view>
+      </view>
+    </view>
+  </view>
+</view>

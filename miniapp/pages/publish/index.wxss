@@ -1,0 +1,4 @@
+.agent-action {
+  margin-bottom: 18rpx;
+  padding: 28rpx;
+}

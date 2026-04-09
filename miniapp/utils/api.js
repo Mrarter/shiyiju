@@ -29,12 +29,27 @@ function clearToken() {
   wx.removeStorageSync("token")
 }
 
+function normalizeRequestError(error, requestUrl) {
+  const rawMessage = (error && (error.errMsg || error.message)) || "请求失败"
+  if (rawMessage.includes("url not in domain list")) {
+    return new Error(`请求被微信合法域名校验拦截，请在开发者工具关闭“不校验合法域名”，或把 ${requestUrl} 配到 request 合法域名`)
+  }
+  if (rawMessage.includes("timeout")) {
+    return new Error(`请求超时，请确认后端服务可访问: ${requestUrl}`)
+  }
+  if (rawMessage.includes("fail")) {
+    return new Error(`网络请求失败，请确认接口地址可访问: ${requestUrl}`)
+  }
+  return new Error(rawMessage)
+}
+
 function request(options) {
   const app = getAppInstance()
   const token = getToken()
+  const requestUrl = `${app.globalData.apiBaseUrl}${options.url}`
   return new Promise((resolve, reject) => {
     wx.request({
-      url: `${app.globalData.apiBaseUrl}${options.url}`,
+      url: requestUrl,
       method: options.method || "GET",
       data: options.data,
       header: Object.assign({}, options.header, token ? { Authorization: `Bearer ${token}` } : {}),
@@ -47,10 +62,10 @@ function request(options) {
         if (body.code === 40100) {
           clearToken()
         }
-        reject(new Error(body.message || "请求失败"))
+        reject(new Error(body.message || `请求失败: ${requestUrl}`))
       },
       fail(error) {
-        reject(error)
+        reject(normalizeRequestError(error, requestUrl))
       }
     })
   })

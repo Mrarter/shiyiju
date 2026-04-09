@@ -1,53 +1,108 @@
-<view class="app-shell">
+<view class="discover-page">
   <view class="safe-top"></view>
+
   <view class="page-body">
-    <view class="page-title">发现</view>
-    <view class="page-subtitle">分类筛选、签约艺术家、独家发行与流通市场入口。</view>
-
-    <view class="tabs section">
-      <view class="tab {{activeIndex === index ? 'tab-active' : ''}}" wx:for="{{filters}}" wx:key="*this" data-index="{{index}}" bindtap="handleTabTap">{{item}}</view>
+    <view class="topbar">
+      <view class="top-icon" bindtap="handleSearchTap">⌕</view>
+      <view class="brand-word">拾艺局</view>
+      <view class="top-icon" bindtap="handleCreateTap">＋</view>
     </view>
 
-    <view class="section" wx:if="{{loading}}">
-      <view class="surface-card page-subtitle">发现页加载中...</view>
+    <view class="filter-row">
+      <view
+        class="filter-chip {{activeFilter === item ? 'filter-chip-active' : ''}}"
+        wx:for="{{filters}}"
+        wx:key="*this"
+        data-filter="{{item}}"
+        bindtap="handleTabTap"
+      >
+        {{item}}
+      </view>
     </view>
 
-    <view class="section" wx:elif="{{error}}">
-      <view class="surface-card page-subtitle">{{error}}</view>
-      <view class="gold-button" bindtap="handleRetry">重试</view>
+    <view wx:if="{{loading}}" class="loading-card">发现页加载中...</view>
+
+    <view wx:elif="{{error}}">
+      <view class="loading-card">{{error}}</view>
+      <view class="retry-btn" bindtap="handleRetry">重试</view>
     </view>
 
-    <block wx:else>
-      <view class="section">
-        <view class="section-head">
-          <view class="section-title">签约艺术家</view>
-        </view>
-        <view class="menu-list">
-          <view class="surface-card menu-item" wx:for="{{artists}}" wx:key="artistId" data-artist-id="{{item.artistId}}" bindtap="goArtistProfile">
-            <view>
-              <view class="menu-title">{{item.artistName}}</view>
-              <view class="page-subtitle">{{item.levelName || '签约艺术家'}} · {{item.slogan || '持续创作中'}}</view>
+    <view wx:else>
+      <view wx:if="{{feedItems.length}}" class="waterfall">
+        <view class="waterfall-column">
+          <view
+            class="feed-card"
+            wx:for="{{leftColumn}}"
+            wx:key="artworkId"
+          >
+            <view class="art-image art-image-{{item.visual.ratio}}" bindtap="goArtworkDetail" data-artwork-id="{{item.artworkId}}">
+              <image wx:if="{{item.coverUrl}}" src="{{item.coverUrl}}" mode="aspectFill" class="card-image"></image>
+              <view wx:else class="placeholder-art" style="background: {{item.visual.background}};">
+                <view class="art-glow" style="background: {{item.visual.glow}};"></view>
+                <view class="art-mountain left" style="background: {{item.visual.mountain}};"></view>
+                <view class="art-mountain center" style="background: {{item.visual.mountain}};"></view>
+                <view class="art-mountain right" style="background: {{item.visual.mountain}};"></view>
+              </view>
             </view>
-            <view class="menu-arrow">›</view>
+            <view class="slot-row">
+              <view class="slot-tag">{{item.slotPrimary}}</view>
+              <view class="slot-tag dark">{{item.slotSecondary}}</view>
+            </view>
+            <view class="feed-title">{{item.title}}</view>
+            <view class="feed-meta">{{item.metaText}}</view>
+            <view class="feed-price-row">
+              <view class="feed-price">{{item.priceText}}</view>
+              <view class="follow-btn {{item.followed ? 'followed' : ''}}" bindtap="handleFollowTap" data-artwork-id="{{item.artworkId}}">
+                {{item.followed ? '已关注' : '关注'}}
+              </view>
+            </view>
+            <view wx:if="{{item.discountText}}" class="discount-chip">{{item.discountText}}</view>
+            <view class="deadline-row">🔨 {{item.deadlineText}}</view>
+          </view>
+        </view>
+
+        <view class="waterfall-column">
+          <view
+            class="feed-card"
+            wx:for="{{rightColumn}}"
+            wx:key="artworkId"
+          >
+            <view class="art-image art-image-{{item.visual.ratio}}" bindtap="goArtworkDetail" data-artwork-id="{{item.artworkId}}">
+              <image wx:if="{{item.coverUrl}}" src="{{item.coverUrl}}" mode="aspectFill" class="card-image"></image>
+              <view wx:else class="placeholder-art" style="background: {{item.visual.background}};">
+                <view class="art-glow" style="background: {{item.visual.glow}};"></view>
+                <view class="art-mountain left" style="background: {{item.visual.mountain}};"></view>
+                <view class="art-mountain center" style="background: {{item.visual.mountain}};"></view>
+                <view class="art-mountain right" style="background: {{item.visual.mountain}};"></view>
+              </view>
+            </view>
+            <view class="slot-row">
+              <view class="slot-tag">{{item.slotPrimary}}</view>
+              <view class="slot-tag dark">{{item.slotSecondary}}</view>
+            </view>
+            <view class="feed-title">{{item.title}}</view>
+            <view class="feed-meta">{{item.metaText}}</view>
+            <view class="feed-price-row">
+              <view class="feed-price">{{item.priceText}}</view>
+              <view class="follow-btn {{item.followed ? 'followed' : ''}}" bindtap="handleFollowTap" data-artwork-id="{{item.artworkId}}">
+                {{item.followed ? '已关注' : '关注'}}
+              </view>
+            </view>
+            <view wx:if="{{item.discountText}}" class="discount-chip">{{item.discountText}}</view>
+            <view class="deadline-row">🔨 {{item.deadlineText}}</view>
           </view>
         </view>
       </view>
 
-      <view class="section">
-        <view class="section-head">
-          <view class="section-title">流通市场</view>
-        </view>
-        <view class="menu-list">
-          <view class="surface-card menu-item" wx:for="{{artworks}}" wx:key="artworkId" data-artwork-id="{{item.artworkId}}" bindtap="goArtworkDetail">
-            <view>
-              <view class="menu-title">{{item.title}}</view>
-              <view class="page-subtitle">{{item.artistName}} · {{item.currentPrice ? ('¥' + item.currentPrice) : '价格待定'}}</view>
-            </view>
-            <view class="menu-arrow">›</view>
-          </view>
-        </view>
+      <view wx:if="{{feedItems.length}}" class="feed-status">
+        <view wx:if="{{loadingMore}}">正在加载更多作品...</view>
+        <view wx:elif="{{hasMore}}">继续上滑，加载更多作品</view>
+        <view wx:else>已经到底了</view>
       </view>
-    </block>
+
+      <view wx:else class="loading-card">当前筛选下还没有作品</view>
+    </view>
   </view>
+
   <view class="bottom-bar-spacer"></view>
 </view>

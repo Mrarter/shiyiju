@@ -2,12 +2,15 @@ package com.shiyiju.modules.admin.vo;
 
 public class AdminUserVO {
 
+    private Long id;
     private String nickname;
     private String userNo;
     private String gender;
     private String status;
     private String lastLogin;
 
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
     public String getNickname() { return nickname; }
     public void setNickname(String nickname) { this.nickname = nickname; }
     public String getUserNo() { return userNo; }

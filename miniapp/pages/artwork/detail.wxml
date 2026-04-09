@@ -1,72 +1,90 @@
-<view class="app-shell">
+<view class="detail-page">
   <view class="safe-top"></view>
+
   <view class="page-body" wx:if="{{!loading && detail}}">
-    <view class="section">
-      <view class="surface-card">
-        <view class="detail-image" bindtap="previewImage" data-url="{{coverImage}}">
-          <image wx:if="{{coverImage}}" src="{{coverImage}}" mode="aspectFill" class="detail-image-tag"></image>
-          <view wx:else class="page-subtitle">暂无作品图片</view>
+    <view class="hero-panel">
+      <view class="hero-image" style="background: {{heroVisual.style.background}};">
+        <view class="hero-overlay"></view>
+        <view class="hero-glow" style="background: {{heroVisual.style.glow}};"></view>
+        <view class="hero-mountain left" style="background: {{heroVisual.style.mountain}};"></view>
+        <view class="hero-mountain center" style="background: {{heroVisual.style.mountain}};"></view>
+        <view class="hero-mountain right" style="background: {{heroVisual.style.mountain}};"></view>
+
+        <view class="hero-toolbar">
+          <view class="tool-btn" bindtap="goBack">‹</view>
+          <view class="tool-right">
+            <view class="tool-btn" bindtap="handleShareTap">↗</view>
+            <view class="tool-btn {{liked ? 'tool-btn-active' : ''}}" bindtap="handleLikeTap">♡</view>
+          </view>
         </view>
       </view>
     </view>
 
-    <view class="section">
-      <view class="surface-card detail-card">
-        <view class="tag-row">
-          <view class="tag" wx:for="{{tags}}" wx:key="*this">{{item}}</view>
+    <view class="info-card">
+      <view class="card-head">
+        <view class="card-chip">跨期艺术家藏</view>
+        <view class="card-arrow">›</view>
+      </view>
+
+      <view class="artwork-title">{{detail.title}}</view>
+
+      <view class="artist-row">
+        <view class="artist-main">
+          <view class="artist-avatar">{{detail.artistInitial}}</view>
+          <view class="artist-name">{{detail.artistName}}</view>
+          <view class="artist-level">{{detail.artistLevelName}}</view>
         </view>
-        <view class="hero-title">{{detail.title}}</view>
-        <view class="page-subtitle">{{detail.artistName}} · {{detail.category || '未分类'}}</view>
-        <view class="metric-value rise">{{formatPrice(detail.currentPrice)}}</view>
-        <view class="page-subtitle">编号：{{detail.artworkNo}}</view>
-      </view>
-    </view>
-
-    <view class="section">
-      <view class="section-head">
-        <view class="section-title">作品信息</view>
-      </view>
-      <view class="surface-card detail-card">
-        <view class="page-subtitle">材质：{{detail.material || '待补充'}}</view>
-        <view class="page-subtitle">创作年份：{{detail.creationYear || '待补充'}}</view>
-        <view class="page-subtitle">尺寸：{{detail.widthCm || '-'}} × {{detail.heightCm || '-'}}{{detail.depthCm ? (' × ' + detail.depthCm) : ''}} cm</view>
-        <view class="page-subtitle">状态：{{detail.saleStatusText || '持续更新'}}</view>
-      </view>
-    </view>
-
-    <view class="section">
-      <view class="section-head">
-        <view class="section-title">作品说明</view>
-      </view>
-      <view class="surface-card detail-card">
-        <view class="page-subtitle">{{detail.description || '暂无作品说明'}}</view>
-      </view>
-    </view>
-
-    <view class="section">
-      <view class="section-head">
-        <view class="section-title">作品数据</view>
-      </view>
-      <view class="grid-two">
-        <view class="surface-card value-card" wx:for="{{stats}}" wx:key="label">
-          <view class="value-title">{{item.label}}</view>
-          <view class="metric-value">{{item.value}}</view>
+        <view class="follow-pill {{followed ? 'follow-pill-active' : ''}}" bindtap="handleFollowTap">
+          {{followed ? '已关注' : '关注'}}
         </view>
       </view>
+
+      <view class="price-row">
+        <view class="price-main">{{detail.currentPriceText}}</view>
+        <view class="price-change">{{detail.changeRateText}}</view>
+      </view>
+      <view class="price-hint">{{detail.dynamicHint}}</view>
+
+      <view class="stats-grid">
+        <view class="stat-item" wx:for="{{stats}}" wx:key="label">
+          <view class="stat-label">{{item.label}}</view>
+          <view class="stat-value">{{item.value}}</view>
+        </view>
+      </view>
+
+      <view class="section-title">作品信息</view>
+      <view class="info-list">
+        <view class="info-row" wx:for="{{infoRows}}" wx:key="label">
+          <view class="info-label">{{item.label}}</view>
+          <view class="info-value">{{item.value}}</view>
+        </view>
+      </view>
+
+      <view class="section-title">入藏方案</view>
+      <view class="option-list">
+        <view class="option-row" wx:for="{{optionRows}}" wx:key="label">
+          <view class="option-label">{{item.label}}</view>
+          <view class="option-value">{{item.value}}</view>
+        </view>
+      </view>
+
+      <view class="section-title">作品说明</view>
+      <view class="description">{{detail.description || '暂无作品说明'}}</view>
     </view>
   </view>
 
   <view class="page-body" wx:elif="{{loading}}">
-    <view class="section">
-      <view class="surface-card page-subtitle">作品详情加载中...</view>
-    </view>
+    <view class="loading-card">作品详情加载中...</view>
   </view>
 
   <view class="page-body" wx:elif="{{error}}">
-    <view class="section">
-      <view class="surface-card page-subtitle">{{error}}</view>
-      <view class="gold-button" bindtap="handleRetry">重试</view>
-    </view>
+    <view class="loading-card">{{error}}</view>
+    <view class="retry-btn" bindtap="handleRetry">重试</view>
+  </view>
+
+  <view class="cta-bar" wx:if="{{!loading && detail}}">
+    <view class="cta-btn ghost" bindtap="handleCartTap">加入购物车</view>
+    <view class="cta-btn primary" bindtap="handlePrimaryTap">{{primaryActionText}}</view>
   </view>
 
   <view class="bottom-bar-spacer"></view>
