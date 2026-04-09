@@ -8,7 +8,8 @@ Page({
     cartItems: [],
     allSelected: false,
     totalPrice: "0.00",
-    selectedCount: 0
+    selectedCount: 0,
+    recommendProducts: []
   },
 
   onShow() {
@@ -52,8 +53,19 @@ Page({
         }
       ]
 
+      // 模拟推荐作品数据
+      const recommendProducts = [
+        { id: 101, title: "抽象艺术 No.7", artistName: "李明", price: "15,800", tag: "特价" },
+        { id: 102, title: "海边日落", artistName: "陈静", price: "8,800", tag: "" },
+        { id: 103, title: "雕塑作品 #3", artistName: "赵磊", price: "45,000", tag: "独家" },
+        { id: 104, title: "花卉系列", artistName: "王芳", price: "5,200", tag: "" },
+        { id: 105, title: "竹林深处", artistName: "张伟", price: "19,800", tag: "热卖" },
+        { id: 106, title: "星空之下", artistName: "吴敏", price: "22,800", tag: "新品" }
+      ]
+
       this.setData({
         cartItems: mockItems,
+        recommendProducts,
         loading: false,
         error: ""
       })
@@ -154,5 +166,10 @@ Page({
 
   goHome() {
     wx.switchTab({ url: '/pages/home/index' })
+  },
+
+  goToDetail(e) {
+    const id = e.currentTarget.dataset.id
+    wx.navigateTo({ url: `/pages/artwork/detail?id=${id}` })
   }
 })

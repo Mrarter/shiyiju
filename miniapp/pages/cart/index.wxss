@@ -384,3 +384,99 @@
 .bottom-spacer.show {
   height: 140rpx;
 }
+
+/* 推荐作品区域 */
+.recommend-section {
+  margin-top: 32rpx;
+  padding: 24rpx;
+  background: #fff;
+  border-radius: 16rpx;
+}
+
+.recommend-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+
+.recommend-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.recommend-more {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.recommend-scroll {
+  white-space: nowrap;
+}
+
+.recommend-list {
+  display: inline-flex;
+  gap: 20rpx;
+}
+
+.recommend-item {
+  width: 220rpx;
+  flex-shrink: 0;
+}
+
+.recommend-image-wrap {
+  position: relative;
+  width: 220rpx;
+  height: 220rpx;
+  border-radius: 12rpx;
+  overflow: hidden;
+  background: #f8f8f8;
+}
+
+.recommend-image {
+  width: 100%;
+  height: 100%;
+}
+
+.recommend-tag {
+  position: absolute;
+  top: 12rpx;
+  left: 12rpx;
+  padding: 4rpx 12rpx;
+  background: #ff4d4f;
+  border-radius: 20rpx;
+  font-size: 20rpx;
+  color: #fff;
+}
+
+.recommend-info {
+  margin-top: 12rpx;
+}
+
+.recommend-info .recommend-title {
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recommend-artist {
+  margin-top: 4rpx;
+  font-size: 22rpx;
+  color: #999;
+}
+
+.recommend-price {
+  margin-top: 8rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #ff4d4f;
+}
+
+/* 购物车有推荐时的内边距 */
+.cart-body.has-recommend {
+  padding-bottom: 320rpx;
+}
