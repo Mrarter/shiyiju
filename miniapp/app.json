@@ -10,21 +10,22 @@
     "pages/agent/index",
     "pages/blindbox/index",
     "pages/group/detail",
-    "pages/exclusive/index"
+    "pages/exclusive/index",
+    "pages/collection/index"
   ],
   "window": {
     "navigationStyle": "custom",
-    "backgroundColor": "#0B0A08",
-    "backgroundTextStyle": "light"
+    "backgroundColor": "#ffffff",
+    "backgroundTextStyle": "dark"
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json",
   "tabBar": {
     "custom": true,
-    "color": "#8D8579",
-    "selectedColor": "#D6B074",
-    "backgroundColor": "#0B0A08",
-    "borderStyle": "black",
+    "color": "#999999",
+    "selectedColor": "#000000",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
     "list": [
       {
         "pagePath": "pages/home/index",

@@ -12,6 +12,7 @@
 /Users/master/Desktop/shiyiju/server/src/main/java/com/shiyiju/modules/admin/dto/AdminArtistSaveDTO.java
 /Users/master/Desktop/shiyiju/server/src/main/java/com/shiyiju/modules/admin/dto/AdminArtworkSaveDTO.java
 /Users/master/Desktop/shiyiju/server/src/main/java/com/shiyiju/modules/admin/dto/AdminConfigItemSaveDTO.java
+/Users/master/Desktop/shiyiju/server/src/main/java/com/shiyiju/modules/admin/dto/AdminDistributorSaveDTO.java
 /Users/master/Desktop/shiyiju/server/src/main/java/com/shiyiju/modules/admin/dto/AdminLoginRequestDTO.java
 /Users/master/Desktop/shiyiju/server/src/main/java/com/shiyiju/modules/admin/dto/AdminOperationSaveDTO.java
 /Users/master/Desktop/shiyiju/server/src/main/java/com/shiyiju/modules/admin/dto/AdminRemarkUpdateDTO.java
@@ -20,6 +21,7 @@
 /Users/master/Desktop/shiyiju/server/src/main/java/com/shiyiju/modules/admin/dto/AdminStatusUpdateDTO.java
 /Users/master/Desktop/shiyiju/server/src/main/java/com/shiyiju/modules/admin/entity/AdminArtistEntity.java
 /Users/master/Desktop/shiyiju/server/src/main/java/com/shiyiju/modules/admin/entity/AdminArtworkEntity.java
+/Users/master/Desktop/shiyiju/server/src/main/java/com/shiyiju/modules/admin/entity/AdminDistributorEntity.java
 /Users/master/Desktop/shiyiju/server/src/main/java/com/shiyiju/modules/admin/entity/AdminOperationEntity.java
 /Users/master/Desktop/shiyiju/server/src/main/java/com/shiyiju/modules/admin/entity/AdminOrderEntity.java
 /Users/master/Desktop/shiyiju/server/src/main/java/com/shiyiju/modules/admin/entity/AdminUserEntity.java
@@ -37,6 +39,7 @@
 /Users/master/Desktop/shiyiju/server/src/main/java/com/shiyiju/modules/admin/vo/AdminConfigItemVO.java
 /Users/master/Desktop/shiyiju/server/src/main/java/com/shiyiju/modules/admin/vo/AdminDashboardMetricVO.java
 /Users/master/Desktop/shiyiju/server/src/main/java/com/shiyiju/modules/admin/vo/AdminDashboardVO.java
+/Users/master/Desktop/shiyiju/server/src/main/java/com/shiyiju/modules/admin/vo/AdminDistributorVO.java
 /Users/master/Desktop/shiyiju/server/src/main/java/com/shiyiju/modules/admin/vo/AdminLoginUserVO.java
 /Users/master/Desktop/shiyiju/server/src/main/java/com/shiyiju/modules/admin/vo/AdminLoginVO.java
 /Users/master/Desktop/shiyiju/server/src/main/java/com/shiyiju/modules/admin/vo/AdminOperationVO.java

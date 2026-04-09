@@ -1,28 +1,28 @@
 Component({
   data: {
     selected: 0,
-    color: "#8D8579",
-    selectedColor: "#D6B074",
+    color: "#999999",
+    selectedColor: "#000000",
     list: [
       {
         pagePath: "/pages/home/index",
         text: "首页",
-        icon: "首"
+        icon: "🏠"
       },
       {
         pagePath: "/pages/publish/index",
         text: "发布",
-        icon: "发"
+        icon: "+"
       },
       {
         pagePath: "/pages/cart/index",
         text: "购物车",
-        icon: "购"
+        icon: "🛒"
       },
       {
         pagePath: "/pages/mine/index",
         text: "我的",
-        icon: "我"
+        icon: "👤"
       }
     ]
   },

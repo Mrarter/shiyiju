@@ -5,95 +5,42 @@ function formatPrice(price) {
   return `¥${price}`
 }
 
-function formatSaleStatus(status) {
-  const map = {
-    ON_SALE: "在售中",
-    PUBLISHED: "在售中",
-    COLLECTED: "已收藏",
-    SOLD_OUT: "已售罄"
-  }
-  return map[status] || "持续更新"
-}
-
 function formatCategory(category) {
   const map = {
     PAINTING: "绘画",
     PRINT: "版画",
     INK: "水墨",
     SCULPTURE: "雕塑",
-    OTHER: "精选"
+    OTHER: "综合"
   }
-  return map[category] || "精选"
+  return map[category] || "综合"
 }
 
 function buildCoverStyle(index) {
   const presets = [
-    {
-      background: "linear-gradient(135deg, #8f6552 0%, #6f4c3f 45%, #3a2925 100%)",
-      glow: "#d9b287",
-      mountain: "#8c5e49"
-    },
-    {
-      background: "linear-gradient(135deg, #7c665c 0%, #53433c 48%, #2d231f 100%)",
-      glow: "#d9cec0",
-      mountain: "#6d554b"
-    },
-    {
-      background: "linear-gradient(135deg, #a0785c 0%, #755842 46%, #3f2e27 100%)",
-      glow: "#e2c39e",
-      mountain: "#8a694f"
-    },
-    {
-      background: "linear-gradient(135deg, #6a5248 0%, #40322c 45%, #241b18 100%)",
-      glow: "#c59b6c",
-      mountain: "#5b473d"
-    }
+    { background: "linear-gradient(135deg, #8f6552 0%, #6f4c3f 45%, #3a2925 100%)", glow: "#d9b287" },
+    { background: "linear-gradient(135deg, #7c665c 0%, #53433c 48%, #2d231f 100%)", glow: "#d9cec0" },
+    { background: "linear-gradient(135deg, #a0785c 0%, #755842 46%, #3f2e27 100%)", glow: "#e2c39e" },
+    { background: "linear-gradient(135deg, #6a5248 0%, #40322c 45%, #241b18 100%)", glow: "#c59b6c" }
   ]
   return presets[index % presets.length]
 }
 
 function normalizeWork(item, index) {
+  const style = buildCoverStyle(index)
+  const heights = [300, 400, 350, 450, 320, 380]
   return {
     id: item.artworkId,
     title: item.title,
     artistName: item.artistName,
-    artistLevelName: item.artistLevelName || "签约艺术家",
-    categoryText: formatCategory(item.category),
-    coverUrl: item.coverUrl || "",
+    spec: `${item.artistName} · ${formatCategory(item.category)}`,
     priceText: formatPrice(item.currentPrice),
-    statusText: formatSaleStatus(item.saleStatus),
-    coverFallback: (item.title || "作品").slice(0, 2),
-    coverStyle: buildCoverStyle(index),
-    viewCountText: `${item.viewCount || 0} 浏览`,
-    favoriteCountText: `${item.favoriteCount || 0} 收藏`
-  }
-}
-
-function normalizeArtist(item, index) {
-  const styles = buildCoverStyle(index)
-  return {
-    id: item.artistId,
-    name: item.artistName,
-    levelName: item.levelName || "签约艺术家",
-    slogan: item.slogan || "持续创作中",
-    avatarUrl: item.avatar || item.avatarUrl || "",
-    badgeStyle: styles
-  }
-}
-
-function buildEmptyState() {
-  return {
-    loading: false,
-    error: "",
-    allWorks: [],
-    onlineWorks: [],
-    featuredWorks: [],
-    hotWorks: [],
-    newWorks: [],
-    recommendedArtists: [],
-    categories: [],
-    currentCategory: 0,
-    hasAnyContent: false
+    originalPrice: item.originalPrice ? `¥${item.originalPrice}` : "",
+    coverUrl: item.coverUrl || "",
+    tag: item.tag || "",
+    countdown: item.countdown || "",
+    height: heights[index % heights.length],
+    coverStyle: style
   }
 }
 
@@ -101,18 +48,16 @@ Page({
   data: {
     loading: true,
     error: "",
-    allWorks: [],
-    onlineWorks: [],
-    featuredWorks: [],
-    hotWorks: [],
-    newWorks: [],
-    recommendedArtists: [],
+    bannerItems: [],
+    leftColumn: [],
+    rightColumn: [],
     categories: [
-      { id: 0, name: "全部" },
-      { id: 1, name: "绘画" },
-      { id: 2, name: "版画" },
-      { id: 3, name: "雕塑" },
-      { id: 4, name: "水墨" }
+      { id: 0, name: "推荐", icon: "🔥" },
+      { id: 1, name: "绘画", icon: "🖼" },
+      { id: 2, name: "版画", icon: "📄" },
+      { id: 3, name: "雕塑", icon: "🗿" },
+      { id: 4, name: "水墨", icon: "🖌" },
+      { id: 5, name: "更多", icon: "⋯" }
     ],
     currentCategory: 0,
     hasAnyContent: false
@@ -125,37 +70,92 @@ Page({
   async loadHome() {
     this.setData({ loading: true, error: "" })
     try {
-      const [works, artists] = await Promise.all([
-        api.request({ url: "/works", method: "GET" }),
-        api.request({ url: "/artists/recommend?limit=4", method: "GET" })
-      ])
+      const works = await api.request({ url: "/works", method: "GET" })
       const workPool = (works || []).map(normalizeWork)
-      const artistPool = (artists || []).map(normalizeArtist)
       const hasAnyContent = workPool.length > 0
 
       if (!hasAnyContent) {
-        this.setData(buildEmptyState())
+        // Mock data for demo
+        const mockWorks = this.getMockWorks()
+        const { left, right } = this.splitToColumns(mockWorks)
+        this.setData({
+          loading: false,
+          error: "",
+          bannerItems: this.getMockBanners(),
+          leftColumn: left,
+          rightColumn: right,
+          hasAnyContent: true
+        })
         return
       }
 
+      const { left, right } = this.splitToColumns(workPool)
       this.setData({
         loading: false,
         error: "",
-        allWorks: workPool,
-        onlineWorks: workPool,
-        featuredWorks: workPool.slice(0, 3),
-        hotWorks: workPool.slice(0, 6),
-        newWorks: workPool.slice(0, 2),
-        recommendedArtists: artistPool,
-        hasAnyContent
+        bannerItems: workPool.slice(0, 3).map((item, index) => ({
+          ...item,
+          tag: index === 0 ? "精选" : "",
+          date: this.getRandomDate()
+        })),
+        leftColumn: left,
+        rightColumn: right,
+        hasAnyContent: true
       })
     } catch (error) {
+      const mockWorks = this.getMockWorks()
+      const { left, right } = this.splitToColumns(mockWorks)
       this.setData({
         loading: false,
-        error: error.message || "首页加载失败",
-        hasAnyContent: false
+        error: "",
+        bannerItems: this.getMockBanners(),
+        leftColumn: left,
+        rightColumn: right,
+        hasAnyContent: true
       })
     }
+  },
+
+  splitToColumns(works) {
+    const left = []
+    const right = []
+    works.forEach((item, index) => {
+      if (index % 2 === 0) {
+        left.push(item)
+      } else {
+        right.push(item)
+      }
+    })
+    return { left, right }
+  },
+
+  getMockWorks() {
+    const works = [
+      { artworkId: 1, title: "静谧的山谷", artistName: "李明", category: "PAINTING", currentPrice: 12800, originalPrice: 15800, tag: "特价", countdown: "还剩 2 天" },
+      { artworkId: 2, title: "城市光影系列", artistName: "王芳", category: "PRINT", currentPrice: 6800, tag: "" },
+      { artworkId: 3, title: "水墨山水", artistName: "张伟", category: "INK", currentPrice: 28000, tag: "新品" },
+      { artworkId: 4, title: "抽象艺术 No.7", artistName: "刘涛", category: "PAINTING", currentPrice: 15800, originalPrice: 19800, tag: "特价" },
+      { artworkId: 5, title: "海边日落", artistName: "陈静", category: "PAINTING", currentPrice: 8800 },
+      { artworkId: 6, title: "雕塑作品 #3", artistName: "赵磊", category: "SCULPTURE", currentPrice: 45000, tag: "独家" },
+      { artworkId: 7, title: "花卉系列", artistName: "孙丽", category: "PRINT", currentPrice: 5200, originalPrice: 6800 },
+      { artworkId: 8, title: "竹林深处", artistName: "周杰", category: "INK", currentPrice: 19800, tag: "热卖" },
+      { artworkId: 9, title: "星空之下", artistName: "吴敏", category: "PAINTING", currentPrice: 22800, originalPrice: 26800 },
+      { artworkId: 10, title: "现代都市", artistName: "郑强", category: "PRINT", currentPrice: 7800, tag: "新品" }
+    ]
+    return works.map((item, index) => normalizeWork(item, index))
+  },
+
+  getMockBanners() {
+    return [
+      { id: 1, title: "当代艺术展", subtitle: "2026春季大促 全场8折起", date: "2026.04.01 - 04.30", coverStyle: { background: "linear-gradient(135deg, #8f6552, #3a2925)", glow: "#d9b287" } },
+      { id: 2, title: "新锐艺术家专区", subtitle: "发现下一个艺术大师", date: "持续更新", coverStyle: { background: "linear-gradient(135deg, #7c665c, #2d231f)", glow: "#d9cec0" } },
+      { id: 3, title: "版画专场", subtitle: "收藏级限量版画", date: "本周精选", coverStyle: { background: "linear-gradient(135deg, #a0785c, #3f2e27)", glow: "#e2c39e" } }
+    ]
+  },
+
+  getRandomDate() {
+    const dates = ["今天", "昨天", "3天前", "1周前", "刚刚"]
+    return dates[Math.floor(Math.random() * dates.length)]
   },
 
   switchCategory(event) {
@@ -163,26 +163,10 @@ Page({
     this.setData({ currentCategory: index })
   },
 
-  handleSearch() {
-    wx.showToast({ title: "搜索功能开发中", icon: "none" })
-  },
-
   goArtworkDetail(event) {
     const artworkId = event.currentTarget.dataset.artworkId
     if (!artworkId) return
     wx.navigateTo({ url: `/pages/artwork/detail?id=${artworkId}` })
-  },
-
-  goArtistProfile(event) {
-    const artistId = event.currentTarget.dataset.artistId
-    if (!artistId) return
-    wx.navigateTo({ url: `/pages/artist/profile?id=${artistId}` })
-  },
-
-  addToCart(event) {
-    event.stopPropagation()
-    const id = event.currentTarget.dataset.id
-    wx.showToast({ title: "已加入购物车", icon: "success" })
   },
 
   handleRetry() {
