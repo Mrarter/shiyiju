@@ -10,9 +10,9 @@ Component({
         icon: "🏠"
       },
       {
-        pagePath: "/pages/publish/index",
-        text: "发布",
-        icon: "+"
+        pagePath: "/pages/agent/index",
+        text: "经纪人",
+        icon: "🤝"
       },
       {
         pagePath: "/pages/cart/index",
