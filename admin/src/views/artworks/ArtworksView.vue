@@ -520,7 +520,9 @@ function showDialog() {
 function startEdit(row) {
   editingId.value = row.id
   form.name = row.name || ''
-  form.artistId = row.artistId || artists.value.find((artist) => artist.name === row.artist)?.id || null
+  // 优先通过艺术家名字查找，如果找不到则用第一个艺术家
+  const matchedArtist = artists.value.find((a) => a.name === row.artist)
+  form.artistId = matchedArtist?.id || (artists.value[0]?.id || null)
   form.category = row.category || 'PAINTING'
   form.status = normalizeArtworkStatus(row.status)
   form.price = parsePrice(row.price)
