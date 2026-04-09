@@ -11,7 +11,7 @@
   <!-- 商品列表 -->
   <view class="cart-body {{recommendProducts.length > 0 ? 'has-recommend' : ''}}" wx:if="{{!loading && !error}}">
     <view class="cart-list" wx:if="{{cartItems.length > 0}}">
-      <view class="cart-item" wx:for="{{cartItems}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
+      <view class="cart-item" wx:for="{{cartItems}}" wx:key="id">
         <!-- 选择框 -->
         <view class="item-check" bindtap="toggleItem" data-id="{{item.id}}">
           <view class="check-circle {{item.selected ? 'checked' : ''}}">
@@ -20,7 +20,7 @@
         </view>
 
         <!-- 商品图片 -->
-        <view class="item-image-wrap">
+        <view class="item-image-wrap" bindtap="goToDetail" data-id="{{item.id}}">
           <image wx:if="{{item.coverUrl}}" src="{{item.coverUrl}}" mode="aspectFill" class="item-image"></image>
           <view wx:else class="item-image fallback">
             <view class="fallback-icon">🎨</view>
@@ -28,7 +28,7 @@
         </view>
 
         <!-- 商品信息 -->
-        <view class="item-content">
+        <view class="item-content" bindtap="goToDetail" data-id="{{item.id}}">
           <view class="item-title">{{item.title}}</view>
           <view class="item-artist">{{item.artistName}}</view>
           <view class="item-spec">

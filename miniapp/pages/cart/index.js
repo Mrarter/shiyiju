@@ -173,7 +173,12 @@ Page({
       wx.showToast({ title: '请先选择商品', icon: 'none' })
       return
     }
-    wx.showToast({ title: '结算功能开发中', icon: 'none' })
+    // 获取选中的商品信息
+    const selectedItems = this.data.cartItems.filter(item => item.selected)
+    // 跳转到订单确认页面，传递选中商品信息
+    wx.navigateTo({
+      url: `/pages/order/confirm?items=${encodeURIComponent(JSON.stringify(selectedItems))}`
+    })
   },
 
   goHome() {
