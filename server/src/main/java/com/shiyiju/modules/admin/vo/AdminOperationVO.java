@@ -9,6 +9,9 @@ public class AdminOperationVO {
     private String imageUrl;
     private String status;
     private String updatedAt;
+    private String subtitle;
+    private String date;
+    private String coverUrl;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -24,4 +27,10 @@ public class AdminOperationVO {
     public void setStatus(String status) { this.status = status; }
     public String getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(String updatedAt) { this.updatedAt = updatedAt; }
+    public String getSubtitle() { return subtitle; }
+    public void setSubtitle(String subtitle) { this.subtitle = subtitle; }
+    public String getDate() { return date; }
+    public void setDate(String date) { this.date = date; }
+    public String getCoverUrl() { return coverUrl; }
+    public void setCoverUrl(String coverUrl) { this.coverUrl = coverUrl; }
 }

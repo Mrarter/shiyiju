@@ -93,5 +93,9 @@ Page({
   handleRetry() {
     if (!this.data.artistId) return
     this.loadArtistProfile(this.data.artistId)
+  },
+
+  goBack() {
+    wx.navigateBack({ fail: () => wx.switchTab({ url: '/pages/home/index' }) })
   }
 })

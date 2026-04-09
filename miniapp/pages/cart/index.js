@@ -28,7 +28,7 @@ Page({
           price: 12800,
           quantity: 1,
           stock: 5,
-          coverUrl: "",
+          coverUrl: "https://picsum.photos/seed/art1/400/500",
           selected: false
         },
         {
@@ -38,7 +38,7 @@ Page({
           price: 6800,
           quantity: 2,
           stock: 3,
-          coverUrl: "",
+          coverUrl: "https://picsum.photos/seed/art2/400/500",
           selected: false
         },
         {
@@ -48,19 +48,19 @@ Page({
           price: 28000,
           quantity: 1,
           stock: 1,
-          coverUrl: "",
+          coverUrl: "https://picsum.photos/seed/art3/400/500",
           selected: false
         }
       ]
 
-      // 模拟推荐作品数据
+      // 模拟推荐作品数据 - 使用首页存在的作品ID
       const recommendProducts = [
-        { id: 101, title: "抽象艺术 No.7", artistName: "李明", price: "15,800", tag: "特价" },
-        { id: 102, title: "海边日落", artistName: "陈静", price: "8,800", tag: "" },
-        { id: 103, title: "雕塑作品 #3", artistName: "赵磊", price: "45,000", tag: "独家" },
-        { id: 104, title: "花卉系列", artistName: "王芳", price: "5,200", tag: "" },
-        { id: 105, title: "竹林深处", artistName: "张伟", price: "19,800", tag: "热卖" },
-        { id: 106, title: "星空之下", artistName: "吴敏", price: "22,800", tag: "新品" }
+        { id: 4, title: "抽象艺术 No.7", artistName: "刘涛", price: "15,800", coverUrl: "https://picsum.photos/seed/art4/400/500", tag: "特价" },
+        { id: 5, title: "海边日落", artistName: "陈静", price: "8,800", coverUrl: "https://picsum.photos/seed/art5/400/500", tag: "" },
+        { id: 6, title: "雕塑作品 #3", artistName: "赵磊", price: "45,000", coverUrl: "https://picsum.photos/seed/art6/400/500", tag: "独家" },
+        { id: 7, title: "花卉系列", artistName: "孙丽", price: "5,200", coverUrl: "https://picsum.photos/seed/art7/400/500", tag: "" },
+        { id: 8, title: "竹林深处", artistName: "周杰", price: "19,800", coverUrl: "https://picsum.photos/seed/art8/400/500", tag: "热卖" },
+        { id: 9, title: "星空之下", artistName: "吴敏", price: "22,800", coverUrl: "https://picsum.photos/seed/art9/400/500", tag: "新品" }
       ]
 
       this.setData({

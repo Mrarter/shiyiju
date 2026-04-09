@@ -1,5 +1,8 @@
 <view class="app-shell">
   <view class="safe-top"></view>
+  <view class="nav-header">
+    <view class="nav-back" bindtap="goBack">‹</view>
+  </view>
   <view class="page-body">
     <view class="page-title">发布</view>
     <view class="page-subtitle">默认展示艺术家发布与藏家转售双态入口。</view>

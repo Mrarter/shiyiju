@@ -1,5 +1,8 @@
 <view class="app-shell">
   <view class="safe-top"></view>
+  <view class="nav-header">
+    <view class="nav-back" bindtap="goBack">‹</view>
+  </view>
   <view class="page-body">
     <view class="page-title">艺术盲盒</view>
     <view class="page-subtitle">P2 页面已按设计规范预留专题结构，可继续接概率说明和开盒结果。</view>

@@ -1,5 +1,19 @@
 const api = require("../../utils/api")
 
+// Mock 数据兜底
+const MOCK_WORKS = {
+  1: { artworkId: 1, title: "静谧的山谷", artistName: "李明", artistInitial: "李", category: "PAINTING", saleStatus: "ON_SALE", saleMode: "NORMAL", currentPrice: 12800, basePrice: 12800, coverUrl: "https://picsum.photos/seed/art1/400/500", material: "布面油画", widthCm: 80, heightCm: 100, depthCm: 3, creationYear: "2024", artworkNo: "SYJ-2024-0001", favoriteCount: 328, viewCount: 1256, onlineDays: 45, certificateType: "ELECTRONIC", groupEnabled: false, resaleEnabled: false, priceStatus: "STABLE" },
+  2: { artworkId: 2, title: "城市光影系列", artistName: "王芳", artistInitial: "王", category: "PRINT", saleStatus: "PUBLISHED", saleMode: "LIMITED", currentPrice: 6800, basePrice: 6800, coverUrl: "https://picsum.photos/seed/art2/400/500", material: "丝网版画", widthCm: 50, heightCm: 70, creationYear: "2023", artworkNo: "SYJ-2023-0042", favoriteCount: 156, viewCount: 892, onlineDays: 30, certificateType: "PAPER", groupEnabled: true, resaleEnabled: false, priceStatus: "STABLE" },
+  3: { artworkId: 3, title: "水墨山水", artistName: "张伟", artistInitial: "张", category: "INK", saleStatus: "ON_SALE", saleMode: "NORMAL", currentPrice: 28000, basePrice: 28000, coverUrl: "https://picsum.photos/seed/art3/400/500", material: "宣纸水墨", widthCm: 138, heightCm: 69, creationYear: "2025", artworkNo: "SYJ-2025-0008", favoriteCount: 567, viewCount: 2340, onlineDays: 15, certificateType: "ELECTRONIC", groupEnabled: false, resaleEnabled: true, priceStatus: "STABLE" },
+  4: { artworkId: 4, title: "抽象艺术 No.7", artistName: "刘涛", artistInitial: "刘", category: "PAINTING", saleStatus: "ON_SALE", saleMode: "LIMITED", currentPrice: 15800, basePrice: 19800, coverUrl: "https://picsum.photos/seed/art4/400/500", material: "布面丙烯", widthCm: 60, heightCm: 80, creationYear: "2024", artworkNo: "SYJ-2024-0023", favoriteCount: 234, viewCount: 1108, onlineDays: 38, certificateType: "ELECTRONIC", groupEnabled: true, resaleEnabled: false, priceStatus: "DYNAMIC" },
+  5: { artworkId: 5, title: "海边日落", artistName: "陈静", artistInitial: "陈", category: "PAINTING", saleStatus: "PUBLISHED", saleMode: "NORMAL", currentPrice: 8800, basePrice: 8800, coverUrl: "https://picsum.photos/seed/art5/400/500", material: "布面油画", widthCm: 40, heightCm: 50, creationYear: "2025", artworkNo: "SYJ-2025-0015", favoriteCount: 189, viewCount: 756, onlineDays: 22, certificateType: "PAPER", groupEnabled: false, resaleEnabled: false, priceStatus: "STABLE" },
+  6: { artworkId: 6, title: "雕塑作品 #3", artistName: "赵磊", artistInitial: "赵", category: "SCULPTURE", saleStatus: "ON_SALE", saleMode: "AUCTION", currentPrice: 45000, basePrice: 38000, coverUrl: "https://picsum.photos/seed/art6/400/500", material: "青铜", widthCm: 25, heightCm: 45, depthCm: 20, creationYear: "2023", artworkNo: "SYJ-2023-0018", favoriteCount: 445, viewCount: 1876, onlineDays: 60, certificateType: "ELECTRONIC", groupEnabled: false, resaleEnabled: true, priceStatus: "DYNAMIC" },
+  7: { artworkId: 7, title: "花卉系列", artistName: "孙丽", artistInitial: "孙", category: "PRINT", saleStatus: "PUBLISHED", saleMode: "LIMITED", currentPrice: 5200, basePrice: 6800, coverUrl: "https://picsum.photos/seed/art7/400/500", material: "木版版画", widthCm: 45, heightCm: 60, creationYear: "2024", artworkNo: "SYJ-2024-0031", favoriteCount: 98, viewCount: 445, onlineDays: 28, certificateType: "PAPER", groupEnabled: true, resaleEnabled: false, priceStatus: "STABLE" },
+  8: { artworkId: 8, title: "竹林深处", artistName: "周杰", artistInitial: "周", category: "INK", saleStatus: "ON_SALE", saleMode: "NORMAL", currentPrice: 19800, basePrice: 19800, coverUrl: "https://picsum.photos/seed/art8/400/500", material: "绢本水墨", widthCm: 68, heightCm: 136, creationYear: "2025", artworkNo: "SYJ-2025-0003", favoriteCount: 312, viewCount: 1432, onlineDays: 35, certificateType: "ELECTRONIC", groupEnabled: false, resaleEnabled: false, priceStatus: "STABLE" },
+  9: { artworkId: 9, title: "星空之下", artistName: "吴敏", artistInitial: "吴", category: "PAINTING", saleStatus: "PUBLISHED", saleMode: "LIMITED", currentPrice: 22800, basePrice: 26800, coverUrl: "https://picsum.photos/seed/art9/400/500", material: "布面油画", widthCm: 90, heightCm: 120, creationYear: "2024", artworkNo: "SYJ-2024-0056", favoriteCount: 421, viewCount: 1890, onlineDays: 42, certificateType: "ELECTRONIC", groupEnabled: true, resaleEnabled: true, priceStatus: "DYNAMIC" },
+  10: { artworkId: 10, title: "现代都市", artistName: "郑强", artistInitial: "郑", category: "PRINT", saleStatus: "ON_SALE", saleMode: "NORMAL", currentPrice: 7800, basePrice: 7800, coverUrl: "https://picsum.photos/seed/art10/400/500", material: "石版画", widthCm: 55, heightCm: 75, creationYear: "2025", artworkNo: "SYJ-2025-0021", favoriteCount: 167, viewCount: 678, onlineDays: 18, certificateType: "PAPER", groupEnabled: false, resaleEnabled: false, priceStatus: "STABLE" }
+}
+
 function formatPrice(value) {
   if (value === null || value === undefined || value === "") {
     return "价格待定"
@@ -139,10 +153,41 @@ Page({
         error: ""
       })
     } catch (error) {
-      this.setData({
-        loading: false,
-        error: error.message || "作品详情加载失败"
-      })
+      // API 失败时尝试使用 mock 数据
+      const mockData = MOCK_WORKS[artworkId]
+      if (mockData) {
+        const detail = mockData
+        const enriched = {
+          ...detail,
+          artistInitial: (detail.artistName || "艺").slice(0, 1),
+          saleStatusText: mapSaleStatus(detail.saleStatus),
+          saleModeText: mapSaleMode(detail.saleMode),
+          categoryText: mapCategory(detail.category),
+          currentPriceText: formatPrice(detail.currentPrice),
+          changeRateText: formatChangeRate(detail),
+          dynamicHint: detail.priceStatus === "DYNAMIC" ? "动态价格，每日10点更新" : "价格稳定，可直接入藏"
+        }
+
+        this.setData({
+          detail: enriched,
+          heroVisual: {
+            title: (detail.title || "作品").slice(0, 4),
+            style: buildPlaceholderStyle(detail.artworkId || artworkId)
+          },
+          tags: this.buildTags(detail),
+          stats: this.buildStats(detail),
+          infoRows: this.buildInfoRows(detail),
+          optionRows: this.buildOptionRows(detail),
+          primaryActionText: detail.groupEnabled ? "发起拼团" : (detail.resaleEnabled ? "查看转售" : "立即入藏"),
+          loading: false,
+          error: ""
+        })
+      } else {
+        this.setData({
+          loading: false,
+          error: "作品详情加载失败"
+        })
+      }
     }
   },
 

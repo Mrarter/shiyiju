@@ -3,19 +3,22 @@
 
   <view class="page-body" wx:if="{{!loading && detail}}">
     <view class="hero-panel">
-      <view class="hero-image" style="background: {{heroVisual.style.background}};">
+      <view class="hero-image">
+        <image wx:if="{{detail.coverUrl}}" src="{{detail.coverUrl}}" mode="aspectFill" class="hero-img"></image>
+        <view wx:else class="hero-bg" style="background: {{heroVisual.style.background}};">
+          <view class="hero-glow" style="background: {{heroVisual.style.glow}};"></view>
+          <view class="hero-mountain left" style="background: {{heroVisual.style.mountain}};"></view>
+          <view class="hero-mountain center" style="background: {{heroVisual.style.mountain}};"></view>
+          <view class="hero-mountain right" style="background: {{heroVisual.style.mountain}};"></view>
+        </view>
         <view class="hero-overlay"></view>
-        <view class="hero-glow" style="background: {{heroVisual.style.glow}};"></view>
-        <view class="hero-mountain left" style="background: {{heroVisual.style.mountain}};"></view>
-        <view class="hero-mountain center" style="background: {{heroVisual.style.mountain}};"></view>
-        <view class="hero-mountain right" style="background: {{heroVisual.style.mountain}};"></view>
+      </view>
 
-        <view class="hero-toolbar">
-          <view class="tool-btn" bindtap="goBack">‹</view>
-          <view class="tool-right">
-            <view class="tool-btn" bindtap="handleShareTap">↗</view>
-            <view class="tool-btn {{liked ? 'tool-btn-active' : ''}}" bindtap="handleLikeTap">♡</view>
-          </view>
+      <view class="hero-toolbar">
+        <view class="tool-btn" bindtap="goBack">‹</view>
+        <view class="tool-right">
+          <view class="tool-btn" bindtap="handleShareTap">↗</view>
+          <view class="tool-btn {{liked ? 'tool-btn-active' : ''}}" bindtap="handleLikeTap">♡</view>
         </view>
       </view>
     </view>

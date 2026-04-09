@@ -20,5 +20,9 @@ Page({
     if (action === "resale") {
       wx.navigateTo({ url: "/pages/resale/create" })
     }
+  },
+
+  goBack() {
+    wx.navigateBack({ fail: () => wx.switchTab({ url: '/pages/home/index' }) })
   }
 })

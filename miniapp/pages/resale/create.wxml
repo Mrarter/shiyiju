@@ -1,5 +1,8 @@
 <view class="app-shell">
   <view class="safe-top"></view>
+  <view class="nav-header">
+    <view class="nav-back" bindtap="goBack">‹</view>
+  </view>
   <view class="page-body">
     <view class="page-title">转售发布</view>
     <view class="page-subtitle">3 步完成价格填写、交付方式选择与确认发布。</view>

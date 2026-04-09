@@ -1,5 +1,8 @@
 <view class="app-shell">
   <view class="safe-top"></view>
+  <view class="nav-header">
+    <view class="nav-back" bindtap="goBack">‹</view>
+  </view>
   <view class="page-body">
     <view class="page-title">我的藏品</view>
     <view class="page-subtitle">查看你已收藏与持有的作品。</view>

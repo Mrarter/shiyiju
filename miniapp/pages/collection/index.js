@@ -43,5 +43,9 @@ Page({
 
   handleRetry() {
     this.loadCollectionState()
+  },
+
+  goBack() {
+    wx.navigateBack({ fail: () => wx.switchTab({ url: '/pages/home/index' }) })
   }
 })

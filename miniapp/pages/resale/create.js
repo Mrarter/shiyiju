@@ -2,5 +2,9 @@ Page({
   data: {
     steps: ["填写转售价", "选择交付方式", "确认发布"],
     methods: ["实物转移", "托管转移", "纸质证书补发"]
+  },
+
+  goBack() {
+    wx.navigateBack({ fail: () => wx.switchTab({ url: '/pages/home/index' }) })
   }
 })
