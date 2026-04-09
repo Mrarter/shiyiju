@@ -8,6 +8,7 @@ public class AdminUserVO {
     private String gender;
     private String status;
     private String lastLogin;
+    private String avatarUrl;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -21,4 +22,6 @@ public class AdminUserVO {
     public void setStatus(String status) { this.status = status; }
     public String getLastLogin() { return lastLogin; }
     public void setLastLogin(String lastLogin) { this.lastLogin = lastLogin; }
+    public String getAvatarUrl() { return avatarUrl; }
+    public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
 }
