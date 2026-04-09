@@ -21,6 +21,7 @@ Page({
   },
 
   onLoad(options) {
+    wx.hideTabBar({ animation: false })
     const { artworkId } = options
     this.loadArtwork(artworkId || 1)
     this.loadAddress()
