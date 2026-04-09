@@ -1,4 +1,9 @@
 <view class="container">
+  <!-- 固定返回按钮 -->
+  <view class="fixed-back-btn" bindtap="goBack">
+    <view class="back-arrow">‹</view>
+  </view>
+
   <view class="success-header">
     <view class="icon">✓</view>
     <view class="title">支付成功</view>

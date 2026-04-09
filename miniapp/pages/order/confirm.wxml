@@ -1,4 +1,9 @@
 <view class="order-page">
+  <!-- 固定返回按钮 -->
+  <view class="fixed-back-btn" bindtap="goBack">
+    <view class="back-arrow">‹</view>
+  </view>
+
   <!-- 地址区域 -->
   <view class="address-card" bindtap="selectAddress">
     <view wx:if="{{!address}}" class="add-address">

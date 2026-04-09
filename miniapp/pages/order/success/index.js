@@ -7,6 +7,9 @@ Page({
   },
 
   onLoad(options) {
+    wx.hideTabBar({ animation: false })
+    this.goBack = () => wx.navigateBack()
+    
     const { orderId } = options
     this.setData({ orderId })
     if (orderId) {

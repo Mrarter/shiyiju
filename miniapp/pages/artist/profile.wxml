@@ -1,7 +1,7 @@
 <view class="app-shell">
-  <view class="safe-top"></view>
-  <view class="nav-header">
-    <view class="nav-back" bindtap="goBack">‹</view>
+  <!-- 固定返回按钮 -->
+  <view class="fixed-back-btn" bindtap="goBack">
+    <view class="back-arrow">‹</view>
   </view>
   <view class="page-body" wx:if="{{!loading && artist}}">
     <view class="section">

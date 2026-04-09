@@ -27,6 +27,7 @@ Page({
 
   onLoad(options) {
     wx.hideTabBar({ animation: false })
+    this.goBack = () => wx.navigateBack()
     
     // 支持从购物车传来的商品信息
     if (options.items) {

@@ -1,19 +1,21 @@
-.nav-header {
-  display: flex;
-  align-items: center;
-  padding: 16rpx 24rpx;
-  background: #fff;
-}
-
-.nav-back {
-  width: 60rpx;
-  height: 60rpx;
+/* 固定返回按钮 */
+.fixed-back-btn {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  width: 80rpx;
+  height: 80rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 48rpx;
-  color: #000;
-  font-weight: 300;
+  padding-top: env(safe-area-inset-top);
+}
+
+.back-arrow {
+  font-size: 56rpx;
+  color: #333;
+  font-weight: bold;
 }
 
 .artist-header {

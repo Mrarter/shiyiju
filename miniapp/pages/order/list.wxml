@@ -1,4 +1,9 @@
 <view class="container">
+  <!-- 固定返回按钮 -->
+  <view class="fixed-back-btn" bindtap="goBack">
+    <view class="back-arrow">‹</view>
+  </view>
+
   <!-- 状态标签 -->
   <view class="tabs">
     <view 

@@ -18,6 +18,8 @@ Page({
   },
 
   onLoad() {
+    wx.hideTabBar({ animation: false })
+    this.goBack = () => wx.navigateBack()
     this.loadOrders()
   },
 
