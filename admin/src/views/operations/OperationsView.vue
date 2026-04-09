@@ -96,25 +96,38 @@
         </el-upload>
         <div class="dialog-image-tip">建议上传横图，建议尺寸 750×400</div>
       </div>
-      <div class="form-grid">
-        <el-input v-model="form.title" placeholder="标题" />
-        <el-input v-model="form.target" placeholder="关联对象/说明" />
-        <el-select v-model="form.type" placeholder="类型">
-          <el-option label="Banner" value="BANNER" />
-          <el-option label="热门藏品" value="HOT" />
-          <el-option label="正在升值" value="GROWTH" />
-          <el-option label="推荐艺术家" value="ARTIST" />
-          <el-option label="公告" value="NOTICE" />
-        </el-select>
-        <el-select v-model="form.status" placeholder="状态">
-          <el-option label="上线" value="ENABLED" />
-          <el-option label="草稿" value="DRAFT" />
-          <el-option label="下线" value="DISABLED" />
-        </el-select>
-      </div>
-      <div style="margin-top: 16px;">
-        <div style="margin-bottom: 4px; color: #666; font-size: 14px;">排序权重</div>
-        <el-input-number v-model="form.sortNo" :min="0" :max="999" placeholder="值越小越靠前" />
+      <div class="form-fields">
+        <div class="form-field">
+          <label>标题</label>
+          <el-input v-model="form.title" placeholder="Banner显示的标题文字" maxlength="50" show-word-limit />
+        </div>
+        <div class="form-field">
+          <label>关联对象</label>
+          <el-input v-model="form.target" placeholder="关联的作品ID或艺术家名称等" />
+        </div>
+        <div class="form-field">
+          <label>类型</label>
+          <el-select v-model="form.type" placeholder="选择内容类型">
+            <el-option label="Banner" value="BANNER" />
+            <el-option label="热门藏品" value="HOT" />
+            <el-option label="正在升值" value="GROWTH" />
+            <el-option label="推荐艺术家" value="ARTIST" />
+            <el-option label="公告" value="NOTICE" />
+          </el-select>
+        </div>
+        <div class="form-field">
+          <label>状态</label>
+          <el-select v-model="form.status" placeholder="选择状态">
+            <el-option label="上线" value="ENABLED" />
+            <el-option label="草稿" value="DRAFT" />
+            <el-option label="下线" value="DISABLED" />
+          </el-select>
+        </div>
+        <div class="form-field">
+          <label>排序权重</label>
+          <el-input-number v-model="form.sortNo" :min="0" :max="999" />
+          <span class="field-tip">数值越大排序越靠前</span>
+        </div>
       </div>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
@@ -413,5 +426,34 @@ onMounted(async () => {
 }
 .table-image-empty:hover {
   color: var(--el-color-primary);
+}
+
+/* 表单字段样式 */
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+}
+.form-field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.form-field label {
+  width: 80px;
+  flex-shrink: 0;
+  color: var(--el-text-color-regular);
+  font-size: 14px;
+  text-align: right;
+}
+.form-field .el-input,
+.form-field .el-select {
+  flex: 1;
+}
+.field-tip {
+  color: var(--el-text-color-secondary);
+  font-size: 12px;
+  white-space: nowrap;
 }
 </style>
