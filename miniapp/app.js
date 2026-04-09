@@ -2,7 +2,7 @@ const api = require("./utils/api")
 
 App({
   globalData: {
-    apiBaseUrl: "http://192.168.1.163:8082/api/v1",
+    apiBaseUrl: "http://192.168.1.163:8080/api/v1",
     token: wx.getStorageSync("token") || ""
   },
 
