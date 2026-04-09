@@ -1,74 +1,100 @@
 <view class="cart-page">
-  <view class="safe-top"></view>
-
-  <view class="page-header">
-    <view class="page-title">购物车</view>
-    <view class="page-subtitle">选中的作品将会为你保留</view>
+  <!-- 顶部导航 -->
+  <view class="cart-header">
+    <view class="header-title">购物车</view>
+    <view class="header-count" wx:if="{{cartItems.length > 0}}">{{cartItems.length}} 件商品</view>
+    <view class="edit-btn" bindtap="toggleEditMode" wx:if="{{cartItems.length > 0}}">
+      {{isEditMode ? '完成' : '编辑'}}
+    </view>
   </view>
 
-  <view class="page-body" wx:if="{{!loading && !error}}">
+  <!-- 商品列表 -->
+  <view class="cart-body" wx:if="{{!loading && !error}}">
     <view class="cart-list" wx:if="{{cartItems.length > 0}}">
       <view class="cart-item" wx:for="{{cartItems}}" wx:key="id">
+        <!-- 选择框 -->
         <view class="item-check" bindtap="toggleItem" data-id="{{item.id}}">
-          <view class="check-icon {{item.selected ? 'checked' : ''}}">{{item.selected ? '✓' : ''}}</view>
+          <view class="check-circle {{item.selected ? 'checked' : ''}}">
+            <view class="check-inner" wx:if="{{item.selected}}"></view>
+          </view>
         </view>
+
+        <!-- 商品图片 -->
         <view class="item-image-wrap">
           <image wx:if="{{item.coverUrl}}" src="{{item.coverUrl}}" mode="aspectFill" class="item-image"></image>
-          <view wx:else class="item-image fallback-art" style="background: {{item.coverStyle.background}};">
-            <view class="art-glow small" style="background: {{item.coverStyle.glow}};"></view>
-            <view class="art-mountain left small" style="background: {{item.coverStyle.mountain}};"></view>
-            <view class="art-mountain center small" style="background: {{item.coverStyle.mountain}};"></view>
-            <view class="art-mountain right small" style="background: {{item.coverStyle.mountain}};"></view>
+          <view wx:else class="item-image fallback">
+            <view class="fallback-icon">🎨</view>
           </view>
         </view>
-        <view class="item-info">
+
+        <!-- 商品信息 -->
+        <view class="item-content">
           <view class="item-title">{{item.title}}</view>
-          <view class="item-meta">{{item.artistName}} · {{item.categoryText}}</view>
+          <view class="item-artist">{{item.artistName}}</view>
           <view class="item-bottom">
-            <view class="item-price">{{item.priceText}}</view>
-            <view class="item-actions">
-              <view class="action-btn minus" bindtap="decreaseCount" data-id="{{item.id}}">−</view>
-              <view class="item-count">{{item.count}}</view>
-              <view class="action-btn plus" bindtap="increaseCount" data-id="{{item.id}}">+</view>
-            </view>
+            <view class="item-price">¥{{item.price}}</view>
+            <view class="item-stock" wx:if="{{item.stock > 0}}">剩余 {{item.stock}}</view>
+            <view class="item-stock sold-out" wx:else>已售罄</view>
+          </view>
+
+          <!-- 数量选择器 -->
+          <view class="quantity-wrap">
+            <view class="qty-btn {{item.quantity <= 1 ? 'disabled' : ''}}" catchtap="decreaseCount" data-id="{{item.id}}">−</view>
+            <view class="qty-value">{{item.quantity}}</view>
+            <view class="qty-btn" catchtap="increaseCount" data-id="{{item.id}}">+</view>
           </view>
         </view>
-        <view class="item-delete" bindtap="removeItem" data-id="{{item.id}}">×</view>
+
+        <!-- 删除按钮（编辑模式下显示） -->
+        <view class="item-delete {{isEditMode ? 'show' : ''}}" catchtap="removeItem" data-id="{{item.id}}">
+          <text>删除</text>
+        </view>
       </view>
     </view>
 
+    <!-- 空购物车 -->
     <view class="empty-state" wx:else>
       <view class="empty-icon">🛒</view>
       <view class="empty-title">购物车是空的</view>
-      <view class="empty-desc">去首页发现喜欢的作品吧</view>
-      <view class="empty-action" bindtap="goHome">去首页</view>
-    </view>
-
-    <view class="cart-summary" wx:if="{{cartItems.length > 0}}">
-      <view class="summary-left">
-        <view class="select-all" bindtap="toggleSelectAll">
-          <view class="check-icon {{allSelected ? 'checked' : ''}}">{{allSelected ? '✓' : ''}}</view>
-          <view class="select-text">全选</view>
-        </view>
-        <view class="total-info">
-          <view class="total-label">合计</view>
-          <view class="total-price">{{totalPrice}}</view>
-        </view>
-      </view>
-      <view class="checkout-btn" bindtap="handleCheckout">
-        结算 ({{selectedCount}})
-      </view>
+      <view class="empty-desc">去发现更多喜欢的作品吧</view>
+      <view class="empty-action" bindtap="goHome">去逛逛</view>
     </view>
   </view>
 
-  <view class="page-body" wx:elif="{{loading}}">
-    <view class="loading-state">购物车加载中...</view>
+  <!-- 加载状态 -->
+  <view class="loading-state" wx:elif="{{loading}}">
+    <view class="loading-spinner"></view>
+    <view class="loading-text">加载中...</view>
   </view>
 
-  <view class="page-body" wx:elif="{{error}}">
-    <view class="error-state">{{error}}</view>
-    <view class="retry-btn" bindtap="loadCart">重试</view>
+  <!-- 错误状态 -->
+  <view class="error-state" wx:elif="{{error}}">
+    <view class="error-text">{{error}}</view>
+    <view class="retry-btn" bindtap="loadCart">重新加载</view>
   </view>
 
-  <view class="bottom-bar-spacer"></view>
+  <!-- 底部结算栏 -->
+  <view class="cart-footer {{cartItems.length > 0 ? 'show' : ''}}">
+    <view class="footer-left">
+      <view class="select-all" bindtap="toggleSelectAll">
+        <view class="check-circle {{allSelected ? 'checked' : ''}}">
+          <view class="check-inner" wx:if="{{allSelected}}"></view>
+        </view>
+        <view class="select-text">全选</view>
+      </view>
+      <view class="total-section">
+        <view class="total-label">合计</view>
+        <view class="total-price">¥{{totalPrice}}</view>
+      </view>
+    </view>
+
+    <view class="footer-right">
+      <view class="checkout-btn {{selectedCount > 0 ? 'active' : 'disabled'}}" bindtap="handleCheckout">
+        结算{{selectedCount > 0 ? '(' + selectedCount + ')' : ''}}
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部占位 -->
+  <view class="bottom-spacer {{cartItems.length > 0 ? 'show' : ''}}"></view>
 </view>
