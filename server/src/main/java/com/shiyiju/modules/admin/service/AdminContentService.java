@@ -108,6 +108,12 @@ public class AdminContentService {
 
     public List<AdminOperationVO> listOperations() {
         List<AdminOperationEntity> entities = adminMapper.findOperations();
+        System.out.println("=== listOperations DEBUG ===");
+        if (entities != null) {
+            for (AdminOperationEntity e : entities) {
+                System.out.println("Entity: id=" + e.getId() + ", title=" + e.getTitle() + ", type=" + e.getType() + ", status=" + e.getStatus());
+            }
+        }
         if (entities == null || entities.isEmpty()) {
             // 占位图URL
             String[] bannerUrls = {

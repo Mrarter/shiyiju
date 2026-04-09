@@ -48,5 +48,16 @@ export const http = {
     const formData = new FormData()
     formData.append('file', file)
     return request(path, { method: 'POST', body: formData })
+  },
+  uploadWithParams(path, file, params = {}) {
+    const formData = new FormData()
+    formData.append('file', file)
+    // 添加裁剪参数
+    for (const [key, value] of Object.entries(params)) {
+      if (value !== undefined && value !== null && value !== '') {
+        formData.append(key, String(value))
+      }
+    }
+    return request(path, { method: 'POST', body: formData })
   }
 }

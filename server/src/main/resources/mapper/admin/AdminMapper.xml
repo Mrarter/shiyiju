@@ -4,16 +4,27 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.shiyiju.modules.admin.mapper.AdminMapper">
 
-    <select id="findOperations" resultType="com.shiyiju.modules.admin.entity.AdminOperationEntity">
+    <resultMap id="AdminOperationResultMap" type="com.shiyiju.modules.admin.entity.AdminOperationEntity">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="type" property="type"/>
+        <result column="target" property="target"/>
+        <result column="image_url" property="imageUrl"/>
+        <result column="status" property="status"/>
+        <result column="sort_no" property="sortNo"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <select id="findOperations" resultMap="AdminOperationResultMap">
         SELECT
             id,
             title,
             type,
             target,
-            image_url AS imageUrl,
+            image_url,
             status,
-            sort_no AS sortNo,
-            DATE_FORMAT(updated_at, '%Y-%m-%d %H:%i') AS updatedAt
+            sort_no,
+            DATE_FORMAT(updated_at, '%Y-%m-%d %H:%i') AS updated_at
         FROM admin_operation_config
         ORDER BY sort_no DESC, id DESC
     </select>

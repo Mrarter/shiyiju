@@ -1,4 +1,5 @@
 const api = require("../../utils/api")
+const { normalizeImageUrl, getArtistAvatarPlaceholder, getArtworkCoverPlaceholder } = require("../../utils/imageUrl")
 
 // Mock 数据兜底
 const MOCK_WORKS = {
@@ -104,7 +105,7 @@ Page({
     stats: [],
     infoRows: [],
     optionRows: [],
-    primaryActionText: "立即入藏"
+    showWantModal: false
   },
 
   onLoad(options) {
@@ -130,8 +131,9 @@ Page({
 
       const enriched = {
         ...detail,
+        coverUrl: normalizeImageUrl(detail.coverUrl, getArtworkCoverPlaceholder(artworkId)),
+        artistAvatar: normalizeImageUrl(detail.artistAvatar, getArtistAvatarPlaceholder(detail.artistName)),
         artistInitial: (detail.artistName || "艺").slice(0, 1),
-        artistAvatar: detail.artistAvatar || "",
         saleStatusText: mapSaleStatus(detail.saleStatus),
         saleModeText: mapSaleMode(detail.saleMode),
         categoryText: mapCategory(detail.category),
@@ -154,7 +156,6 @@ Page({
         stats: this.buildStats(detail),
         infoRows: this.buildInfoRows(detail),
         optionRows: this.buildOptionRows(detail),
-        primaryActionText: detail.groupEnabled ? "发起拼团" : (detail.resaleEnabled ? "查看转售" : "立即入藏"),
         favorited: isFavorited,
         loading: false,
         error: ""
@@ -166,8 +167,9 @@ Page({
         const detail = mockData
         const enriched = {
           ...detail,
+          coverUrl: normalizeImageUrl(detail.coverUrl, getArtworkCoverPlaceholder(artworkId)),
+          artistAvatar: normalizeImageUrl(detail.artistAvatar, getArtistAvatarPlaceholder(detail.artistName)),
           artistInitial: (detail.artistName || "艺").slice(0, 1),
-          artistAvatar: detail.artistAvatar || "",
           saleStatusText: mapSaleStatus(detail.saleStatus),
           saleModeText: mapSaleMode(detail.saleMode),
           categoryText: mapCategory(detail.category),
@@ -189,7 +191,6 @@ Page({
           stats: this.buildStats(detail),
           infoRows: this.buildInfoRows(detail),
           optionRows: this.buildOptionRows(detail),
-          primaryActionText: detail.groupEnabled ? "发起拼团" : (detail.resaleEnabled ? "查看转售" : "立即入藏"),
           favorited: isFavorited,
           loading: false,
           error: ""
@@ -279,27 +280,70 @@ Page({
     this.setData({ followed: !this.data.followed })
   },
 
-  handleCartTap() {
-    wx.showToast({ title: "已加入意向清单", icon: "none" })
+  // 显示我想要弹窗
+  showWantOptions() {
+    this.setData({ showWantModal: true })
   },
 
-  handlePrimaryTap() {
-    const { artworkId, detail, primaryActionText } = this.data
-    
-    if (primaryActionText === "发起拼团") {
-      wx.showToast({ title: "拼团功能开发中", icon: "none" })
-      return
-    }
-    
-    if (primaryActionText === "查看转售") {
-      wx.showToast({ title: "转售功能开发中", icon: "none" })
-      return
-    }
-    
-    // 立即购买 - 跳转到订单确认页
+  // 隐藏我想要弹窗
+  hideWantOptions() {
+    this.setData({ showWantModal: false })
+  },
+
+  // 阻止事件冒泡
+  stopPropagation() {
+    return
+  },
+
+  // 加入购物车
+  handleAddCart() {
+    const { artworkId } = this.data
+    this.setData({ showWantModal: false })
+    wx.showToast({ title: "已加入购物车", icon: "success" })
+    // TODO: 调用购物车 API
+    api.request({
+      url: `/cart/add`,
+      method: "POST",
+      data: { artworkId }
+    }).catch(() => {})
+  },
+
+  // 直接购买
+  handleDirectBuy() {
+    const { artworkId } = this.data
+    this.setData({ showWantModal: false })
     wx.navigateTo({
       url: `/pages/order/confirm?artworkId=${artworkId}`
     })
+  },
+
+  // 联系作者
+  handleContactAuthor() {
+    const { detail } = this.data
+    this.setData({ showWantModal: false })
+    wx.showToast({ title: "正在打开会话...", icon: "none" })
+    // TODO: 调用联系作者 API
+    api.request({
+      url: `/messages/artist`,
+      method: "POST",
+      data: { artistId: detail.artistId }
+    }).catch(() => {})
+  },
+
+  // 评论点击
+  handleCommentTap() {
+    const { artworkId } = this.data
+    wx.showToast({ title: "评论功能开发中", icon: "none" })
+    // TODO: 跳转到评论页
+    // wx.navigateTo({
+    //   url: `/pages/comment/list?artworkId=${artworkId}`
+    // })
+  },
+
+  handleCartTap() {
+    wx.showToast({ title: "正在跳转购物车...", icon: "none" })
+    // TODO: 跳转到购物车页
+    // wx.switchTab({ url: "/pages/cart/index" })
   },
 
   handleRetry() {

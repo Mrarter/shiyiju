@@ -27,6 +27,14 @@
         </el-button>
         <el-button
           v-if="selectedArtworks.length > 0"
+          type="success"
+          plain
+          @click="batchPublish"
+        >
+          <el-icon><Upload /></el-icon> 批量上架 ({{ selectedArtworks.length }})
+        </el-button>
+        <el-button
+          v-if="selectedArtworks.length > 0"
           type="info"
           plain
           @click="clearSelection"
@@ -124,7 +132,12 @@
     >
       <div style="margin-bottom: 16px;">
         <div class="form-label">作品封面</div>
-        <UploadImageField v-model="form.coverUrl" placeholder="作品封面图片URL" tip="建议上传竖图或方图作为作品主图" />
+        <CropUploadField 
+          v-model="form.coverUrl" 
+          placeholder="作品封面图片" 
+          :crop-ratio="4/3"
+          tip="建议上传 4:3 比例的作品封面图，支持裁剪调整"
+        />
       </div>
       <div class="form-grid">
         <div class="form-field">
@@ -133,7 +146,15 @@
         </div>
         <div class="form-field">
           <div class="form-label">所属艺术家</div>
-          <el-select v-model="form.artistId" placeholder="请选择所属艺术家" style="width: 100%;">
+          <el-select
+            v-model="form.artistId"
+            placeholder="请选择或输入艺术家名称"
+            style="width: 100%;"
+            filterable
+            allow-create
+            default-first-option
+            :reserve-keyword="false"
+          >
             <el-option
               v-for="artist in artists"
               :key="artist.id"
@@ -347,9 +368,20 @@
         >
           <el-icon><Plus /></el-icon>
           <template #tip>
-            <div class="el-upload__tip">点击上传，或拖拽图片到此处</div>
+            <div class="el-upload__tip">点击上传，或拖拽图片到此处，支持裁剪调整</div>
           </template>
         </el-upload>
+        
+        <!-- 批量裁剪控制 -->
+        <div v-if="batchFileList.length > 0" class="batch-crop-controls">
+          <div class="form-label">批量裁剪比例</div>
+          <el-radio-group v-model="batchCropRatio" size="small">
+            <el-radio-button :value="null">自由</el-radio-button>
+            <el-radio-button :value="1">1:1 方形</el-radio-button>
+            <el-radio-button :value="4/3">4:3 横图</el-radio-button>
+            <el-radio-button :value="3/4">3:4 竖图</el-radio-button>
+          </el-radio-group>
+        </div>
       </div>
 
       <template #footer>
@@ -373,7 +405,7 @@ import { storeToRefs } from 'pinia'
 import { ElMessage } from 'element-plus'
 import { Download, Plus, Picture, Upload } from '@element-plus/icons-vue'
 import { useAdminStore } from '../../stores/admin'
-import UploadImageField from '../../components/UploadImageField.vue'
+import CropUploadField from '../../components/CropUploadField.vue'
 
 const adminStore = useAdminStore()
 const { artworks: artworksState, artists: artistsState } = storeToRefs(adminStore)
@@ -393,12 +425,13 @@ const batchUploadVisible = ref(false)
 const batchFileList = ref([])
 const batchUrls = ref({})
 const batchUploading = ref(false)
+const batchCropRatio = ref(4/3) // 默认 4:3 比例
 const uploadRef = ref(null)
 const form = reactive({
   name: '',
   artistId: null,
   category: 'PAINTING',
-  status: 'DRAFT',
+  status: 'PUBLISHED',
   price: 0,
   stock: 1,
   material: '',
@@ -512,7 +545,7 @@ function resetForm() {
   form.name = ''
   form.artistId = artists.value[0]?.id || null
   form.category = 'PAINTING'
-  form.status = 'DRAFT'
+  form.status = 'PUBLISHED'
   form.price = 0
   form.stock = 1
   form.material = ''
@@ -650,7 +683,7 @@ async function submitForm() {
     return
   }
   if (!form.artistId) {
-    ElMessage.warning('请选择所属艺术家')
+    ElMessage.warning('请选择或输入所属艺术家')
     return
   }
   const price = Number(form.price || 0)
@@ -658,11 +691,43 @@ async function submitForm() {
     ElMessage.warning('请输入有效价格')
     return
   }
+  
+  // 处理艺术家：如果输入的是字符串（手动输入的名称），需要查找或创建艺术家
+  let artistId = form.artistId
+  if (typeof artistId === 'string') {
+    const artistName = artistId.trim()
+    // 查找是否已有同名艺术家
+    const existingArtist = artists.value.find(a => a.name === artistName)
+    if (existingArtist) {
+      artistId = existingArtist.id
+    } else {
+      // 创建新艺术家
+      try {
+        ElMessage.info(`正在创建新艺术家: ${artistName}`)
+        await adminStore.createArtist({ name: artistName, status: 'ACTIVE' })
+        // 重新加载艺术家列表
+        await adminStore.loadArtists()
+        // 获取新创建的艺术家ID
+        const newArtist = artists.value.find(a => a.name === artistName)
+        if (newArtist) {
+          artistId = newArtist.id
+        } else {
+          ElMessage.error('艺术家创建失败，请重试')
+          return
+        }
+      } catch (err) {
+        console.error('创建艺术家失败:', err)
+        ElMessage.error('艺术家创建失败，请重试')
+        return
+      }
+    }
+  }
+  
   saving.value = true
   try {
     const payload = {
       name: form.name.trim(),
-      artistId: form.artistId,
+      artistId: artistId,
       category: form.category || 'PAINTING',
       price: price,
       stock: Number(form.stock ?? 0),
@@ -702,6 +767,34 @@ async function changeStatus(row, status) {
     ElMessage.success(status === 'ONLINE' ? '作品已上架' : '作品已下架')
   } catch (error) {
     ElMessage.error(error.message || '状态更新失败')
+  }
+}
+
+// 批量上架功能
+async function batchPublish() {
+  if (selectedArtworks.value.length === 0) {
+    ElMessage.warning('请先选择要上架的作品')
+    return
+  }
+  
+  const unpublishedWorks = selectedArtworks.value.filter(item => 
+    item.status !== '上架' && item.status !== 'PUBLISHED'
+  )
+  
+  if (unpublishedWorks.length === 0) {
+    ElMessage.info('所选作品都已上架')
+    return
+  }
+  
+  try {
+    const publishPromises = unpublishedWorks.map(work => 
+      adminStore.changeArtworkStatus(work.id, 'ONLINE')
+    )
+    await Promise.all(publishPromises)
+    ElMessage.success(`已上架 ${unpublishedWorks.length} 个作品`)
+    clearSelection()
+  } catch (error) {
+    ElMessage.error(error.message || '批量上架失败')
   }
 }
 
@@ -1048,6 +1141,15 @@ onMounted(async () => {
 }
 .upload-area {
   margin-top: 16px;
+}
+.batch-crop-controls {
+  margin-top: 16px;
+  padding: 12px;
+  background: #f5f7fa;
+  border-radius: 8px;
+}
+.batch-crop-controls .form-label {
+  margin-bottom: 8px;
 }
 .custom-size-inputs {
   display: flex;

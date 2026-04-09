@@ -42,6 +42,8 @@ public class HomeController {
                     AdminOperationVO banner = new AdminOperationVO();
                     banner.setId(op.getId());
                     banner.setTitle(op.getTitle());
+                    banner.setType(op.getType());
+                    banner.setStatus(op.getStatus());
                     banner.setSubtitle(op.getTarget() != null ? op.getTarget() : "查看详情");
                     banner.setDate(op.getUpdatedAt());
                     banner.setImageUrl(op.getImageUrl());

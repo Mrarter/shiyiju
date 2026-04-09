@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -61,6 +62,27 @@ public class AdminContentController {
     @PostMapping(value = "/uploads/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<AdminUploadVO> uploadImage(@RequestPart("file") MultipartFile file) {
         return ApiResponse.success("上传成功", adminAssetService.uploadImage(file));
+    }
+
+    /**
+     * 上传图片（支持裁剪）
+     * @param file   图片文件
+     * @param cropX  裁剪起点X坐标
+     * @param cropY  裁剪起点Y坐标
+     * @param cropW  裁剪宽度
+     * @param cropH  裁剪高度
+     * @param scale  缩放比例（可选）
+     */
+    @PostMapping(value = "/uploads/images/crop", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<AdminUploadVO> uploadImageWithCrop(
+            @RequestPart("file") MultipartFile file,
+            @RequestParam(value = "cropX", required = false) Integer cropX,
+            @RequestParam(value = "cropY", required = false) Integer cropY,
+            @RequestParam(value = "cropW", required = false) Integer cropW,
+            @RequestParam(value = "cropH", required = false) Integer cropH,
+            @RequestParam(value = "scale", required = false) Double scale) {
+        return ApiResponse.success("上传成功", 
+            adminAssetService.uploadImageWithCrop(file, cropX, cropY, cropW, cropH, scale));
     }
 
     @PostMapping("/operations")

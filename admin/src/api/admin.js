@@ -38,6 +38,16 @@ export async function uploadAdminImage(file) {
   return http.upload(`${ADMIN_API_PREFIX}/uploads/images`, file)
 }
 
+/**
+ * 上传图片（支持裁剪）
+ * @param {File} file - 图片文件
+ * @param {Object} cropParams - 裁剪参数 { cropX, cropY, cropW, cropH, scale }
+ */
+export async function uploadAdminImageWithCrop(file, cropParams = {}) {
+  if (useMock) return { url: URL.createObjectURL(file), name: file.name }
+  return http.uploadWithParams(`${ADMIN_API_PREFIX}/uploads/images/crop`, file, cropParams)
+}
+
 export async function updateArtworkStatus(id, status) {
   if (useMock) return { success: true }
   return http.put(`${ADMIN_API_PREFIX}/artworks/${id}/status`, { status })

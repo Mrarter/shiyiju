@@ -1,8 +1,10 @@
 package com.shiyiju.modules.artwork.service;
 
 import com.shiyiju.common.exception.BusinessException;
+import com.shiyiju.common.util.ImageUrlUtil;
 import com.shiyiju.modules.artwork.dto.ArtworkQueryDTO;
 import com.shiyiju.modules.artwork.entity.ArtworkDetailEntity;
+import com.shiyiju.modules.artwork.entity.ArtworkListItemEntity;
 import com.shiyiju.modules.artwork.mapper.ArtworkMapper;
 import com.shiyiju.modules.artwork.vo.ArtworkDetailVO;
 import com.shiyiju.modules.artwork.vo.ArtworkListItemVO;
@@ -18,20 +20,76 @@ import java.util.List;
 public class ArtworkService {
 
     private final ArtworkMapper artworkMapper;
+    private final ImageUrlUtil imageUrlUtil;
 
-    public ArtworkService(ArtworkMapper artworkMapper) {
+    public ArtworkService(ArtworkMapper artworkMapper, ImageUrlUtil imageUrlUtil) {
         this.artworkMapper = artworkMapper;
+        this.imageUrlUtil = imageUrlUtil;
     }
 
     public List<ArtworkListItemVO> listWorks(ArtworkQueryDTO queryDTO) {
         ArtworkQueryDTO effectiveQuery = normalizeQuery(queryDTO);
         
-        // 演示模式：始终返回模拟数据，避免数据库为空时前端无内容
-        // 正式环境可将此行注释或删除
-        List<ArtworkListItemVO> works = getMockWorks();
+        // 优先从数据库读取作品数据
+        List<ArtworkListItemEntity> entities = artworkMapper.findWorks(effectiveQuery);
+        List<ArtworkListItemVO> works;
+        
+        if (entities == null || entities.isEmpty()) {
+            // 数据库为空时返回mock数据兜底
+            works = getMockWorks();
+        } else {
+            // 转换Entity为VO
+            works = entities.stream().map(this::toArtworkListVO).collect(java.util.stream.Collectors.toList());
+        }
         
         // 按权重排序
         return sortByWeight(works);
+    }
+    
+    private ArtworkListItemVO toArtworkListVO(ArtworkListItemEntity entity) {
+        ArtworkListItemVO vo = new ArtworkListItemVO();
+        vo.setArtworkId(entity.getArtworkId());
+        vo.setArtworkNo(entity.getArtworkNo());
+        vo.setArtistId(entity.getArtistId());
+        vo.setArtistName(entity.getArtistName());
+        vo.setArtistLevelName(entity.getArtistLevelName());
+        vo.setTitle(entity.getTitle());
+        vo.setCategory(entity.getCategory());
+        vo.setSaleMode(entity.getSaleMode());
+        vo.setSaleStatus(mapSaleStatus(entity.getStatus()));
+        vo.setCoverUrl(entity.getCoverUrl());
+        vo.setCurrentPrice(entity.getCurrentPrice());
+        vo.setFavoriteCount(entity.getFavoriteCount());
+        vo.setViewCount(entity.getViewCount());
+        // 设置艺术家头像
+        vo.setArtistAvatar(generateArtistAvatar(entity.getArtistName()));
+        // 处理封面图URL，确保是完整路径
+        vo.setCoverUrl(normalizeImageUrl(entity.getCoverUrl()));
+        // 权重相关字段
+        vo.setCartCount(0);
+        // 从数据库读取admin_weight，如果为null则默认为1
+        vo.setAdminWeight(entity.getAdminWeight() != null ? entity.getAdminWeight() : 1);
+        return vo;
+    }
+    
+    private String normalizeImageUrl(String url) {
+        return imageUrlUtil.normalize(url);
+    }
+    
+    private String normalizeImageUrl(String url, String placeholder) {
+        return imageUrlUtil.normalize(url, placeholder);
+    }
+    
+    private String generateArtistAvatar(String artistName) {
+        if (artistName == null || artistName.isEmpty()) {
+            return "https://ui-avatars.com/api/?name=U&background=c9a96d&color=fff&size=128";
+        }
+        try {
+            return "https://ui-avatars.com/api/?name=" + java.net.URLEncoder.encode(artistName, "UTF-8") 
+                   + "&background=c9a96d&color=fff&size=128&font-size=0.4&bold=true&rounded=true";
+        } catch (Exception e) {
+            return "https://ui-avatars.com/api/?name=" + artistName + "&background=c9a96d&color=fff&size=128&rounded=true";
+        }
     }
     
     // 权重排序：后台配置权重*10 + 点击次数*1 + 收藏次数*3 + 加入购物车次数*5
@@ -116,6 +174,11 @@ public class ArtworkService {
         vo.setCoverUrl(entity.getCoverUrl());
         vo.setMediaUrls(artworkMapper.findArtworkMedia(artworkId).stream().map(media -> media.getMediaUrl()).toList());
         vo.setPriceRule(buildPriceRule(entity));
+        // 标准化图片URL
+        vo.setCoverUrl(imageUrlUtil.normalize(entity.getCoverUrl()));
+        vo.setMediaUrls(artworkMapper.findArtworkMedia(artworkId).stream()
+            .map(media -> imageUrlUtil.normalize(media.getMediaUrl()))
+            .toList());
         return vo;
     }
     

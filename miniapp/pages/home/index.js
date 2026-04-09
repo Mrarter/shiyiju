@@ -1,4 +1,5 @@
 const api = require("../../utils/api")
+const { normalizeImageUrl, normalizeImageFields, getArtworkCoverPlaceholder, getBannerPlaceholder } = require("../../utils/imageUrl")
 
 const PAGE_SIZE = 10
 
@@ -60,7 +61,7 @@ function normalizeWork(item, index, favorites = []) {
     spec: formatSpec(item),
     priceText: formatPrice(item.currentPrice),
     originalPrice: item.originalPrice ? `¥${item.originalPrice.toLocaleString()}` : "",
-    coverUrl: item.coverUrl || "",
+    coverUrl: normalizeImageUrl(item.coverUrl, getArtworkCoverPlaceholder(item.artworkId)),
     tag: item.tag || "",
     countdown: item.countdown || "",
     height: heights[index % heights.length],
@@ -101,6 +102,16 @@ function sortByWeight(works) {
     const { _weight, _originalIndex, ...rest } = work
     return rest
   })
+}
+
+// 随机打乱数组
+function shuffleArray(array) {
+  const shuffled = [...array]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+  return shuffled
 }
 
 // 50个作品数据
@@ -169,15 +180,11 @@ function normalizeBanner(item) {
     { background: "linear-gradient(135deg, #7c665c, #2d231f)", glow: "#d9cec0" },
     { background: "linear-gradient(135deg, #a0785c, #3f2e27)", glow: "#e2c39e" }
   ]
-  // 默认 banner 图片
-  const defaultBannerUrls = [
-    "https://picsum.photos/seed/banner1/750/400",
-    "https://picsum.photos/seed/banner2/750/400",
-    "https://picsum.photos/seed/banner3/750/400"
-  ]
-  // 确保 coverUrl 有值，否则使用 imageUrl 或默认图片
-  const coverUrl = item.coverUrl || item.imageUrl || ""
-  const hasValidImage = coverUrl && coverUrl.startsWith("http")
+  // 确保 coverUrl 有值，否则使用 imageUrl
+  let coverUrl = item.coverUrl || item.imageUrl || ""
+  // 使用统一的图片处理函数
+  const normalizedUrl = normalizeImageUrl(coverUrl, getBannerPlaceholder(item.id))
+  const hasValidImage = normalizedUrl && normalizedUrl.startsWith("http")
   const presetIdx = (item.id || 1) % presets.length
   return {
     id: item.id,
@@ -185,7 +192,7 @@ function normalizeBanner(item) {
     subtitle: item.subtitle || item.target || item.title || "查看详情",
     date: item.date || item.updatedAt || "",
     // 如果有有效图片URL就用它，否则用默认图片
-    coverUrl: hasValidImage ? coverUrl : defaultBannerUrls[presetIdx],
+    coverUrl: hasValidImage ? normalizedUrl : getBannerPlaceholder(item.id),
     coverStyle: presets[presetIdx],
     fallbackBg: presets[presetIdx].background,
     fallbackGlow: presets[presetIdx].glow
@@ -227,7 +234,7 @@ Page({
   },
 
   onPullDownRefresh() {
-    this.loadHome().then(() => {
+    this.loadHome(true).then(() => {
       wx.stopPullDownRefresh()
     })
   },
@@ -236,7 +243,7 @@ Page({
     this.loadMore()
   },
 
-  async loadHome() {
+  async loadHome(isRefresh = false) {
     this.setData({ loading: true, error: "", page: 1, allWorks: [] })
     try {
       // 从 API 获取 Banner 数据
@@ -263,8 +270,8 @@ Page({
         works = ALL_WORKS
       }
 
-      // 按权重排序
-      const sortedWorks = sortByWeight(works)
+      // 下拉刷新时随机显示，首次加载按权重排序
+      let sortedWorks = isRefresh ? shuffleArray(works) : sortByWeight(works)
       const favorites = this.data.favorites || []
       const normalizedWorks = sortedWorks.map((item, index) => normalizeWork(item, index, favorites))
       const { left, right } = this.splitToColumns(normalizedWorks, PAGE_SIZE)
@@ -281,7 +288,7 @@ Page({
       })
     } catch (error) {
       // 使用本地数据
-      const sortedWorks = sortByWeight(ALL_WORKS)
+      let sortedWorks = isRefresh ? shuffleArray(ALL_WORKS) : sortByWeight(ALL_WORKS)
       const favorites = this.data.favorites || []
       const normalizedWorks = sortedWorks.map((item, index) => normalizeWork(item, index, favorites))
       const { left, right } = this.splitToColumns(normalizedWorks, PAGE_SIZE)
@@ -299,42 +306,73 @@ Page({
     }
   },
 
-  loadMore() {
-    if (this.data.loadingMore || !this.data.hasMore) return
+  async loadMore() {
+    if (this.data.loadingMore) return
     
     this.setData({ loadingMore: true })
     
-    const currentPage = this.data.page
-    const nextPage = currentPage + 1
-    const start = currentPage * PAGE_SIZE
-    const end = nextPage * PAGE_SIZE
-    
-    const moreWorks = this.data.allWorks.slice(start, end)
-    
-    if (moreWorks.length === 0) {
-      this.setData({ loadingMore: false, hasMore: false })
-      return
-    }
-
-    const newLeft = []
-    const newRight = []
-    
-    // 交错分配到两列
-    moreWorks.forEach((item, index) => {
-      if (index % 2 === 0) {
-        newLeft.push(item)
-      } else {
-        newRight.push(item)
+    try {
+      // 获取所有作品
+      const works = await api.request({ url: "/works", method: "GET" })
+      const allWorks = works || ALL_WORKS
+      
+      // 获取已显示作品的ID
+      const displayedIds = new Set(this.data.allWorks.map(w => w.id))
+      
+      // 分离未显示和已显示的作品
+      const unshownWorks = allWorks.filter(w => !displayedIds.has(w.id))
+      const shownWorks = allWorks.filter(w => displayedIds.has(w.id))
+      
+      // 优先从未显示的作品中随机获取，不够则从已显示中随机补充
+      const shuffledUnshown = shuffleArray(unshownWorks)
+      let moreWorks = shuffledUnshown.slice(0, PAGE_SIZE)
+      
+      // 如果未显示的不够 PAGE_SIZE，从已显示的补充
+      if (moreWorks.length < PAGE_SIZE && shownWorks.length > 0) {
+        const needed = PAGE_SIZE - moreWorks.length
+        const shuffledShown = shuffleArray(shownWorks).slice(0, needed)
+        moreWorks = [...moreWorks, ...shuffledShown]
       }
-    })
+      
+      // 如果还是没有作品（全是已显示），也随机补充
+      if (moreWorks.length === 0 && allWorks.length > 0) {
+        moreWorks = shuffleArray(allWorks).slice(0, PAGE_SIZE)
+      }
+      
+      if (moreWorks.length === 0) {
+        this.setData({ loadingMore: false })
+        return
+      }
+      
+      const favorites = this.data.favorites || []
+      const nextStartIndex = this.data.page * PAGE_SIZE
+      const normalizedMoreWorks = moreWorks.map((item, index) => 
+        normalizeWork(item, nextStartIndex + index, favorites)
+      )
 
-    this.setData({
-      loadingMore: false,
-      page: nextPage,
-      leftColumn: [...this.data.leftColumn, ...newLeft],
-      rightColumn: [...this.data.rightColumn, ...newRight],
-      hasMore: end < this.data.allWorks.length
-    })
+      const newLeft = []
+      const newRight = []
+      
+      // 交错分配到两列
+      normalizedMoreWorks.forEach((item, index) => {
+        if (index % 2 === 0) {
+          newLeft.push(item)
+        } else {
+          newRight.push(item)
+        }
+      })
+
+      this.setData({
+        loadingMore: false,
+        page: this.data.page + 1,
+        leftColumn: [...this.data.leftColumn, ...newLeft],
+        rightColumn: [...this.data.rightColumn, ...newRight],
+        allWorks: [...this.data.allWorks, ...normalizedMoreWorks],
+        hasMore: true  // 始终允许加载更多
+      })
+    } catch (error) {
+      this.setData({ loadingMore: false })
+    }
   },
 
   splitToColumns(works, limit) {
@@ -366,7 +404,7 @@ Page({
   },
 
   handleRetry() {
-    this.loadHome()
+    this.loadHome(false)
   },
 
   // 加载收藏列表

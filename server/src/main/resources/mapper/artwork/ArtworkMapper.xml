@@ -25,7 +25,8 @@
             ) AS cover_url,
             a.current_price,
             a.favorite_count,
-            a.view_count
+            a.view_count,
+            COALESCE(a.admin_weight, 1) AS admin_weight
         FROM artwork a
         INNER JOIN artist_profile ap ON ap.id = a.artist_id
         LEFT JOIN artist_level al ON al.id = ap.level_id
@@ -43,7 +44,7 @@
                 AND (a.title LIKE CONCAT('%', #{keyword}, '%') OR ap.artist_name LIKE CONCAT('%', #{keyword}, '%'))
             </if>
         </where>
-        ORDER BY a.created_at DESC
+        ORDER BY a.admin_weight DESC, a.created_at DESC
     </select>
 
     <select id="findWorkDetail" resultType="com.shiyiju.modules.artwork.entity.ArtworkDetailEntity">
