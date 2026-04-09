@@ -11,9 +11,9 @@
             type,
             target,
             image_url AS imageUrl,
-            CASE WHEN status = 'ENABLED' THEN '启用' WHEN status = 'DRAFT' THEN '草稿' ELSE '停用' END AS status,
-            sort_no,
-            DATE_FORMAT(updated_at, '%Y-%m-%d %H:%i') AS updated_at
+            status,
+            sort_no AS sortNo,
+            DATE_FORMAT(updated_at, '%Y-%m-%d %H:%i') AS updatedAt
         FROM admin_operation_config
         ORDER BY sort_no ASC, id DESC
     </select>

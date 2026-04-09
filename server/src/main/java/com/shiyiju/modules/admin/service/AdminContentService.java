@@ -63,7 +63,8 @@ public class AdminContentService {
         entity.setStatus(request.getStatus());
         entity.setSortNo(request.getSortNo());
         adminMapper.insertOperation(entity);
-        return operation(entity.getId(), request.getTitle(), request.getType(), request.getTarget(), request.getImageUrl(), displayOperationStatus(request.getStatus()), "刚刚");
+        // 返回原始状态值，由前端显示层负责转换
+        return operation(entity.getId(), request.getTitle(), request.getType(), request.getTarget(), request.getImageUrl(), request.getStatus(), "刚刚");
     }
 
     public AdminOperationVO updateOperation(Long id, AdminOperationSaveDTO request) {
@@ -78,7 +79,8 @@ public class AdminContentService {
         if (adminMapper.updateOperation(entity) <= 0) {
             throw new BusinessException(40404, "运营配置不存在");
         }
-        return operation(id, request.getTitle(), request.getType(), request.getTarget(), request.getImageUrl(), displayOperationStatus(request.getStatus()), "刚刚");
+        // 返回原始状态值，由前端显示层负责转换
+        return operation(id, request.getTitle(), request.getType(), request.getTarget(), request.getImageUrl(), request.getStatus(), "刚刚");
     }
 
     public void updateOperationStatus(Long id, String status) {
