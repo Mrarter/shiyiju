@@ -15,7 +15,7 @@
             sort_no AS sortNo,
             DATE_FORMAT(updated_at, '%Y-%m-%d %H:%i') AS updatedAt
         FROM admin_operation_config
-        ORDER BY sort_no ASC, id DESC
+        ORDER BY sort_no DESC, id DESC
     </select>
 
     <insert id="insertOperation" parameterType="com.shiyiju.modules.admin.entity.AdminOperationEntity" useGeneratedKeys="true" keyProperty="id">

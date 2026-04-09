@@ -8,6 +8,7 @@ public class AdminOperationVO {
     private String target;
     private String imageUrl;
     private String status;
+    private Integer sortNo;
     private String updatedAt;
     private String subtitle;
     private String date;
@@ -25,6 +26,8 @@ public class AdminOperationVO {
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+    public Integer getSortNo() { return sortNo; }
+    public void setSortNo(Integer sortNo) { this.sortNo = sortNo; }
     public String getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(String updatedAt) { this.updatedAt = updatedAt; }
     public String getSubtitle() { return subtitle; }

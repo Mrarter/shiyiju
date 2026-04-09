@@ -46,9 +46,9 @@ public class AdminContentService {
                 "https://picsum.photos/seed/banner3/750/400"
             };
             return List.of(
-                operation(1L, "春季主视觉 Banner", "Banner", "首页主视觉", bannerUrls[0], "启用", "2026-04-07 14:20"),
-                operation(2L, "热门藏品推荐", "热门藏品", "作品 8 个", bannerUrls[1], "启用", "2026-04-07 13:45"),
-                operation(3L, "推荐艺术家", "推荐艺术家", "艺术家 6 位", bannerUrls[2], "草稿", "2026-04-07 12:15")
+                operation(1L, "春季主视觉 Banner", "Banner", "首页主视觉", bannerUrls[0], "ENABLED", 100, "2026-04-07 14:20"),
+                operation(2L, "热门藏品推荐", "热门藏品", "作品 8 个", bannerUrls[1], "ENABLED", 80, "2026-04-07 13:45"),
+                operation(3L, "推荐艺术家", "推荐艺术家", "艺术家 6 位", bannerUrls[2], "DRAFT", 60, "2026-04-07 12:15")
             );
         }
         return entities.stream().map(this::toOperationVO).toList();
@@ -64,7 +64,7 @@ public class AdminContentService {
         entity.setSortNo(request.getSortNo());
         adminMapper.insertOperation(entity);
         // 返回原始状态值，由前端显示层负责转换
-        return operation(entity.getId(), request.getTitle(), request.getType(), request.getTarget(), request.getImageUrl(), request.getStatus(), "刚刚");
+        return operation(entity.getId(), request.getTitle(), request.getType(), request.getTarget(), request.getImageUrl(), request.getStatus(), request.getSortNo(), "刚刚");
     }
 
     public AdminOperationVO updateOperation(Long id, AdminOperationSaveDTO request) {
@@ -80,7 +80,7 @@ public class AdminContentService {
             throw new BusinessException(40404, "运营配置不存在");
         }
         // 返回原始状态值，由前端显示层负责转换
-        return operation(id, request.getTitle(), request.getType(), request.getTarget(), request.getImageUrl(), request.getStatus(), "刚刚");
+        return operation(id, request.getTitle(), request.getType(), request.getTarget(), request.getImageUrl(), request.getStatus(), request.getSortNo(), "刚刚");
     }
 
     public void updateOperationStatus(Long id, String status) {
@@ -521,7 +521,7 @@ public class AdminContentService {
     }
 
     private AdminOperationVO toOperationVO(AdminOperationEntity entity) {
-        return operation(entity.getId(), entity.getTitle(), entity.getType(), entity.getTarget(), entity.getImageUrl(), entity.getStatus(), entity.getUpdatedAt());
+        return operation(entity.getId(), entity.getTitle(), entity.getType(), entity.getTarget(), entity.getImageUrl(), entity.getStatus(), entity.getSortNo(), entity.getUpdatedAt());
     }
 
     private String displayOperationStatus(String status) {
@@ -622,7 +622,7 @@ public class AdminContentService {
             .orElseThrow(() -> new BusinessException(40404, "艺荐官不存在"));
     }
 
-    private AdminOperationVO operation(Long id, String title, String type, String target, String imageUrl, String status, String updatedAt) {
+    private AdminOperationVO operation(Long id, String title, String type, String target, String imageUrl, String status, Integer sortNo, String updatedAt) {
         AdminOperationVO item = new AdminOperationVO();
         item.setId(id);
         item.setTitle(title);
@@ -630,6 +630,7 @@ public class AdminContentService {
         item.setTarget(target);
         item.setImageUrl(imageUrl);
         item.setStatus(status);
+        item.setSortNo(sortNo);
         item.setUpdatedAt(updatedAt);
         return item;
     }

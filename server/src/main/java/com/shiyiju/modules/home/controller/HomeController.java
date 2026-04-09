@@ -33,10 +33,10 @@ public class HomeController {
                 .filter(op -> "ENABLED".equals(op.getStatus()) || "启用".equals(op.getStatus()))
                 .filter(op -> "BANNER".equals(op.getType()) || "Banner".equals(op.getType()))
                 .sorted((a, b) -> {
-                    // 按权重 sortNo 升序排序（值越小越靠前）
-                    int sortA = a.getSortNo() != null ? a.getSortNo() : 999;
-                    int sortB = b.getSortNo() != null ? b.getSortNo() : 999;
-                    return Integer.compare(sortA, sortB);
+                    // 按权重 sortNo 降序排序（值越大越靠前）
+                    int sortA = a.getSortNo() != null ? a.getSortNo() : 0;
+                    int sortB = b.getSortNo() != null ? b.getSortNo() : 0;
+                    return Integer.compare(sortB, sortA);
                 })
                 .map(op -> {
                     AdminOperationVO banner = new AdminOperationVO();
