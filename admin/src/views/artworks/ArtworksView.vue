@@ -5,10 +5,10 @@
         <div class="page-title">作品管理</div>
         <div class="page-subtitle">管理作品资料、价格、库存和上架状态</div>
       </div>
-      <el-button type="primary" @click="startCreate">新建作品</el-button>
+      <el-button type="primary" @click="showDialog">新建作品</el-button>
     </div>
 
-    <div class="section-card" style="padding: 20px; margin-bottom: 16px;">
+    <div class="section-card" style="padding: 20px;">
       <div class="toolbar">
         <el-input v-model="keyword" placeholder="搜索作品名/艺术家" style="max-width: 260px;" />
       </div>
@@ -53,12 +53,18 @@
       </el-table>
     </div>
 
-    <div class="section-card" style="padding: 24px;">
-      <div class="page-title" style="font-size: 18px;">{{ editingId ? '编辑作品' : '新建作品' }}</div>
-      <div style="margin-top: 16px;">
+    <!-- 新建/编辑作品对话框 -->
+    <el-dialog
+      v-model="dialogVisible"
+      :title="editingId ? '编辑作品' : '新建作品'"
+      width="720px"
+      :close-on-click-modal="false"
+      destroy-on-close
+    >
+      <div style="margin-bottom: 16px;">
         <UploadImageField v-model="form.coverUrl" placeholder="作品封面" tip="建议上传竖图或方图作为作品主图" />
       </div>
-      <div class="form-grid" style="margin-top: 16px;">
+      <div class="form-grid">
         <el-input v-model="form.name" placeholder="作品名称" />
         <el-select v-model="form.artistId" placeholder="所属艺术家">
           <el-option
@@ -96,15 +102,15 @@
       <el-input
         v-model="form.description"
         type="textarea"
-        :rows="5"
+        :rows="4"
         placeholder="作品描述"
         style="margin-top: 16px;"
       />
-      <div style="margin-top: 16px;">
-        <el-button @click="resetForm">取消</el-button>
+      <template #footer>
+        <el-button @click="dialogVisible = false">取消</el-button>
         <el-button type="primary" :loading="saving" @click="submitForm">保存作品</el-button>
-      </div>
-    </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -120,6 +126,7 @@ const { artworks: artworksState, artists: artistsState } = storeToRefs(adminStor
 const keyword = ref('')
 const saving = ref(false)
 const editingId = ref(null)
+const dialogVisible = ref(false)
 const form = reactive({
   name: '',
   artistId: null,
@@ -165,8 +172,9 @@ function resetForm() {
   form.coverUrl = ''
 }
 
-function startCreate() {
+function showDialog() {
   resetForm()
+  dialogVisible.value = true
 }
 
 function startEdit(row) {
@@ -186,6 +194,7 @@ function startEdit(row) {
   form.tag = row.tag || ''
   form.description = row.description || ''
   form.coverUrl = row.coverUrl || ''
+  dialogVisible.value = true
 }
 
 function normalizeArtworkStatus(status) {
@@ -252,6 +261,7 @@ async function submitForm() {
       coverUrl: form.coverUrl
     })
     ElMessage.success(editingId.value ? '作品已更新' : '作品已创建')
+    dialogVisible.value = false
     resetForm()
   } catch (error) {
     ElMessage.error(error.message || '保存失败')
