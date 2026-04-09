@@ -1,5 +1,5 @@
 const { request } = require('../../utils/api')
-const { getAddressList, getDefaultAddress } = require('../../utils/address')
+const { getDefaultAddress } = require('../../utils/address')
 
 // 模拟作品数据
 const MOCK_ARTWORK = {
@@ -8,7 +8,10 @@ const MOCK_ARTWORK = {
   artistName: '李明',
   coverUrl: 'https://picsum.photos/400/400?random=1',
   currentPrice: 6888,
-  spec: '油画（布面油画）/60cm×80cm/2024年'
+  category: '油画',
+  widthCm: 60,
+  heightCm: 80,
+  creationYear: 2024
 }
 
 Page({
@@ -16,38 +19,57 @@ Page({
     artwork: null,
     address: null,
     remark: '',
+    paymentMethod: 'alipay',
+    isAnonymous: false,
     loading: false,
     disabled: false
   },
 
   onLoad(options) {
     wx.hideTabBar({ animation: false })
-    const { artworkId } = options
-    this.loadArtwork(artworkId || 1)
+    
+    // 支持从购物车传来的商品信息
+    if (options.items) {
+      try {
+        const items = JSON.parse(decodeURIComponent(options.items))
+        if (items && items.length > 0) {
+          const item = items[0]
+          this.setData({
+            artwork: {
+              id: item.id,
+              title: item.title,
+              artistName: item.artistName,
+              coverUrl: item.coverUrl,
+              currentPrice: item.price,
+              category: this.getCategoryName(item.category),
+              widthCm: item.widthCm,
+              heightCm: item.heightCm,
+              creationYear: item.creationYear
+            }
+          })
+        }
+      } catch (e) {
+        console.log('解析商品信息失败', e)
+      }
+    }
+    
+    // 如果没有商品数据，加载默认数据
+    if (!this.data.artwork) {
+      this.setData({ artwork: MOCK_ARTWORK })
+    }
+    
     this.loadAddress()
   },
 
-  async loadArtwork(artworkId) {
-    try {
-      const res = await request({
-        url: `/works/${artworkId}`,
-        method: 'GET'
-      })
-      this.setData({
-        artwork: {
-          ...res.data,
-          spec: this.formatSpec(res.data)
-        }
-      })
-    } catch (err) {
-      // 使用模拟数据
-      this.setData({
-        artwork: {
-          ...MOCK_ARTWORK,
-          id: parseInt(artworkId) || MOCK_ARTWORK.id
-        }
-      })
+  getCategoryName(category) {
+    const map = {
+      PAINTING: '油画',
+      PRINT: '版画',
+      INK: '水墨',
+      SCULPTURE: '雕塑',
+      OTHER: '综合'
     }
+    return map[category] || '综合'
   },
 
   async loadAddress() {
@@ -61,25 +83,19 @@ Page({
     }
   },
 
-  formatSpec(item) {
-    const categoryMap = {
-      PAINTING: '布面油画',
-      PRINT: '丝网版画',
-      INK: '宣纸水墨',
-      SCULPTURE: '青铜雕塑',
-      OTHER: '综合材料'
-    }
-    const category = categoryMap[item.category] || '综合材料'
-    const width = item.widthCm || '-'
-    const height = item.heightCm || '-'
-    const year = item.creationYear || ''
-    return `${category}/${width}cm×${height}cm/${year}`
-  },
-
   selectAddress() {
     wx.navigateTo({
       url: '/pages/address/list?mode=select'
     })
+  },
+
+  selectPayment(e) {
+    const method = e.currentTarget.dataset.method
+    this.setData({ paymentMethod: method })
+  },
+
+  toggleAnonymous(e) {
+    this.setData({ isAnonymous: e.detail.value })
   },
 
   onRemarkInput(e) {
@@ -89,10 +105,10 @@ Page({
   async handlePay() {
     if (this.data.loading || this.data.disabled) return
 
-    const { artwork, address, remark } = this.data
+    const { artwork, address, remark, paymentMethod, isAnonymous } = this.data
 
     if (!address) {
-      wx.showToast({ title: '请选择收货地址', icon: 'none' })
+      wx.showToast({ title: '请先添加收货地址', icon: 'none' })
       return
     }
 
@@ -106,7 +122,8 @@ Page({
         data: {
           artworkId: artwork.id,
           addressId: address.id,
-          remark: remark
+          remark: remark,
+          anonymous: isAnonymous
         }
       })
 
@@ -118,19 +135,24 @@ Page({
         url: '/payments/prepay',
         method: 'POST',
         data: {
-          orderId: order.orderId
+          orderId: order.orderId,
+          paymentMethod: paymentMethod
         }
       })
 
       const payData = payRes.data
       console.log('预支付成功', payData)
 
-      // 3. 调起微信支付
+      // 3. 调起支付
       if (payData.prepayId && payData.prepayId.startsWith('simulate_')) {
-        // 开发环境模拟支付
         await this.simulatePay(order.orderId)
+      } else if (paymentMethod === 'alipay') {
+        // 支付宝支付
+        wx.navigateTo({
+          url: `/pages/order/success?orderId=${order.orderId}`
+        })
       } else {
-        // 正式环境
+        // 微信支付
         await this.doWxPay(payData, order)
       }
 
@@ -154,7 +176,6 @@ Page({
         signType: 'MD5',
         paySign: payData.paySign || 'mock_sign',
         success: () => {
-          console.log('支付成功')
           wx.redirectTo({
             url: `/pages/order/success?orderId=${order.orderId}`
           })
@@ -170,20 +191,17 @@ Page({
   },
 
   async simulatePay(orderId) {
-    // 开发环境：调用模拟支付接口
     try {
       await request({
         url: `/payments/simulate`,
         method: 'POST',
         data: { orderId }
       })
-      wx.redirectTo({
-        url: `/pages/order/success?orderId=${orderId}`
-      })
     } catch (err) {
-      wx.redirectTo({
-        url: `/pages/order/success?orderId=${orderId}`
-      })
+      console.log('模拟支付接口调用失败', err)
     }
+    wx.redirectTo({
+      url: `/pages/order/success?orderId=${orderId}`
+    })
   }
 })
