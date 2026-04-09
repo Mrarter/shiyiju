@@ -214,7 +214,28 @@ public class AdminContentService {
 
     public AdminArtistVO updateArtist(Long id, AdminArtistSaveDTO request) {
         initMockData();
-        // 演示模式：更新mock数据并返回
+        
+        // 先检查数据库是否有该艺术家，如果有就走数据库更新路径
+        AdminArtistEntity existingEntity = adminMapper.findArtistById(id);
+        if (existingEntity != null) {
+            // 数据库存在该艺术家，更新数据库
+            existingEntity.setName(request.getName());
+            existingEntity.setCity(request.getCity());
+            existingEntity.setTags(request.getTags());
+            existingEntity.setAvatarUrl(request.getAvatarUrl());
+            existingEntity.setWorks(request.getWorks());
+            existingEntity.setStatus(toArtistStatus(request.getStatus()));
+            existingEntity.setSort(request.getSort() != null ? request.getSort() : id.intValue());
+            existingEntity.setBio(request.getBio());
+            existingEntity.setGraduatedFrom(request.getGraduatedFrom());
+            existingEntity.setAwards(request.getAwards());
+            existingEntity.setAge(request.getAge());
+            adminMapper.updateArtist(existingEntity);
+            adminMapper.updateArtistUserAvatar(id, "艺术家" + request.getName(), request.getAvatarUrl());
+            return artist(id, request.getName(), request.getCity() != null ? request.getCity() : "", request.getTags(), request.getAvatarUrl(), request.getWorks(), displayArtistStatus(existingEntity.getStatus()), existingEntity.getSort(), request.getBio(), request.getGraduatedFrom(), request.getAwards(), request.getAge());
+        }
+        
+        // 数据库没有该艺术家，检查是否是 mock 艺术家 ID
         if (isMockArtistId(id)) {
             String city = request.getCity() != null ? request.getCity() : "";
             Integer sort = request.getSort() != null ? request.getSort() : id.intValue();
@@ -230,30 +251,23 @@ public class AdminContentService {
             return updated;
         }
         
-        AdminArtistEntity entity = new AdminArtistEntity();
-        entity.setId(id);
-        entity.setName(request.getName());
-        entity.setCity(request.getCity());
-        entity.setTags(request.getTags());
-        entity.setAvatarUrl(request.getAvatarUrl());
-        entity.setWorks(request.getWorks());
-        entity.setStatus(toArtistStatus(request.getStatus()));
-        entity.setSort(request.getSort() != null ? request.getSort() : id.intValue());
-        entity.setBio(request.getBio());
-        entity.setGraduatedFrom(request.getGraduatedFrom());
-        entity.setAwards(request.getAwards());
-        entity.setAge(request.getAge());
-        if (adminMapper.updateArtist(entity) <= 0) {
-            throw new BusinessException(40404, "艺术家不存在");
-        }
-        adminMapper.updateArtistUserAvatar(id, "艺术家" + request.getName(), request.getAvatarUrl());
-        return artist(id, request.getName(), request.getCity() != null ? request.getCity() : "", request.getTags(), request.getAvatarUrl(), request.getWorks(), displayArtistStatus(entity.getStatus()), entity.getSort(), request.getBio(), request.getGraduatedFrom(), request.getAwards(), request.getAge());
+        // 数据库和 mock 中都没有，返回错误
+        throw new BusinessException(40404, "艺术家不存在");
     }
 
     public void updateArtistStatus(Long id, String status) {
         initMockData();
         String targetStatus = toArtistStatus(status);
-        // 演示模式：更新mock数据
+        
+        // 先检查数据库是否有该艺术家，如果有就更新数据库
+        if (adminMapper.findArtistById(id) != null) {
+            if (adminMapper.updateArtistStatus(id, targetStatus) <= 0) {
+                throw new BusinessException(40404, "艺术家不存在");
+            }
+            return;
+        }
+        
+        // 数据库没有该艺术家，检查是否是 mock 艺术家 ID
         if (isMockArtistId(id)) {
             for (AdminArtistVO artist : mockArtists) {
                 if (artist.getId().equals(id)) {
@@ -263,9 +277,8 @@ public class AdminContentService {
             }
             return;
         }
-        if (adminMapper.updateArtistStatus(id, targetStatus) <= 0) {
-            throw new BusinessException(40404, "艺术家不存在");
-        }
+        
+        throw new BusinessException(40404, "艺术家不存在");
     }
 
     public List<AdminArtworkVO> listArtworks() {

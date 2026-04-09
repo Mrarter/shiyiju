@@ -12,7 +12,7 @@
       <div class="toolbar">
         <el-input v-model="keyword" placeholder="搜索艺术家姓名/标签" style="max-width: 260px;" />
       </div>
-      <el-table :data="filteredArtists">
+      <el-table ref="tableRef" :data="filteredArtists" :key="tableKey" row-key="id">
         <el-table-column label="头像" width="110">
           <template #default="{ row }">
             <el-avatar v-if="row.avatarUrl" :src="row.avatarUrl" :size="44" class="clickable-avatar" @click="startEdit(row)" />
@@ -44,7 +44,12 @@
       destroy-on-close
     >
       <div style="margin-bottom: 16px;">
-        <UploadImageField v-model="form.avatarUrl" placeholder="艺术家头像图片URL" tip="建议上传 1:1 正方形头像图" />
+        <CropUploadField
+          v-model="form.avatarUrl"
+          placeholder="艺术家头像"
+          :crop-ratio="1"
+          tip="建议上传 1:1 正方形头像图，最大 20MB"
+        />
       </div>
       <div class="form-grid">
         <div class="form-field">
@@ -102,11 +107,11 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { ElMessage } from 'element-plus'
 import { useAdminStore } from '../../stores/admin'
-import UploadImageField from '../../components/UploadImageField.vue'
+import CropUploadField from '../../components/CropUploadField.vue'
 
 const adminStore = useAdminStore()
 const { artists: artistsState } = storeToRefs(adminStore)
@@ -114,6 +119,8 @@ const keyword = ref('')
 const saving = ref(false)
 const editingId = ref(null)
 const dialogVisible = ref(false)
+const tableKey = ref(0)
+const tableRef = ref(null)
 const form = reactive({
   name: '',
   city: '',
@@ -255,8 +262,11 @@ async function submitForm() {
       age: form.age ?? null
     }
     console.log('保存艺术家:', editingId.value ? '更新' : '新建', payload)
-    await adminStore.saveArtist(editingId.value, payload)
-    ElMessage.success(editingId.value ? '艺术家已更新' : '艺术家已创建')
+    const editId = editingId.value
+    await adminStore.saveArtist(editId, payload)
+    tableKey.value++ // 强制刷新表格
+    await nextTick()
+    ElMessage.success(editId ? '艺术家已更新' : '艺术家已创建')
     clearDraft()
     dialogVisible.value = false
     resetForm()

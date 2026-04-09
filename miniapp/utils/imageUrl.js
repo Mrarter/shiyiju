@@ -3,17 +3,30 @@
  * 统一处理数据库返回的图片URL，确保兼容各种格式
  */
 
-// 服务器基础URL（需与后端配置一致）
-let serverBaseUrl = 'http://localhost:8080';
+// 获取实际的服务器基础URL（从 app.globalData.apiBaseUrl 提取）
+function getActualServerBaseUrl() {
+  let apiBaseUrl = 'http://localhost:8080/api/v1';
+  
+  try {
+    const app = getApp();
+    if (app && app.globalData && app.globalData.apiBaseUrl) {
+      apiBaseUrl = app.globalData.apiBaseUrl;
+    }
+  } catch (e) {
+    // 忽略错误，使用默认值
+  }
+  
+  // 从 API 地址提取基础 URL
+  const match = apiBaseUrl.match(/^(https?:\/\/[^\/]+)/);
+  return match ? match[1] : 'http://localhost:8080';
+}
 
 /**
- * 设置服务器基础URL
+ * 设置服务器基础URL（保留此方法以兼容旧代码）
  * @param {string} url - 服务器基础地址
  */
 function setServerBaseUrl(url) {
-  if (url) {
-    serverBaseUrl = url.replace(/\/$/, ''); // 去除末尾斜杠
-  }
+  // 现在改用动态获取，此方法仅作保留
 }
 
 /**
@@ -21,7 +34,7 @@ function setServerBaseUrl(url) {
  * @returns {string}
  */
 function getServerBaseUrl() {
-  return serverBaseUrl;
+  return getActualServerBaseUrl();
 }
 
 /**

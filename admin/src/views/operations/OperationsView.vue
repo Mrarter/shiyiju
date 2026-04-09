@@ -70,32 +70,14 @@
       destroy-on-close
     >
       <div style="margin-bottom: 16px;">
-        <!-- 可点击上传的图片区域 -->
-        <el-upload
-          :show-file-list="false"
-          accept="image/jpeg,image/jpg,image/png,image/webp"
-          :before-upload="beforeDialogUpload"
-          :http-request="handleDialogUpload"
-          class="dialog-image-uploader"
-        >
-          <div class="dialog-image-box" :class="{ 'has-image': form.imageUrl }">
-            <el-image
-              v-if="form.imageUrl"
-              :src="form.imageUrl"
-              fit="contain"
-              style="width: 100%; height: 100%;"
-            />
-            <div v-else class="dialog-image-placeholder">
-              <el-icon size="32"><Plus /></el-icon>
-              <span>点击上传图片</span>
-            </div>
-            <div v-if="form.imageUrl" class="dialog-image-overlay">
-              <el-icon size="24"><Edit /></el-icon>
-              <span>更换图片</span>
-            </div>
-          </div>
-        </el-upload>
-        <div class="dialog-image-tip">不限制尺寸，最大 20MB</div>
+        <!-- 使用裁剪上传组件 -->
+        <CropUploadField
+          v-model="form.imageUrl"
+          :enable-crop="true"
+          :crop-ratio="750/400"
+          placeholder="点击上传 Banner 图片"
+          tip="建议尺寸 750×400，最大 20MB"
+        />
       </div>
       <div class="form-fields">
         <div class="form-field">
@@ -162,22 +144,13 @@ import { storeToRefs } from 'pinia'
 import { ElMessage } from 'element-plus'
 import { Plus, Edit } from '@element-plus/icons-vue'
 import { useAdminStore } from '../../stores/admin'
-import { uploadAdminImage } from '../../api/admin'
+import CropUploadField from '../../components/CropUploadField.vue'
 
 const adminStore = useAdminStore()
 const { operations } = storeToRefs(adminStore)
 const keyword = ref('')
 const saving = ref(false)
-const imageUploading = ref(false)
 const MAX_SIZE = 20 * 1024 * 1024 // 20MB
-
-function beforeDialogUpload(file) {
-  if (file.size > MAX_SIZE) {
-    ElMessage.error('图片体积不能超过 20MB')
-    return false
-  }
-  return true
-}
 
 const editingId = ref(null)
 const dialogVisible = ref(false)
@@ -303,22 +276,6 @@ function normalizeStatus(status) {
     停用: 'DISABLED'
   }
   return map[status] || status || 'ENABLED'
-}
-
-async function handleDialogUpload(options) {
-  imageUploading.value = true
-  try {
-    const result = await uploadAdminImage(options.file)
-    form.imageUrl = result.url || ''
-    ElMessage.success('图片上传成功')
-    options.onProgress?.({ percent: 100 })
-    options.onSuccess?.(result)
-  } catch (error) {
-    options.onError?.(error)
-    ElMessage.error(error.message || '图片上传失败')
-  } finally {
-    imageUploading.value = false
-  }
 }
 
 async function submitForm() {

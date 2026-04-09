@@ -71,6 +71,26 @@
         LIMIT 100
     </select>
 
+    <select id="findArtistById" resultType="com.shiyiju.modules.admin.entity.AdminArtistEntity">
+        SELECT
+            id,
+            user_id AS userId,
+            artist_name AS name,
+            COALESCE(city, '') AS city,
+            COALESCE(style_tags, '') AS tags,
+            avatar_url AS avatarUrl,
+            COALESCE(work_count, 0) AS works,
+            CASE WHEN status = 'ACTIVE' THEN '上线' ELSE '下线' END AS status,
+            COALESCE(sort_no, id) AS sort,
+            COALESCE(bio, '') AS bio,
+            COALESCE(graduated_from, '') AS graduatedFrom,
+            COALESCE(awards, '') AS awards,
+            age
+        FROM artist_profile
+        WHERE id = #{id}
+        LIMIT 1
+    </select>
+
     <insert id="insertArtistUser" parameterType="com.shiyiju.modules.user.entity.UserAccountEntity" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO user_account
         (user_no, nickname, avatar_url, gender, status, register_source, invitation_code_used, last_login_at)

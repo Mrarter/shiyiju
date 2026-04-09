@@ -25,6 +25,8 @@ public interface AdminMapper {
 
     List<AdminArtistEntity> findArtists();
 
+    AdminArtistEntity findArtistById(@Param("id") Long id);
+
     int insertArtistUser(UserAccountEntity entity);
 
     int insertArtist(AdminArtistEntity entity);

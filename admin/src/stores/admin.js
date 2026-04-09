@@ -53,23 +53,28 @@ export const useAdminStore = defineStore('admin', {
       this.operations = await getOperationConfigs()
     },
     async loadArtists() {
-      this.artists = await getArtists()
+      const newArtists = await getArtists()
+      this.artists.splice(0, this.artists.length, ...newArtists)
     },
     async loadArtworks() {
-      this.artworks = await getArtworks()
+      const newArtworks = await getArtworks()
+      this.artworks.splice(0, this.artworks.length, ...newArtworks)
     },
     async loadUsers() {
-      this.users = await getUsers()
+      const newUsers = await getUsers()
+      this.users.splice(0, this.users.length, ...newUsers)
     },
     async changeUserStatus(id, status) {
       await updateUserStatus(id, status)
       await this.loadUsers()
     },
     async loadOrders() {
-      this.orders = await getOrders()
+      const newOrders = await getOrders()
+      this.orders.splice(0, this.orders.length, ...newOrders)
     },
     async loadAdminAccounts() {
-      this.adminAccounts = await getAdminAccountsApi()
+      const newAccounts = await getAdminAccountsApi()
+      this.adminAccounts.splice(0, this.adminAccounts.length, ...newAccounts)
     },
     async saveAdminAccount(id, payload) {
       if (id) {
@@ -81,7 +86,8 @@ export const useAdminStore = defineStore('admin', {
       await this.loadAdminRoles()
     },
     async loadAdminRoles() {
-      this.adminRoles = await getAdminRolesApi()
+      const newRoles = await getAdminRolesApi()
+      this.adminRoles.splice(0, this.adminRoles.length, ...newRoles)
     },
     async saveAdminRole(id, payload) {
       if (id) {
@@ -98,7 +104,8 @@ export const useAdminStore = defineStore('admin', {
       await this.loadAdminAccounts()
     },
     async loadSystemConfigs() {
-      this.systemConfigs = await getSystemConfigsApi()
+      const newConfigs = await getSystemConfigsApi()
+      this.systemConfigs.splice(0, this.systemConfigs.length, ...newConfigs)
     },
     async saveSystemConfig(id, payload) {
       if (id) {
@@ -121,11 +128,13 @@ export const useAdminStore = defineStore('admin', {
     },
     async createOperation(payload) {
       await createOperationConfig(payload)
-      await this.loadOperations()
+      const newOps = await getOperationConfigs()
+      this.operations.splice(0, this.operations.length, ...newOps)
     },
     async updateOperation(id, payload) {
       await updateOperationConfig(id, payload)
-      await this.loadOperations()
+      const newOps = await getOperationConfigs()
+      this.operations.splice(0, this.operations.length, ...newOps)
     },
     async changeArtworkStatus(id, status) {
       await updateArtworkStatus(id, status)
@@ -139,10 +148,17 @@ export const useAdminStore = defineStore('admin', {
       let result
       if (id) {
         result = await updateArtist(id, payload)
+        // 直接更新本地数据，避免依赖后端重新查询
+        if (result) {
+          const index = this.artists.findIndex(a => a.id === id)
+          if (index !== -1) {
+            this.artists.splice(index, 1, result)
+          }
+        }
       } else {
         result = await createArtist(payload)
+        await this.loadArtists()
       }
-      await this.loadArtists()
       return result
     },
     async saveArtwork(id, payload) {
@@ -154,9 +170,6 @@ export const useAdminStore = defineStore('admin', {
       }
       await this.loadArtworks()
       return result
-    },
-    async updateArtwork(id, payload) {
-      await updateArtwork(id, payload)
     },
     async saveOrderShipment(id, payload) {
       await updateOrderShipment(id, payload)

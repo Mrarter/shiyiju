@@ -2,7 +2,10 @@ const api = require("./utils/api")
 
 App({
   globalData: {
-    apiBaseUrl: "http://192.168.1.163:8080/api/v1",
+    // 开发环境使用 HTTPS
+    apiBaseUrl: "https://localhost:8443/api/v1",
+    // 生产环境示例（根据实际服务器配置）
+    // apiBaseUrl: "https://your-server.com/api/v1",
     token: wx.getStorageSync("token") || ""
   },
 

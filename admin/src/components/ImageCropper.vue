@@ -16,7 +16,7 @@
         <div class="info-item">
           <span class="label">宽高比：</span>
           <el-select v-model="currentAspectRatio" size="small" @change="handleRatioChange">
-            <el-option :value="null" label="自由" />
+            <el-option :value="undefined" label="自由" />
             <el-option :value="1" label="1:1 方形" />
             <el-option :value="4/3" label="4:3" />
             <el-option :value="16/9" label="16:9" />
