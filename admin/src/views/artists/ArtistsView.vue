@@ -8,7 +8,7 @@
       <el-button type="primary" @click="startCreate">新建艺术家</el-button>
     </div>
 
-    <div class="section-card" style="padding: 20px; margin-bottom: 16px;">
+    <div class="section-card" style="padding: 20px;">
       <div class="toolbar">
         <el-input v-model="keyword" placeholder="搜索艺术家姓名/标签" style="max-width: 260px;" />
       </div>
@@ -35,25 +35,35 @@
       </el-table>
     </div>
 
-    <div class="section-card" style="padding: 24px;">
-      <div class="page-title" style="font-size: 18px;">{{ editingId ? '编辑艺术家' : '新建艺术家' }}</div>
-      <div style="margin-top: 16px;">
+    <!-- 新建/编辑艺术家对话框 -->
+    <el-dialog
+      v-model="dialogVisible"
+      :title="editingId ? '编辑艺术家' : '新建艺术家'"
+      width="600px"
+      :close-on-click-modal="false"
+      destroy-on-close
+    >
+      <div style="margin-bottom: 16px;">
         <UploadImageField v-model="form.avatarUrl" placeholder="艺术家头像" tip="建议上传 1:1 头像图" />
       </div>
-      <div class="form-grid" style="margin-top: 16px;">
+      <div class="form-grid">
         <el-input v-model="form.name" placeholder="艺术家名称" />
+        <el-input v-model="form.city" placeholder="所在城市" />
         <el-input v-model="form.tags" placeholder="风格标签，逗号分隔" />
-        <el-input v-model.number="form.works" placeholder="作品数" />
         <el-select v-model="form.status" placeholder="状态">
           <el-option label="上线" value="ONLINE" />
           <el-option label="下线" value="OFFLINE" />
         </el-select>
       </div>
-      <div style="margin-top: 16px;">
-        <el-button @click="resetForm">取消</el-button>
-        <el-button type="primary" :loading="saving" @click="submitForm">保存艺术家</el-button>
+      <div class="form-grid" style="margin-top: 16px;">
+        <el-input v-model.number="form.works" placeholder="作品数" />
+        <el-input v-model.number="form.sort" placeholder="排序值（越小越靠前）" />
       </div>
-    </div>
+      <template #footer>
+        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="saving" @click="submitForm">保存艺术家</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -69,11 +79,14 @@ const { artists: artistsState } = storeToRefs(adminStore)
 const keyword = ref('')
 const saving = ref(false)
 const editingId = ref(null)
+const dialogVisible = ref(false)
 const form = reactive({
   name: '',
+  city: '',
   tags: '',
   avatarUrl: '',
   works: 0,
+  sort: 0,
   status: 'ONLINE'
 })
 
@@ -87,23 +100,29 @@ const filteredArtists = computed(() => {
 function resetForm() {
   editingId.value = null
   form.name = ''
+  form.city = ''
   form.tags = ''
   form.avatarUrl = ''
   form.works = 0
+  form.sort = 0
   form.status = 'ONLINE'
 }
 
 function startCreate() {
   resetForm()
+  dialogVisible.value = true
 }
 
 function startEdit(row) {
   editingId.value = row.id
   form.name = row.name || ''
+  form.city = row.city || ''
   form.tags = row.tags || ''
   form.avatarUrl = row.avatarUrl || ''
   form.works = Number(row.works || 0)
+  form.sort = Number(row.sort || 0)
   form.status = normalizeArtistStatus(row.status)
+  dialogVisible.value = true
 }
 
 function normalizeArtistStatus(status) {
@@ -120,12 +139,15 @@ async function submitForm() {
   try {
     await adminStore.saveArtist(editingId.value, {
       name: form.name.trim(),
+      city: form.city.trim(),
       tags: form.tags.trim(),
       avatarUrl: form.avatarUrl,
       works: Number(form.works || 0),
+      sort: Number(form.sort || 0),
       status: form.status
     })
     ElMessage.success(editingId.value ? '艺术家已更新' : '艺术家已创建')
+    dialogVisible.value = false
     resetForm()
   } catch (error) {
     ElMessage.error(error.message || '保存失败')
