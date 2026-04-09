@@ -4,6 +4,8 @@ public class AdminUserEntity {
 
     private Long id;
     private String nickname;
+    private String avatarUrl;
+    private String mobile;
     private String userNo;
     private String gender;
     private String status;
@@ -13,6 +15,10 @@ public class AdminUserEntity {
     public void setId(Long id) { this.id = id; }
     public String getNickname() { return nickname; }
     public void setNickname(String nickname) { this.nickname = nickname; }
+    public String getAvatarUrl() { return avatarUrl; }
+    public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
+    public String getMobile() { return mobile; }
+    public void setMobile(String mobile) { this.mobile = mobile; }
     public String getUserNo() { return userNo; }
     public void setUserNo(String userNo) { this.userNo = userNo; }
     public String getGender() { return gender; }

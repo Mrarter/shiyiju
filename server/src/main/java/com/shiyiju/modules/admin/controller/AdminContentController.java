@@ -10,6 +10,7 @@ import com.shiyiju.modules.admin.dto.AdminRemarkUpdateDTO;
 import com.shiyiju.modules.admin.dto.AdminRoleSaveDTO;
 import com.shiyiju.modules.admin.dto.AdminShipmentUpdateDTO;
 import com.shiyiju.modules.admin.dto.AdminStatusUpdateDTO;
+import com.shiyiju.modules.admin.dto.AdminDistributorSaveDTO;
 import com.shiyiju.modules.admin.service.AdminContentService;
 import com.shiyiju.modules.admin.service.AdminSettingsService;
 import com.shiyiju.modules.admin.vo.AdminAccountVO;
@@ -21,6 +22,7 @@ import com.shiyiju.modules.admin.vo.AdminOrderVO;
 import com.shiyiju.modules.admin.vo.AdminRoleVO;
 import com.shiyiju.modules.admin.vo.AdminUploadVO;
 import com.shiyiju.modules.admin.vo.AdminUserVO;
+import com.shiyiju.modules.admin.vo.AdminDistributorVO;
 import com.shiyiju.modules.admin.service.AdminAssetService;
 import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
@@ -206,6 +208,27 @@ public class AdminContentController {
     @PutMapping("/orders/{id}/remark")
     public ApiResponse<Void> updateOrderRemark(@PathVariable Long id, @Valid @RequestBody AdminRemarkUpdateDTO request) {
         adminContentService.updateOrderRemark(id, request);
+        return ApiResponse.success("更新成功", null);
+    }
+
+    @GetMapping("/distributors")
+    public ApiResponse<List<AdminDistributorVO>> distributors() {
+        return ApiResponse.success(adminContentService.listDistributors());
+    }
+
+    @PostMapping("/distributors")
+    public ApiResponse<AdminDistributorVO> createDistributor(@Valid @RequestBody AdminDistributorSaveDTO request) {
+        return ApiResponse.success("创建成功", adminContentService.createDistributor(request));
+    }
+
+    @PutMapping("/distributors/{id}")
+    public ApiResponse<AdminDistributorVO> updateDistributor(@PathVariable Long id, @Valid @RequestBody AdminDistributorSaveDTO request) {
+        return ApiResponse.success("更新成功", adminContentService.updateDistributor(id, request));
+    }
+
+    @PutMapping("/distributors/{id}/status")
+    public ApiResponse<Void> updateDistributorStatus(@PathVariable Long id, @Valid @RequestBody AdminStatusUpdateDTO request) {
+        adminContentService.updateDistributorStatus(id, request.getStatus());
         return ApiResponse.success("更新成功", null);
     }
 }

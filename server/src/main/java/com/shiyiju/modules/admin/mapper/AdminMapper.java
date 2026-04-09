@@ -5,6 +5,7 @@ import com.shiyiju.modules.admin.entity.AdminArtworkEntity;
 import com.shiyiju.modules.admin.entity.AdminOperationEntity;
 import com.shiyiju.modules.admin.entity.AdminOrderEntity;
 import com.shiyiju.modules.admin.entity.AdminUserEntity;
+import com.shiyiju.modules.admin.entity.AdminDistributorEntity;
 import com.shiyiju.modules.user.entity.UserAccountEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -74,4 +75,22 @@ public interface AdminMapper {
     int updateOrderStatus(@Param("orderId") Long orderId, @Param("status") String status);
 
     int updateOrderRemark(@Param("orderId") Long orderId, @Param("remark") String remark);
+
+    List<AdminDistributorEntity> findDistributors();
+
+    int insertDistributor(AdminDistributorEntity entity);
+
+    int insertUserRoleRelation(@Param("userId") Long userId, @Param("roleCode") String roleCode);
+
+    int updateDistributor(AdminDistributorEntity entity);
+
+    int updateDistributorStatus(@Param("id") Long id, @Param("status") String status);
+
+    int insertInvitationCode(@Param("userId") Long userId, @Param("code") String code, @Param("codeType") String codeType);
+
+    String findInvitationCodeByUserId(@Param("userId") Long userId);
+
+    int updateInvitationCodeStatus(@Param("userId") Long userId, @Param("status") String status);
+
+    List<AdminUserEntity> findUsersWithoutDistributor();
 }

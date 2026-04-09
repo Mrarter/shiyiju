@@ -7,6 +7,7 @@ import ArtistsView from '../views/artists/ArtistsView.vue'
 import ArtworksView from '../views/artworks/ArtworksView.vue'
 import UsersView from '../views/users/UsersView.vue'
 import OrdersView from '../views/orders/OrdersView.vue'
+import DistributorsView from '../views/distributors/DistributorsView.vue'
 import SettingsView from '../views/settings/SettingsView.vue'
 import { useAuthStore } from '../stores/auth'
 
@@ -23,6 +24,7 @@ const routes = [
       { path: 'artworks', component: ArtworksView },
       { path: 'users', component: UsersView },
       { path: 'orders', component: OrdersView },
+      { path: 'distributors', component: DistributorsView },
       { path: 'settings', component: SettingsView }
     ]
   }

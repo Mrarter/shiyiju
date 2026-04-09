@@ -15,6 +15,7 @@
         <el-menu-item index="/artworks">作品管理</el-menu-item>
         <el-menu-item index="/users">用户管理</el-menu-item>
         <el-menu-item index="/orders">订单管理</el-menu-item>
+        <el-menu-item index="/distributors">艺荐官管理</el-menu-item>
         <el-menu-item index="/settings">系统设置</el-menu-item>
       </el-menu>
     </aside>
@@ -95,6 +96,7 @@ const pageTitle = computed(() => {
     '/artworks': '作品管理',
     '/users': '用户管理',
     '/orders': '订单管理',
+    '/distributors': '艺荐官管理',
     '/settings': '系统设置'
   }
   return map[route.path] || '拾艺局运营后台'

@@ -6,17 +6,20 @@ import com.shiyiju.modules.admin.dto.AdminArtistSaveDTO;
 import com.shiyiju.modules.admin.dto.AdminArtworkSaveDTO;
 import com.shiyiju.modules.admin.dto.AdminRemarkUpdateDTO;
 import com.shiyiju.modules.admin.dto.AdminShipmentUpdateDTO;
+import com.shiyiju.modules.admin.dto.AdminDistributorSaveDTO;
 import com.shiyiju.modules.admin.entity.AdminArtistEntity;
 import com.shiyiju.modules.admin.entity.AdminArtworkEntity;
 import com.shiyiju.modules.admin.entity.AdminOperationEntity;
 import com.shiyiju.modules.admin.entity.AdminOrderEntity;
 import com.shiyiju.modules.admin.entity.AdminUserEntity;
+import com.shiyiju.modules.admin.entity.AdminDistributorEntity;
 import com.shiyiju.modules.admin.mapper.AdminMapper;
 import com.shiyiju.modules.admin.vo.AdminArtistVO;
 import com.shiyiju.modules.admin.vo.AdminArtworkVO;
 import com.shiyiju.modules.admin.vo.AdminOperationVO;
 import com.shiyiju.modules.admin.vo.AdminOrderVO;
 import com.shiyiju.modules.admin.vo.AdminUserVO;
+import com.shiyiju.modules.admin.vo.AdminDistributorVO;
 import com.shiyiju.modules.user.entity.UserAccountEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
@@ -203,6 +206,68 @@ public class AdminContentService {
         }
     }
 
+    public List<AdminDistributorVO> listDistributors() {
+        List<AdminDistributorEntity> entities = adminMapper.findDistributors();
+        if (entities == null || entities.isEmpty()) {
+            return List.of(
+                distributor(6001L, 1001L, "木木", null, "艺术推广大使", "专注推荐新锐艺术家作品", 1, "艺荐官", "ACTIVE", "正常", null, null, 5, 12, "¥1,280.00", "¥860.00", "YJ20260401", "2026-04-01"),
+                distributor(6002L, 1002L, "阿泽", null, "资深艺荐官", "收藏当代艺术7年", 2, "高级艺荐官", "ACTIVE", "正常", null, null, 18, 45, "¥8,560.00", "¥2,300.00", "YJ20260402", "2026-03-28"),
+                distributor(6003L, 1003L, "Suki", null, "入门艺荐官", "艺术爱好者", 1, "艺荐官", "INACTIVE", "禁用", null, null, 2, 5, "¥320.00", "¥0.00", "YJ20260403", "2026-04-05")
+            );
+        }
+        return entities.stream().map(this::toDistributorVO).toList();
+    }
+
+    @Transactional
+    public AdminDistributorVO createDistributor(AdminDistributorSaveDTO request) {
+        AdminUserEntity user = adminMapper.findUsers().stream()
+            .filter(u -> u.getId().equals(request.getUserId()))
+            .findFirst()
+            .orElseThrow(() -> new BusinessException(40404, "用户不存在"));
+
+        AdminDistributorEntity entity = new AdminDistributorEntity();
+        entity.setUserId(request.getUserId());
+        entity.setDisplayName(request.getDisplayName());
+        entity.setBio(request.getBio());
+        entity.setTeamLevel(request.getTeamLevel() != null ? request.getTeamLevel() : 1);
+        entity.setStatus(toDistributorStatus(request.getStatus()));
+        entity.setParentDistributorId(request.getParentDistributorId());
+        adminMapper.insertDistributor(entity);
+
+        adminMapper.insertUserRoleRelation(request.getUserId(), "DISTRIBUTOR");
+
+        String invitationCode = "YJ" + System.currentTimeMillis();
+        adminMapper.insertInvitationCode(request.getUserId(), invitationCode, "DISTRIBUTOR");
+
+        return distributor(
+            entity.getId(), user.getId(), user.getNickname(), user.getAvatarUrl(),
+            request.getDisplayName(), request.getBio(), entity.getTeamLevel(),
+            getTeamLevelName(entity.getTeamLevel()), entity.getStatus(), "正常",
+            request.getParentDistributorId(), null, 0, 0, "¥0.00", "¥0.00", invitationCode, "刚刚"
+        );
+    }
+
+    public AdminDistributorVO updateDistributor(Long id, AdminDistributorSaveDTO request) {
+        AdminDistributorEntity entity = new AdminDistributorEntity();
+        entity.setId(id);
+        entity.setDisplayName(request.getDisplayName());
+        entity.setBio(request.getBio());
+        entity.setTeamLevel(request.getTeamLevel() != null ? request.getTeamLevel() : 1);
+        entity.setStatus(toDistributorStatus(request.getStatus()));
+        entity.setParentDistributorId(request.getParentDistributorId());
+        if (adminMapper.updateDistributor(entity) <= 0) {
+            throw new BusinessException(40404, "艺荐官不存在");
+        }
+        return findDistributorVO(id);
+    }
+
+    public void updateDistributorStatus(Long id, String status) {
+        String targetStatus = toDistributorStatus(status);
+        if (adminMapper.updateDistributorStatus(id, targetStatus) <= 0) {
+            throw new BusinessException(40404, "艺荐官不存在");
+        }
+    }
+
     public List<AdminUserVO> listUsers() {
         List<AdminUserEntity> entities = adminMapper.findUsers();
         if (entities == null || entities.isEmpty()) {
@@ -260,6 +325,80 @@ public class AdminContentService {
 
     private AdminOrderVO toOrderVO(AdminOrderEntity entity) {
         return order(entity.getId(), entity.getOrderNo(), entity.getUser(), entity.getArtwork(), entity.getAmount(), entity.getStatus(), entity.getPayStatus(), entity.getShipStatus());
+    }
+
+    private AdminDistributorVO toDistributorVO(AdminDistributorEntity entity) {
+        return distributor(
+            entity.getId(), entity.getUserId(), entity.getNickname(), entity.getAvatarUrl(),
+            entity.getDisplayName(), entity.getBio(), entity.getTeamLevel(),
+            getTeamLevelName(entity.getTeamLevel()), entity.getStatus(),
+            displayDistributorStatus(entity.getStatus()),
+            entity.getParentDistributorId(), entity.getParentDistributorName(),
+            entity.getDirectCount() != null ? entity.getDirectCount() : 0,
+            entity.getTeamCount() != null ? entity.getTeamCount() : 0,
+            entity.getTotalCommission() != null ? entity.getTotalCommission() : "¥0.00",
+            entity.getAvailableCommission() != null ? entity.getAvailableCommission() : "¥0.00",
+            entity.getInvitationCode() != null ? entity.getInvitationCode() : "",
+            entity.getCreatedAt()
+        );
+    }
+
+    private AdminDistributorVO distributor(Long id, Long userId, String nickname, String avatarUrl,
+            String displayName, String bio, Integer teamLevel, String teamLevelName,
+            String status, String statusName, Long parentDistributorId, String parentDistributorName,
+            Integer directCount, Integer teamCount, String totalCommission, String availableCommission,
+            String invitationCode, String createdAt) {
+        AdminDistributorVO item = new AdminDistributorVO();
+        item.setId(id);
+        item.setUserId(userId);
+        item.setNickname(nickname);
+        item.setAvatarUrl(avatarUrl);
+        item.setDisplayName(displayName);
+        item.setBio(bio);
+        item.setTeamLevel(teamLevel);
+        item.setTeamLevelName(teamLevelName);
+        item.setStatus(status);
+        item.setStatusName(statusName);
+        item.setParentDistributorId(parentDistributorId);
+        item.setParentDistributorName(parentDistributorName);
+        item.setDirectCount(directCount);
+        item.setTeamCount(teamCount);
+        item.setTotalCommission(totalCommission);
+        item.setAvailableCommission(availableCommission);
+        item.setInvitationCode(invitationCode);
+        item.setCreatedAt(createdAt);
+        return item;
+    }
+
+    private String getTeamLevelName(Integer level) {
+        if (level == null) return "艺荐官";
+        return switch (level) {
+            case 1 -> "艺荐官";
+            case 2 -> "高级艺荐官";
+            case 3 -> "资深艺荐官";
+            default -> "艺荐官";
+        };
+    }
+
+    private String toDistributorStatus(String status) {
+        if ("正常".equals(status) || "ACTIVE".equalsIgnoreCase(status) || "启用".equals(status)) {
+            return "ACTIVE";
+        }
+        return "INACTIVE";
+    }
+
+    private String displayDistributorStatus(String status) {
+        if ("ACTIVE".equalsIgnoreCase(status)) {
+            return "正常";
+        }
+        return "禁用";
+    }
+
+    private AdminDistributorVO findDistributorVO(Long id) {
+        return listDistributors().stream()
+            .filter(item -> id.equals(item.getId()))
+            .findFirst()
+            .orElseThrow(() -> new BusinessException(40404, "艺荐官不存在"));
     }
 
     private AdminOperationVO operation(Long id, String title, String type, String target, String imageUrl, String status, String updatedAt) {
