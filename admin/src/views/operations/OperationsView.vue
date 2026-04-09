@@ -67,7 +67,31 @@
       destroy-on-close
     >
       <div style="margin-bottom: 16px;">
-        <UploadImageField v-model="form.imageUrl" placeholder="Banner / 推荐图" tip="建议上传横图，保存后会用于后台配置" />
+        <!-- 可点击上传的图片区域 -->
+        <el-upload
+          :show-file-list="false"
+          accept="image/jpeg,image/jpg,image/png,image/webp"
+          :http-request="handleDialogUpload"
+          class="dialog-image-uploader"
+        >
+          <div class="dialog-image-box" :class="{ 'has-image': form.imageUrl }">
+            <el-image
+              v-if="form.imageUrl"
+              :src="form.imageUrl"
+              fit="cover"
+              style="width: 100%; height: 100%;"
+            />
+            <div v-else class="dialog-image-placeholder">
+              <el-icon size="32"><Plus /></el-icon>
+              <span>点击上传图片</span>
+            </div>
+            <div v-if="form.imageUrl" class="dialog-image-overlay">
+              <el-icon size="24"><Edit /></el-icon>
+              <span>更换图片</span>
+            </div>
+          </div>
+        </el-upload>
+        <div class="dialog-image-tip">建议上传横图，建议尺寸 750×400</div>
       </div>
       <div class="form-grid">
         <el-input v-model="form.title" placeholder="标题" />
@@ -119,13 +143,15 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { ElMessage } from 'element-plus'
+import { Plus, Edit } from '@element-plus/icons-vue'
 import { useAdminStore } from '../../stores/admin'
-import UploadImageField from '../../components/UploadImageField.vue'
+import { uploadAdminImage } from '../../api/admin'
 
 const adminStore = useAdminStore()
 const { operations } = storeToRefs(adminStore)
 const keyword = ref('')
 const saving = ref(false)
+const imageUploading = ref(false)
 const editingId = ref(null)
 const dialogVisible = ref(false)
 const previewVisible = ref(false)
@@ -252,6 +278,22 @@ function normalizeStatus(status) {
   return map[status] || status || 'ENABLED'
 }
 
+async function handleDialogUpload(options) {
+  imageUploading.value = true
+  try {
+    const result = await uploadAdminImage(options.file)
+    form.imageUrl = result.url || ''
+    ElMessage.success('图片上传成功')
+    options.onProgress?.({ percent: 100 })
+    options.onSuccess?.(result)
+  } catch (error) {
+    options.onError?.(error)
+    ElMessage.error(error.message || '图片上传失败')
+  } finally {
+    imageUploading.value = false
+  }
+}
+
 async function submitForm() {
   saving.value = true
   try {
@@ -283,3 +325,58 @@ onMounted(async () => {
   if (!operations.value.length) await adminStore.loadOperations()
 })
 </script>
+
+<style scoped>
+.dialog-image-uploader {
+  width: 100%;
+}
+.dialog-image-box {
+  width: 100%;
+  height: 180px;
+  border-radius: 12px;
+  border: 2px dashed var(--el-border-color);
+  background: var(--el-fill-color-lighter);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.dialog-image-box:hover {
+  border-color: var(--el-color-primary);
+}
+.dialog-image-box.has-image {
+  border-style: solid;
+  border-color: var(--el-border-color);
+}
+.dialog-image-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--el-text-color-secondary);
+}
+.dialog-image-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.dialog-image-box:hover .dialog-image-overlay {
+  opacity: 1;
+}
+.dialog-image-tip {
+  margin-top: 8px;
+  color: var(--el-text-color-secondary);
+  font-size: 13px;
+}
+</style>
