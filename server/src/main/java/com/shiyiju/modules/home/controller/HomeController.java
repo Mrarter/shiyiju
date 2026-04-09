@@ -32,6 +32,12 @@ public class HomeController {
         List<AdminOperationVO> banners = operations.stream()
                 .filter(op -> "ENABLED".equals(op.getStatus()) || "启用".equals(op.getStatus()))
                 .filter(op -> "BANNER".equals(op.getType()) || "Banner".equals(op.getType()))
+                .sorted((a, b) -> {
+                    // 按权重 sortNo 升序排序（值越小越靠前）
+                    int sortA = a.getSortNo() != null ? a.getSortNo() : 999;
+                    int sortB = b.getSortNo() != null ? b.getSortNo() : 999;
+                    return Integer.compare(sortA, sortB);
+                })
                 .map(op -> {
                     AdminOperationVO banner = new AdminOperationVO();
                     banner.setId(op.getId());
@@ -40,6 +46,7 @@ public class HomeController {
                     banner.setDate(op.getUpdatedAt());
                     banner.setImageUrl(op.getImageUrl());
                     banner.setCoverUrl(op.getImageUrl());
+                    banner.setSortNo(op.getSortNo());
                     return banner;
                 })
                 .collect(Collectors.toList());

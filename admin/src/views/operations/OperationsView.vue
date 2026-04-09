@@ -25,13 +25,32 @@
             <span v-else>未上传</span>
           </template>
         </el-table-column>
-        <el-table-column prop="title" label="标题" min-width="220" />
-        <el-table-column prop="type" label="类型" width="140" />
-        <el-table-column prop="target" label="关联对象" min-width="180" />
-        <el-table-column prop="status" label="状态" width="100" />
-        <el-table-column prop="updatedAt" label="更新时间" width="180" />
-        <el-table-column label="操作" width="180">
+        <el-table-column prop="title" label="标题" min-width="180" />
+        <el-table-column prop="type" label="类型" width="120" />
+        <el-table-column prop="target" label="关联对象" min-width="140" />
+        <el-table-column prop="sortNo" label="权重" width="80" sortable>
           <template #default="{ row }">
+            <el-input-number
+              v-model="row.sortNo"
+              :min="0"
+              :max="999"
+              size="small"
+              controls-position="right"
+              style="width: 70px;"
+              @change="handleSortChange(row)"
+            />
+          </template>
+        </el-table-column>
+        <el-table-column prop="status" label="状态" width="100">
+          <template #default="{ row }">
+            <el-tag :type="getStatusType(row.status)" size="small">{{ getStatusText(row.status) }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="updatedAt" label="更新时间" width="160" />
+        <el-table-column label="操作" width="200">
+          <template #default="{ row }">
+            <el-button v-if="row.status !== 'ENABLED'" link type="success" @click="handleToggleStatus(row, 'ENABLED')">上线</el-button>
+            <el-button v-if="row.status === 'ENABLED'" link type="warning" @click="handleToggleStatus(row, 'DISABLED')">下线</el-button>
             <el-button link type="primary" @click="startEdit(row)">编辑</el-button>
             <el-button link @click="previewOperation(row)">预览</el-button>
           </template>
@@ -125,6 +144,57 @@ const filteredItems = computed(() => {
   if (!q) return operationItems.value
   return operationItems.value.filter((item) => (item.title || '').includes(q) || (item.target || '').includes(q))
 })
+
+function getStatusType(status) {
+  const map = {
+    ENABLED: 'success',
+    DRAFT: 'info',
+    DISABLED: 'danger'
+  }
+  return map[status] || 'info'
+}
+
+function getStatusText(status) {
+  const map = {
+    ENABLED: '已上线',
+    DRAFT: '草稿',
+    DISABLED: '已下线'
+  }
+  return map[status] || status
+}
+
+async function handleToggleStatus(row, newStatus) {
+  try {
+    await adminStore.updateOperation(row.id, {
+      title: row.title,
+      type: row.type,
+      target: row.target,
+      imageUrl: row.imageUrl,
+      status: newStatus,
+      sortNo: row.sortNo || 0
+    })
+    row.status = newStatus
+    ElMessage.success(newStatus === 'ENABLED' ? '已上线' : '已下线')
+  } catch (error) {
+    ElMessage.error(error.message || '操作失败')
+  }
+}
+
+async function handleSortChange(row) {
+  try {
+    await adminStore.updateOperation(row.id, {
+      title: row.title,
+      type: row.type,
+      target: row.target,
+      imageUrl: row.imageUrl,
+      status: row.status,
+      sortNo: row.sortNo || 0
+    })
+    ElMessage.success('权重已更新')
+  } catch (error) {
+    ElMessage.error(error.message || '更新权重失败')
+  }
+}
 
 function resetForm() {
   editingId.value = null
