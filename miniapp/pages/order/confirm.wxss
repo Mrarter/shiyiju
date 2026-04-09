@@ -8,9 +8,9 @@
 .address-card {
   position: relative;
   background: linear-gradient(135deg, #323232 0%, #4a4a4a 100%);
-  margin: 24rpx;
+  margin: 32rpx 24rpx 24rpx;
   border-radius: 16rpx;
-  padding: 32rpx;
+  padding: 40rpx 32rpx;
   overflow: hidden;
 }
 
