@@ -20,7 +20,7 @@
       <el-table :data="filteredDistributors" style="margin-top: 16px;">
         <el-table-column label="头像" width="80">
           <template #default="{ row }">
-            <el-avatar v-if="row.avatarUrl" :src="row.avatarUrl" :size="40" class="clickable-avatar" @click="showDetail(row)" />
+            <el-avatar v-if="row.avatarUrl" :src="getImageUrl(row.avatarUrl)" :size="40" class="clickable-avatar" @click="showDetail(row)" />
             <span v-else class="text-muted">无</span>
           </template>
         </el-table-column>
@@ -153,6 +153,7 @@ import { ElMessage } from 'element-plus'
 import { ArrowRight } from '@element-plus/icons-vue'
 import { http } from '../../api/http'
 import { ADMIN_API_PREFIX } from '../../config/env'
+import { getImageUrl } from '../../utils/imageUrl'
 
 const distributors = ref([])
 const keyword = ref('')

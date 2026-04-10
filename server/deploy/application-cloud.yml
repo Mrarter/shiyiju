@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    # CloudBase云托管MySQL连接（通过环境变量配置）
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:shiyiju-9g4pxbgh603bf08b}?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:}
+  servlet:
+    context-path: /api/v1
+  cloud:
+    enabled: false
+
+server:
+  port: ${PORT:8080}
+
+jwt:
+  secret: ${JWT_SECRET:shiyiju-default-secret-change-in-production}
+  expiration: 604800000
+
+logging:
+  level:
+    com.shiyiju: DEBUG

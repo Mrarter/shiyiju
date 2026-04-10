@@ -13,6 +13,7 @@ com/shiyiju/modules/admin/service/AdminDashboardService.class
 com/shiyiju/modules/artist/vo/ArtistDetailVO.class
 com/shiyiju/modules/admin/dto/AdminArtworkSaveDTO.class
 com/shiyiju/modules/order/service/OrderQueryService.class
+com/shiyiju/common/util/ImageUrlUtil.class
 com/shiyiju/modules/order/entity/ShippingAddressEntity.class
 com/shiyiju/config/WechatProperties.class
 com/shiyiju/modules/admin/controller/AdminContentController.class
@@ -47,6 +48,7 @@ com/shiyiju/modules/admin/service/AdminSettingsService$2.class
 com/shiyiju/modules/admin/service/AdminSettingsService.class
 com/shiyiju/modules/admin/vo/AdminLoginVO.class
 com/shiyiju/modules/artwork/entity/ArtworkDetailEntity.class
+com/shiyiju/common/util/ImageCropUtil.class
 com/shiyiju/modules/admin/dto/AdminOperationSaveDTO.class
 com/shiyiju/modules/admin/vo/AdminOrderVO.class
 com/shiyiju/modules/admin/service/AdminAuthService.class

@@ -27,10 +27,23 @@ public class ImageUrlUtil {
     private String contextPath;
 
     /**
+     * 图片服务基础URL（支持通过环境变量配置）
+     * 默认为 http://localhost:8080，开发环境可通过 IMAGE_BASE_URL 环境变量覆盖
+     */
+    @Value("${image.base-url:}")
+    private String imageBaseUrl;
+
+    /**
      * 获取服务器基础URL
      * 用于拼接相对路径图片
      */
     public String getServerBaseUrl() {
+        // 如果配置了 image.base-url，使用配置的地址
+        if (imageBaseUrl != null && !imageBaseUrl.trim().isEmpty()) {
+            return imageBaseUrl.endsWith("/") 
+                ? imageBaseUrl.substring(0, imageBaseUrl.length() - 1)
+                : imageBaseUrl;
+        }
         return "http://localhost:" + serverPort + contextPath;
     }
 

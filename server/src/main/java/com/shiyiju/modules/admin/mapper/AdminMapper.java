@@ -23,6 +23,8 @@ public interface AdminMapper {
 
     int updateOperationStatus(@Param("id") Long id, @Param("status") String status);
 
+    int deleteOperation(@Param("id") Long id);
+
     List<AdminArtistEntity> findArtists();
 
     AdminArtistEntity findArtistById(@Param("id") Long id);

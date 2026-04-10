@@ -20,7 +20,7 @@
       <el-table :data="filteredUsers">
         <el-table-column label="头像" width="80">
           <template #default="{ row }">
-            <el-avatar v-if="row.avatarUrl" :src="row.avatarUrl" :size="40" style="cursor: pointer;" />
+            <el-avatar v-if="row.avatarUrl" :src="getImageUrl(row.avatarUrl)" :size="40" style="cursor: pointer;" />
             <el-avatar v-else :size="40">{{ (row.nickname || 'U').slice(0, 1) }}</el-avatar>
           </template>
         </el-table-column>
@@ -43,7 +43,7 @@
     <el-drawer v-model="detailVisible" title="用户详情" size="420px">
       <div v-if="activeUser" style="display: grid; gap: 14px;">
         <div style="text-align: center;">
-          <el-avatar v-if="activeUser.avatarUrl" :src="activeUser.avatarUrl" :size="80" />
+          <el-avatar v-if="activeUser.avatarUrl" :src="getImageUrl(activeUser.avatarUrl)" :size="80" />
           <el-avatar v-else :size="80">{{ (activeUser.nickname || 'U').slice(0, 1) }}</el-avatar>
         </div>
         <div><strong>昵称：</strong>{{ activeUser.nickname }}</div>
@@ -62,6 +62,7 @@ import { storeToRefs } from 'pinia'
 import { ElMessage } from 'element-plus'
 import { useAdminStore } from '../../stores/admin'
 import { downloadCsv } from '../../utils/download'
+import { getImageUrl } from '../../utils/imageUrl'
 
 const adminStore = useAdminStore()
 const { users: usersState } = storeToRefs(adminStore)

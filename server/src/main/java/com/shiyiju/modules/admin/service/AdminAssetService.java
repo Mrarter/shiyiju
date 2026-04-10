@@ -15,13 +15,11 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Set;
 import java.util.UUID;
 
 @Service
 public class AdminAssetService {
 
-    private static final Set<String> ALLOWED_EXTENSIONS = Set.of("jpg", "jpeg", "png", "webp", "gif", "heic", "heif");
     private static final long MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
 
     private final ImageCropUtil imageCropUtil;

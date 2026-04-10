@@ -1,6 +1,8 @@
 /Users/master/Desktop/shiyiju/server/src/main/java/com/shiyiju/bootstrap/ShiyijuApplication.java
 /Users/master/Desktop/shiyiju/server/src/main/java/com/shiyiju/common/api/ApiResponse.java
 /Users/master/Desktop/shiyiju/server/src/main/java/com/shiyiju/common/exception/BusinessException.java
+/Users/master/Desktop/shiyiju/server/src/main/java/com/shiyiju/common/util/ImageCropUtil.java
+/Users/master/Desktop/shiyiju/server/src/main/java/com/shiyiju/common/util/ImageUrlUtil.java
 /Users/master/Desktop/shiyiju/server/src/main/java/com/shiyiju/config/GlobalExceptionHandler.java
 /Users/master/Desktop/shiyiju/server/src/main/java/com/shiyiju/config/JwtProperties.java
 /Users/master/Desktop/shiyiju/server/src/main/java/com/shiyiju/config/WebMvcConfig.java

@@ -15,7 +15,7 @@
       <el-table ref="tableRef" :data="filteredArtists" :key="tableKey" row-key="id">
         <el-table-column label="头像" width="110">
           <template #default="{ row }">
-            <el-avatar v-if="row.avatarUrl" :src="row.avatarUrl" :size="44" class="clickable-avatar" @click="startEdit(row)" />
+            <el-avatar v-if="row.avatarUrl" :src="getImageUrl(row.avatarUrl)" :size="44" class="clickable-avatar" @click="startEdit(row)" />
             <span v-else class="clickable-text" @click="startEdit(row)">未上传</span>
           </template>
         </el-table-column>
@@ -112,6 +112,7 @@ import { storeToRefs } from 'pinia'
 import { ElMessage } from 'element-plus'
 import { useAdminStore } from '../../stores/admin'
 import CropUploadField from '../../components/CropUploadField.vue'
+import { getImageUrl } from '../../utils/imageUrl'
 
 const adminStore = useAdminStore()
 const { artists: artistsState } = storeToRefs(adminStore)

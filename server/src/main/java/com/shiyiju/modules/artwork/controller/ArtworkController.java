@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/works")
+@RequestMapping("/works")
 public class ArtworkController {
 
     private final ArtworkService artworkService;

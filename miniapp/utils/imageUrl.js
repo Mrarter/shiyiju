@@ -5,7 +5,7 @@
 
 // 获取实际的服务器基础URL（从 app.globalData.apiBaseUrl 提取）
 function getActualServerBaseUrl() {
-  let apiBaseUrl = 'http://localhost:8080/api/v1';
+  let apiBaseUrl = 'https://192.168.1.163:8443/api/v1';
   
   try {
     const app = getApp();
@@ -16,9 +16,14 @@ function getActualServerBaseUrl() {
     // 忽略错误，使用默认值
   }
   
-  // 从 API 地址提取基础 URL
+  // 从 API 地址提取基础 URL，强制使用 HTTPS
   const match = apiBaseUrl.match(/^(https?:\/\/[^\/]+)/);
-  return match ? match[1] : 'http://localhost:8080';
+  let baseUrl = match ? match[1] : 'https://192.168.1.163:8443';
+  // 强制使用 HTTPS
+  if (baseUrl.startsWith('http://')) {
+    baseUrl = baseUrl.replace(/^http:/, 'https:');
+  }
+  return baseUrl;
 }
 
 /**
@@ -44,22 +49,24 @@ function getServerBaseUrl() {
  * @returns {string}
  */
 function extractBaseUrlFromApi(apiBaseUrl) {
-  if (!apiBaseUrl) return serverBaseUrl;
+  const defaultUrl = getActualServerBaseUrl();
+  if (!apiBaseUrl) return defaultUrl;
   const match = apiBaseUrl.match(/^(https?:\/\/[^\/]+)/);
-  return match ? match[1] : serverBaseUrl;
+  return match ? match[1] : defaultUrl;
 }
 
 /**
  * 标准化图片URL
  * - null/undefined/空字符串 -> 返回占位图
- * - 相对路径(/开头) -> 拼接服务器基础URL
+ * - 本地图片(localhost/192.168) -> 返回占位图（开发环境）
  * - 绝对路径 -> 直接返回
  *
  * @param {string} url - 数据库中的图片URL
  * @param {string} placeholder - 占位图URL（可选）
+ * @param {string} seed - 用于占位图的种子（可选，默认用 timestamp）
  * @returns {string} 标准化后的URL
  */
-function normalizeImageUrl(url, placeholder) {
+function normalizeImageUrl(url, placeholder, seed) {
   // 默认占位图
   const defaultPlaceholder = 'https://picsum.photos/seed/default/400/500';
   const fallback = placeholder || defaultPlaceholder;
@@ -73,6 +80,12 @@ function normalizeImageUrl(url, placeholder) {
 
   // 已经是完整的HTTP(S) URL
   if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    // 如果是本地图片地址（localhost 或 192.168.x.x），使用占位图
+    if (trimmed.includes('localhost') || trimmed.match(/192\.168\.\d+\.\d+/)) {
+      // 使用 seed 生成占位图
+      const placeholderSeed = seed || Date.now().toString();
+      return `https://picsum.photos/seed/${placeholderSeed}/400/500`;
+    }
     return trimmed;
   }
 
@@ -83,11 +96,11 @@ function normalizeImageUrl(url, placeholder) {
 
   // 相对路径，需要拼接服务器地址
   if (trimmed.startsWith('/')) {
-    return serverBaseUrl + trimmed;
+    return getActualServerBaseUrl() + trimmed;
   }
 
   // 其他情况，当作相对路径处理
-  return serverBaseUrl + '/' + trimmed;
+  return getActualServerBaseUrl() + '/' + trimmed;
 }
 
 /**

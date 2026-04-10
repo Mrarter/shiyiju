@@ -44,6 +44,7 @@ import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { uploadAdminImage } from '../api/admin'
 import ImageCropper from './ImageCropper.vue'
+import { getImageUrl } from '../utils/imageUrl'
 
 const props = defineProps({
   modelValue: {
@@ -111,7 +112,7 @@ async function handleCropConfirm(cropData) {
     const { blob } = cropData
     const file = new File([blob], 'cropped.jpg', { type: 'image/jpeg' })
     const result = await uploadAdminImage(file)
-    emit('update:modelValue', result.url || '')
+    emit('update:modelValue', getImageUrl(result.url) || '')
     ElMessage.success('图片上传成功')
   } catch (error) {
     ElMessage.error(error.message || '图片上传失败')
@@ -133,7 +134,7 @@ async function uploadFile(file) {
   uploading.value = true
   try {
     const result = await uploadAdminImage(file)
-    emit('update:modelValue', result.url || '')
+    emit('update:modelValue', getImageUrl(result.url) || '')
     ElMessage.success('图片上传成功')
   } catch (error) {
     ElMessage.error(error.message || '图片上传失败')

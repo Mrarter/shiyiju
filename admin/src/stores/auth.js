@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import { http } from '../api/http'
-import { ADMIN_API_PREFIX } from '../config/env'
+
+// 硬编码正确路径以避免构建缓存问题
+const ADMIN_API_PREFIX = '/admin/v1'
 
 const TOKEN_KEY = 'shiyiju_admin_token'
 const PROFILE_KEY = 'shiyiju_admin_profile'

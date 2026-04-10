@@ -17,7 +17,7 @@
           <template #default="{ row }">
             <div v-if="row.imageUrl" class="table-image-box" @click="startEdit(row)">
               <el-image
-                :src="row.imageUrl"
+                :src="getImageUrl(row.imageUrl)"
                 fit="cover"
                 style="width: 72px; height: 48px; border-radius: 10px;"
               />
@@ -50,12 +50,12 @@
           </template>
         </el-table-column>
         <el-table-column prop="updatedAt" label="更新时间" width="160" />
-        <el-table-column label="操作" width="200">
+        <el-table-column label="操作" width="260">
           <template #default="{ row }">
             <el-button v-if="row.status !== 'ENABLED'" link type="success" @click="handleToggleStatus(row, 'ENABLED')">上线</el-button>
             <el-button v-if="row.status === 'ENABLED'" link type="warning" @click="handleToggleStatus(row, 'DISABLED')">下线</el-button>
             <el-button link type="primary" @click="startEdit(row)">编辑</el-button>
-            <el-button link @click="previewOperation(row)">预览</el-button>
+            <el-button link type="danger" @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -123,7 +123,7 @@
       <div v-if="previewItem" style="display: grid; gap: 16px;">
         <el-image
           v-if="previewItem.imageUrl"
-          :src="previewItem.imageUrl"
+          :src="getImageUrl(previewItem.imageUrl)"
           fit="cover"
           style="width: 100%; height: 220px; border-radius: 14px;"
           preview-teleported
@@ -141,10 +141,11 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import { storeToRefs } from 'pinia'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Edit } from '@element-plus/icons-vue'
 import { useAdminStore } from '../../stores/admin'
 import CropUploadField from '../../components/CropUploadField.vue'
+import { getImageUrl } from '../../utils/imageUrl'
 
 const adminStore = useAdminStore()
 const { operations } = storeToRefs(adminStore)
@@ -220,6 +221,27 @@ async function handleSortChange(row) {
     ElMessage.success('权重已更新')
   } catch (error) {
     ElMessage.error(error.message || '更新权重失败')
+  }
+}
+
+async function handleDelete(row) {
+  try {
+    await ElMessageBox.confirm(
+      `确定要删除推荐位「${row.title || row.type}」吗？此操作不可恢复。`,
+      '确认删除',
+      {
+        confirmButtonText: '删除',
+        cancelButtonText: '取消',
+        type: 'warning',
+        confirmButtonClass: 'el-button--danger'
+      }
+    )
+    await adminStore.deleteOperation(row.id)
+    ElMessage.success('删除成功')
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error(error.message || '删除失败')
+    }
   }
 }
 

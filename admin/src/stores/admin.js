@@ -7,6 +7,7 @@ import {
   createOperationConfig,
   createSystemConfig as createSystemConfigApi,
   deleteAdminRole as deleteAdminRoleApi,
+  deleteOperationConfig as deleteOperationConfigApi,
   deleteSystemConfig as deleteSystemConfigApi,
   getArtists,
   getAdminAccounts as getAdminAccountsApi,
@@ -133,6 +134,11 @@ export const useAdminStore = defineStore('admin', {
     },
     async updateOperation(id, payload) {
       await updateOperationConfig(id, payload)
+      const newOps = await getOperationConfigs()
+      this.operations.splice(0, this.operations.length, ...newOps)
+    },
+    async deleteOperation(id) {
+      await deleteOperationConfigApi(id)
       const newOps = await getOperationConfigs()
       this.operations.splice(0, this.operations.length, ...newOps)
     },

@@ -51,23 +51,27 @@
         WHERE id = #{id}
     </update>
 
+    <delete id="deleteOperation">
+        DELETE FROM admin_operation_config WHERE id = #{id}
+    </delete>
+
     <select id="findArtists" resultType="com.shiyiju.modules.admin.entity.AdminArtistEntity">
         SELECT
             id,
             user_id AS userId,
             artist_name AS name,
-            COALESCE(city, '') AS city,
+            COALESCE(bio, '') AS city,
             COALESCE(style_tags, '') AS tags,
             avatar_url AS avatarUrl,
             COALESCE(work_count, 0) AS works,
             CASE WHEN status = 'ACTIVE' THEN '上线' ELSE '下线' END AS status,
-            COALESCE(sort_no, id) AS sort,
+            id AS sort,
             COALESCE(bio, '') AS bio,
-            COALESCE(graduated_from, '') AS graduatedFrom,
-            COALESCE(awards, '') AS awards,
-            age
+            COALESCE(slogan, '') AS graduatedFrom,
+            COALESCE(style_tags, '') AS awards,
+            NULL AS age
         FROM artist_profile
-        ORDER BY sort_no ASC, is_signed DESC, id DESC
+        ORDER BY is_signed DESC, id DESC
         LIMIT 100
     </select>
 
@@ -76,16 +80,16 @@
             id,
             user_id AS userId,
             artist_name AS name,
-            COALESCE(city, '') AS city,
+            COALESCE(bio, '') AS city,
             COALESCE(style_tags, '') AS tags,
             avatar_url AS avatarUrl,
             COALESCE(work_count, 0) AS works,
             CASE WHEN status = 'ACTIVE' THEN '上线' ELSE '下线' END AS status,
-            COALESCE(sort_no, id) AS sort,
+            id AS sort,
             COALESCE(bio, '') AS bio,
-            COALESCE(graduated_from, '') AS graduatedFrom,
-            COALESCE(awards, '') AS awards,
-            age
+            COALESCE(slogan, '') AS graduatedFrom,
+            COALESCE(style_tags, '') AS awards,
+            NULL AS age
         FROM artist_profile
         WHERE id = #{id}
         LIMIT 1
@@ -99,24 +103,20 @@
     </insert>
 
     <insert id="insertArtist" parameterType="com.shiyiju.modules.admin.entity.AdminArtistEntity" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO artist_profile (user_id, artist_name, city, real_name, style_tags, avatar_url, work_count, is_signed, status, sort_no, bio, graduated_from, awards, age)
-        VALUES (#{userId}, #{name}, #{city}, #{name}, #{tags}, #{avatarUrl}, #{works}, 0, #{status}, #{sort}, #{bio}, #{graduatedFrom}, #{awards}, #{age})
+        INSERT INTO artist_profile (user_id, artist_name, real_name, style_tags, avatar_url, work_count, is_signed, status, bio, slogan)
+        VALUES (#{userId}, #{name}, #{name}, #{tags}, #{avatarUrl}, #{works}, 0, #{status}, #{bio}, #{graduatedFrom})
     </insert>
 
     <update id="updateArtist" parameterType="com.shiyiju.modules.admin.entity.AdminArtistEntity">
         UPDATE artist_profile
         SET artist_name = #{name},
-            city = #{city},
             real_name = #{name},
             style_tags = #{tags},
             avatar_url = #{avatarUrl},
             work_count = #{works},
             status = #{status},
-            sort_no = #{sort},
             bio = #{bio},
-            graduated_from = #{graduatedFrom},
-            awards = #{awards},
-            age = #{age}
+            slogan = #{graduatedFrom}
         WHERE id = #{id}
     </update>
 

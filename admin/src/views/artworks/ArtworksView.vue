@@ -77,7 +77,7 @@
           <template #default="{ row }">
             <el-image
               v-if="row.coverUrl"
-              :src="row.coverUrl"
+              :src="getImageUrl(row.coverUrl)"
               fit="cover"
               style="width: 64px; height: 64px; border-radius: 10px; cursor: pointer;"
               preview-teleported
@@ -268,7 +268,7 @@
     >
       <div v-if="selectedArtist" class="artist-detail">
         <div class="artist-header">
-          <el-avatar :src="selectedArtist.avatarUrl" :size="80">
+          <el-avatar :src="getImageUrl(selectedArtist.avatarUrl)" :size="80">
             {{ selectedArtist.name?.charAt(0) }}
           </el-avatar>
           <div class="artist-info">
@@ -311,30 +311,53 @@
     <el-dialog
       v-model="batchUploadVisible"
       title="批量上传作品封面"
-      width="680px"
+      width="720px"
       :close-on-click-modal="true"
     >
       <div class="batch-upload-tip">
         <el-alert type="info" :closable="false">
           <template #title>
-            <span>上传说明：</span>
+            <div class="upload-tips-header">
+              <span>上传说明：</span>
+              <el-button type="primary" link @click="downloadTemplate">
+                <el-icon><Document /></el-icon> 下载批量上传模板
+              </el-button>
+            </div>
             <ul class="upload-tips-list">
-              <li>选择多张图片同时上传，按顺序匹配到下方作品列表</li>
-              <li>图片将按顺序分配给选中的作品（按作品ID排序）</li>
-              <li>支持 JPG、PNG、WebP 格式，单张不超过 5MB</li>
+              <li>先在左侧列表勾选要上传的作品，再点击「批量上传」按钮</li>
+              <li>图片按<strong>选择顺序</strong>匹配到作品列表（请确保图片数量 ≤ 作品数量）</li>
+              <li>图片命名格式：<code>序号_作品ID.jpg</code>，如 <code>1_1001.jpg</code> 表示给ID=1001的作品上传封面</li>
+              <li>支持 JPG、PNG、WebP 格式，单张不超过 20MB</li>
+              <li>可选择批量裁剪比例，统一处理所有图片</li>
             </ul>
           </template>
         </el-alert>
       </div>
 
+      <!-- 模板预览说明 -->
+      <div class="template-guide">
+        <div class="guide-title">
+          <el-icon><InfoFilled /></el-icon>
+          <span>图片命名规范</span>
+        </div>
+        <div class="guide-content">
+          <code>001_1001.jpg</code> → 上传到 ID=1001 的作品<br/>
+          <code>002_1002.png</code> → 上传到 ID=1002 的作品<br/>
+          <code>封面图.jpg</code> → 按选择顺序自动匹配第1、2、3...个作品
+        </div>
+      </div>
+
       <div class="upload-target-section">
-        <div class="section-title">目标作品（按ID顺序匹配图片）：</div>
+        <div class="section-title">
+          目标作品（当前已选 <span class="highlight">{{ batchTargetArtworks.length }}</span> 个）
+          <span class="section-tip">← 请先在左侧列表勾选作品</span>
+        </div>
         <div v-if="batchTargetArtworks.length > 0" class="target-list">
           <div v-for="(artwork, index) in batchTargetArtworks" :key="artwork.id" class="target-item">
             <span class="target-index">{{ index + 1 }}</span>
             <el-image
               v-if="artwork.coverUrl"
-              :src="artwork.coverUrl"
+              :src="getImageUrl(artwork.coverUrl)"
               fit="cover"
               class="target-thumb"
             />
@@ -403,9 +426,10 @@
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { ElMessage } from 'element-plus'
-import { Download, Plus, Picture, Upload } from '@element-plus/icons-vue'
+import { Document, Download, InfoFilled, Loading, Plus, Picture, Upload } from '@element-plus/icons-vue'
 import { useAdminStore } from '../../stores/admin'
 import CropUploadField from '../../components/CropUploadField.vue'
+import { getImageUrl } from '../../utils/imageUrl'
 
 const adminStore = useAdminStore()
 const { artworks: artworksState, artists: artistsState } = storeToRefs(adminStore)
@@ -814,7 +838,7 @@ async function batchDownload() {
     return
   }
 
-  const artworksWithImages = selectedArtworks.value.filter(item => item.coverUrl && item.coverUrl.startsWith('http'))
+  const artworksWithImages = selectedArtworks.value.filter(item => item.coverUrl)
   if (artworksWithImages.length === 0) {
     ElMessage.warning('选中的作品都没有封面图片可供下载')
     return
@@ -828,7 +852,8 @@ async function batchDownload() {
 
   for (const artwork of artworksWithImages) {
     try {
-      const response = await fetch(artwork.coverUrl)
+      const imageUrl = getImageUrl(artwork.coverUrl)
+      const response = await fetch(imageUrl)
       const blob = await response.blob()
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
@@ -852,6 +877,60 @@ async function batchDownload() {
   } else {
     ElMessage.error('下载失败，请重试')
   }
+}
+
+// 下载批量上传模板
+function downloadTemplate() {
+  // 生成 CSV 模板内容
+  const headers = ['序号', '作品ID', '作品名称', '艺术家', '图片命名示例', '说明']
+  const rows = [
+    [1, '请填写', '请填写', '请填写', '001_作品ID.jpg', '图片命名格式：序号_作品ID.扩展名'],
+    [2, '请填写', '请填写', '请填写', '002_作品ID.jpg', '或将图片按选择顺序命名后直接上传'],
+    [3, '请填写', '请填写', '请填写', '003_作品ID.png', '支持 JPG/PNG/WEBP 格式'],
+  ]
+
+  // 添加已选作品信息
+  const selectedRows = batchTargetArtworks.value.map((artwork, index) => [
+    index + 1,
+    artwork.id,
+    artwork.name || '未命名',
+    artwork.artist || '',
+    `${String(index + 1).padStart(3, '0')}_${artwork.id}.jpg`,
+    '请按此格式命名图片后上传'
+  ])
+
+  const allRows = selectedRows.length > 0 ? selectedRows : rows
+
+  // 转换为 CSV 字符串
+  const escapeCSV = (val) => {
+    if (val === null || val === undefined) return ''
+    const str = String(val)
+    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+      return `"${str.replace(/"/g, '""')}"`
+    }
+    return str
+  }
+
+  const csvContent = [
+    headers.join(','),
+    ...allRows.map(row => row.map(escapeCSV).join(','))
+  ].join('\n')
+
+  // 添加 BOM 以支持 Excel 打开中文
+  const BOM = '\uFEFF'
+  const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' })
+
+  // 创建下载链接
+  const link = document.createElement('a')
+  const url = URL.createObjectURL(blob)
+  link.href = url
+  link.download = `批量上传作品封面模板_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}.csv`
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
+
+  ElMessage.success('模板已下载，请用 Excel 打开并填写信息')
 }
 
 // 批量上传相关
@@ -1050,7 +1129,12 @@ onMounted(async () => {
 
 /* 批量上传样式 */
 .batch-upload-tip {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+}
+.upload-tips-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 .upload-tips-list {
   margin: 8px 0 0 0;
@@ -1060,14 +1144,65 @@ onMounted(async () => {
 .upload-tips-list li {
   line-height: 1.8;
 }
-.upload-target-section {
+.upload-tips-list code {
+  background: #f5f7fa;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: Consolas, Monaco, monospace;
+  font-size: 12px;
+}
+
+/* 模板使用说明 */
+.template-guide {
+  background: linear-gradient(135deg, #f0f9eb 0%, #e8f5e1 100%);
+  border: 1px solid #c2e7a0;
+  border-radius: 8px;
+  padding: 12px 16px;
   margin-bottom: 16px;
+}
+.template-guide .guide-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #67c23a;
+  margin-bottom: 8px;
+}
+.template-guide .guide-content {
+  font-size: 13px;
+  color: #606266;
+  line-height: 1.8;
+}
+.template-guide code {
+  background: rgba(255,255,255,0.7);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: Consolas, Monaco, monospace;
+  font-size: 12px;
+  color: #67c23a;
+}
+
+.upload-target-section {
+  margin-bottom: 12px;
 }
 .section-title {
   font-size: 14px;
   font-weight: 500;
   color: #606266;
   margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title .highlight {
+  color: #409eff;
+  font-weight: 600;
+}
+.section-title .section-tip {
+  font-size: 12px;
+  color: #909399;
+  font-weight: normal;
 }
 .target-list {
   max-height: 280px;

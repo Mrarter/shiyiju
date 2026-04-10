@@ -28,7 +28,11 @@ Component({
   },
   lifetimes: {
     attached() {
-      const page = getCurrentPages().pop();
+      const pages = getCurrentPages();
+      if (!pages || pages.length === 0) {
+        return;
+      }
+      const page = pages.pop();
       const route = `/${page.route}`;
       const selected = this.data.list.findIndex((item) => item.pagePath === route);
       this.setData({ selected: selected < 0 ? 0 : selected });

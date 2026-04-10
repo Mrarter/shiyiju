@@ -29,15 +29,20 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-            .allowedOriginPatterns("http://localhost:*", "http://127.0.0.1:*", "http://192.168.1.163:*")
+            .allowedOriginPatterns("*")
             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
             .allowedHeaders("*")
-            .allowCredentials(false);
+            .allowCredentials(true)
+            .maxAge(3600);
     }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // 配置 /uploads/** 静态资源路径映射
+        String uploadPath = AdminUploadPaths.root().toAbsolutePath().toString();
+        System.out.println("配置静态资源路径: " + uploadPath);
+        
         registry.addResourceHandler("/uploads/**")
-            .addResourceLocations(AdminUploadPaths.root().toUri().toString());
+                .addResourceLocations("file:" + uploadPath + "/");
     }
 }

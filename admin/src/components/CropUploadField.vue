@@ -42,6 +42,7 @@
       v-model="cropperVisible"
       :image-url="pendingImageUrl"
       :aspect-ratio="cropRatio"
+      :show-tools="false"
       @confirm="handleCropConfirm"
       @cancel="handleCropCancel"
     />
@@ -54,6 +55,7 @@ import { ElMessage } from 'element-plus'
 import { Picture } from '@element-plus/icons-vue'
 import { uploadAdminImage } from '../api/admin'
 import ImageCropper from './ImageCropper.vue'
+import { getImageUrl } from '../utils/imageUrl'
 
 const props = defineProps({
   modelValue: {
@@ -100,9 +102,17 @@ function handleSelect(options) {
   const file = options.file
   
   if (props.enableCrop) {
-    // 创建 blob URL 传给裁剪组件
-    pendingImageUrl.value = URL.createObjectURL(file)
-    cropperVisible.value = true
+    // 使用 FileReader 转为 data URL，避免 blob URL 跨域问题
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      console.log('[Upload] Created data URL, length:', e.target.result.length)
+      pendingImageUrl.value = e.target.result
+      cropperVisible.value = true
+    }
+    reader.onerror = () => {
+      ElMessage.error('图片读取失败')
+    }
+    reader.readAsDataURL(file)
   } else {
     uploadFile(file)
   }
@@ -111,14 +121,31 @@ function handleSelect(options) {
 // 打开裁剪弹窗（已有图片的裁剪）
 function openCropper() {
   if (props.modelValue) {
-    // 如果是 blob URL，直接使用；否则创建新的 blob URL
-    if (props.modelValue.startsWith('blob:')) {
+    // 如果是 data URL，直接使用
+    if (props.modelValue.startsWith('data:')) {
       pendingImageUrl.value = props.modelValue
+      cropperVisible.value = true
     } else {
-      // 已有图片是服务器 URL，需要获取 blob
-      pendingImageUrl.value = props.modelValue // 假设是完整 URL
+      // 服务器 URL，统一用 fetch + FileReader 转 data URL
+      ElMessage.info('正在加载图片...')
+      fetch(props.modelValue)
+        .then(res => res.blob())
+        .then(blob => {
+          const reader = new FileReader()
+          reader.onload = (e) => {
+            console.log('[OpenCropper] Server image converted, length:', e.target.result.length)
+            pendingImageUrl.value = e.target.result
+            cropperVisible.value = true
+          }
+          reader.onerror = () => {
+            ElMessage.error('图片读取失败')
+          }
+          reader.readAsDataURL(blob)
+        })
+        .catch(() => {
+          ElMessage.error('图片加载失败，无法裁剪')
+        })
     }
-    cropperVisible.value = true
   }
 }
 
@@ -132,7 +159,7 @@ async function handleCropConfirm(cropData) {
     const file = new File([blob], 'cropped.jpg', { type: 'image/jpeg' })
     const result = await uploadAdminImage(file)
     
-    emit('update:modelValue', result.url || '')
+    emit('update:modelValue', getImageUrl(result.url) || '')
     ElMessage.success('图片上传成功')
     cropperVisible.value = false
   } catch (error) {
@@ -153,7 +180,7 @@ async function uploadFile(file) {
   uploading.value = true
   try {
     const result = await uploadAdminImage(file)
-    emit('update:modelValue', result.url || '')
+    emit('update:modelValue', getImageUrl(result.url) || '')
     ElMessage.success('图片上传成功')
   } catch (error) {
     ElMessage.error(error.message || '图片上传失败')

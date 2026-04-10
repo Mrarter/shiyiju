@@ -165,6 +165,12 @@ public class AdminContentService {
         }
     }
 
+    public void deleteOperation(Long id) {
+        if (adminMapper.deleteOperation(id) <= 0) {
+            throw new BusinessException(40404, "运营配置不存在");
+        }
+    }
+
     public List<AdminArtistVO> listArtists() {
         initMockData();
         List<AdminArtistEntity> entities = adminMapper.findArtists();

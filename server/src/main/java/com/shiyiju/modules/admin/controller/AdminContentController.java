@@ -101,6 +101,12 @@ public class AdminContentController {
         return ApiResponse.success("更新成功", null);
     }
 
+    @DeleteMapping("/operations/{id}")
+    public ApiResponse<Void> deleteOperation(@PathVariable Long id) {
+        adminContentService.deleteOperation(id);
+        return ApiResponse.success("删除成功", null);
+    }
+
     @GetMapping("/artists")
     public ApiResponse<List<AdminArtistVO>> artists() {
         return ApiResponse.success(adminContentService.listArtists());

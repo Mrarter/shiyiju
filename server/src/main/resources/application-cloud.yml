@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    # 腾讯云 MySQL 公网连接
+    url: jdbc:mysql://gz-cdb-57kuo8o5.sql.tencentcdb.com:21228/${MYSQL_DATABASE:shiyiju}?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:aA123qwe}
+  cloud:
+    enabled: false
+
+server:
+  port: ${PORT:8080}
+  servlet:
+    context-path: /api/v1
+
+jwt:
+  secret: ${JWT_SECRET:shiyiju-default-secret-change-in-production}
+  expiration: 604800000
+
+logging:
+  level:
+    com.shiyiju: DEBUG

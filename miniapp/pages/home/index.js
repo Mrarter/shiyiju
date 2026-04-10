@@ -61,7 +61,7 @@ function normalizeWork(item, index, favorites = []) {
     spec: formatSpec(item),
     priceText: formatPrice(item.currentPrice),
     originalPrice: item.originalPrice ? `¥${item.originalPrice.toLocaleString()}` : "",
-    coverUrl: normalizeImageUrl(item.coverUrl, getArtworkCoverPlaceholder(item.artworkId)),
+    coverUrl: normalizeImageUrl(item.coverUrl, null, `art${item.artworkId}`),
     tag: item.tag || "",
     countdown: item.countdown || "",
     height: heights[index % heights.length],
@@ -251,6 +251,7 @@ Page({
       try {
         banners = await api.request({ url: "/home/banners", method: "GET" })
       } catch (e) {
+        console.error("[首页] Banner API 失败:", e)
         banners = []
       }
       if (!banners || banners.length === 0) {
@@ -262,12 +263,17 @@ Page({
       let works = []
       try {
         works = await api.request({ url: "/works", method: "GET" })
+        console.log("[首页] 作品 API 成功返回:", works ? works.length : 0, "条数据")
       } catch (e) {
+        console.error("[首页] 作品 API 失败:", e)
         works = []
       }
 
       if (!works || works.length === 0) {
+        console.warn("[首页] API 返回空数据，切换到本地假数据")
         works = ALL_WORKS
+      } else {
+        console.log("[首页] 使用真实数据:", works.slice(0, 3))
       }
 
       // 下拉刷新时随机显示，首次加载按权重排序
@@ -288,6 +294,7 @@ Page({
       })
     } catch (error) {
       // 使用本地数据
+      console.error("[首页] 整体加载失败:", error)
       let sortedWorks = isRefresh ? shuffleArray(ALL_WORKS) : sortByWeight(ALL_WORKS)
       const favorites = this.data.favorites || []
       const normalizedWorks = sortedWorks.map((item, index) => normalizeWork(item, index, favorites))

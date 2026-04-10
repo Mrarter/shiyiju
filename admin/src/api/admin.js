@@ -33,6 +33,11 @@ export async function updateOperationConfig(id, payload) {
   return http.put(`${ADMIN_API_PREFIX}/operations/${id}`, payload)
 }
 
+export async function deleteOperationConfig(id) {
+  if (useMock) return { success: true }
+  return http.delete(`${ADMIN_API_PREFIX}/operations/${id}`)
+}
+
 export async function uploadAdminImage(file) {
   if (useMock) return { url: URL.createObjectURL(file), name: file.name }
   return http.upload(`${ADMIN_API_PREFIX}/uploads/images`, file)

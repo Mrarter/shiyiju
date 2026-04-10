@@ -1,0 +1,27 @@
+{
+  "$schema": "https://raw.githubusercontent.com/TencentCloudBase/tcb-schema/main/schema.json",
+  "envId": "shiyiju-9g4pxbgh603bf08b",
+  "framework": {
+    "name": "shiyiju-server",
+    "plugins": {
+      "server": {
+        "use": "@cloudbase/framework-plugin-container",
+        "inputs": {
+          "serviceName": "java-springboot",
+          "servicePort": 8080,
+          "buildRepository": "ccr.ccs.tencentyun.com/{{uin}}/{{appId}}",
+          "dockerfile": "server/Dockerfile",
+          "cpu": 1,
+          "mem": 2,
+          "minNum": 1,
+          "maxNum": 1,
+          "policyVersion": 2,
+          "customLogs": "stdout",
+          "envVariables": {
+            "SPRING_PROFILES_ACTIVE": "cloud"
+          }
+        }
+      }
+    }
+  }
+}

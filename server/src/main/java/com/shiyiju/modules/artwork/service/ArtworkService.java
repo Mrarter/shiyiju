@@ -337,8 +337,10 @@ public class ArtworkService {
 
     private ArtworkQueryDTO normalizeQuery(ArtworkQueryDTO queryDTO) {
         ArtworkQueryDTO normalized = queryDTO == null ? new ArtworkQueryDTO() : queryDTO;
+        // 默认显示所有非草稿状态的作品（PUBLISHED, COLLECTED, SOLD_OUT），确保小程序能看到后台配置的作品
         if (!StringUtils.hasText(normalized.getStatus())) {
-            normalized.setStatus("PUBLISHED");
+            // 不限制状态，返回所有非草稿的作品
+            normalized.setStatus(null);
         }
         if (StringUtils.hasText(normalized.getKeyword())) {
             normalized.setKeyword(normalized.getKeyword().trim());
