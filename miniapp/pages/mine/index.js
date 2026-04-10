@@ -57,10 +57,20 @@ Page({
         error: ""
       })
     } catch (error) {
+      // API 失败时使用默认用户数据，确保页面能正常显示
+      const defaultUser = { nickname: "微信用户", defaultRole: "COLLECTOR", avatarUrl: "", permissions: [] }
       this.setData({
+        user: defaultUser,
+        profileSummary: this.buildProfileSummary(defaultUser),
+        assets: this.buildAssets(defaultUser),
+        tradeMenus: this.buildTradeMenus(),
+        featureCards: this.buildFeatureCards(),
+        quickLinks: this.buildQuickLinks(),
+        serviceLinks: this.buildServiceLinks(defaultUser),
         loading: false,
-        error: error.message || "我的页面加载失败"
+        error: ""
       })
+      console.warn("[我的] 加载用户信息失败，使用默认数据:", error.message)
     }
   },
 

@@ -5,7 +5,12 @@
         <div class="page-title">系统设置</div>
         <div class="page-subtitle">管理后台账号、角色权限和基础配置项</div>
       </div>
-      <el-button type="primary" @click="openCreateAccount">新增账号</el-button>
+      <div class="header-actions">
+        <el-button @click="goToOperations">
+          <el-icon><Promotion /></el-icon> 运营管理
+        </el-button>
+        <el-button type="primary" @click="openCreateAccount">新增账号</el-button>
+      </div>
     </div>
 
     <div class="section-card" style="padding: 24px;">
@@ -125,11 +130,14 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { Promotion } from '@element-plus/icons-vue'
+import { useRouter } from 'vue-router'
 import { useAdminStore } from '../../stores/admin'
 
 const permissionOptions = ['控制台', '首页运营', '艺术家管理', '作品管理', '用户管理', '订单管理', '系统设置']
 
 const adminStore = useAdminStore()
+const router = useRouter()
 const {
   adminAccounts: accountsState,
   adminRoles: rolesState,
@@ -197,6 +205,10 @@ function resetConfigForm() {
   configForm.key = ''
   configForm.value = ''
   configForm.remark = ''
+}
+
+function goToOperations() {
+  router.push('/operations')
 }
 
 function openCreateAccount() {

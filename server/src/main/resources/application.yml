@@ -21,6 +21,7 @@ mybatis:
 
 server:
   port: ${SERVER_PORT:8080}
+  address: 0.0.0.0  # 允许局域网访问
   servlet:
     context-path: /
   tomcat:
@@ -37,5 +38,7 @@ app:
     mock-enabled: ${WECHAT_MOCK_ENABLED:true}
 
 # 图片服务基础URL（小程序访问用）
+# 开发/测试：使用 Cloudflare Tunnel
+# 正式环境：使用静态存储CDN域名
 image:
-  base-url: ${IMAGE_BASE_URL:}
+  base-url: https://euro-spoken-vocal-montgomery.trycloudflare.com

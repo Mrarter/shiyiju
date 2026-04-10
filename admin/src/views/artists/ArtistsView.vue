@@ -5,7 +5,12 @@
         <div class="page-title">艺术家管理</div>
         <div class="page-subtitle">维护艺术家资料、排序和作品关联</div>
       </div>
-      <el-button type="primary" @click="startCreate">新建艺术家</el-button>
+      <div class="header-actions">
+        <el-button @click="goToOperations">
+          <el-icon><Promotion /></el-icon> 运营管理
+        </el-button>
+        <el-button type="primary" @click="startCreate">新建艺术家</el-button>
+      </div>
     </div>
 
     <div class="section-card" style="padding: 20px;">
@@ -110,11 +115,14 @@
 import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { ElMessage } from 'element-plus'
+import { Promotion } from '@element-plus/icons-vue'
+import { useRouter } from 'vue-router'
 import { useAdminStore } from '../../stores/admin'
 import CropUploadField from '../../components/CropUploadField.vue'
 import { getImageUrl } from '../../utils/imageUrl'
 
 const adminStore = useAdminStore()
+const router = useRouter()
 const { artists: artistsState } = storeToRefs(adminStore)
 const keyword = ref('')
 const saving = ref(false)
@@ -207,6 +215,10 @@ function resetForm() {
   form.graduatedFrom = ''
   form.awards = ''
   form.age = null
+}
+
+function goToOperations() {
+  router.push('/operations')
 }
 
 function startCreate() {

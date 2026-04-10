@@ -18,17 +18,16 @@
   ],
   "window": {
     "navigationStyle": "custom",
-    "backgroundColor": "#ffffff",
-    "backgroundTextStyle": "dark"
+    "navigationBarTextStyle": "white"
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json",
   "tabBar": {
     "custom": true,
-    "color": "#999999",
-    "selectedColor": "#000000",
-    "backgroundColor": "#ffffff",
-    "borderStyle": "white",
+    "color": "#8d8579",
+    "selectedColor": "#d6b074",
+    "backgroundColor": "#0b0a08",
+    "borderStyle": "black",
     "list": [
       {
         "pagePath": "pages/home/index",

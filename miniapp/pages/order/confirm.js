@@ -1,22 +1,12 @@
-const { request } = require('../../utils/api')
+const api = require('../../utils/api')
 const { getDefaultAddress } = require('../../utils/address')
-
-// 模拟作品数据
-const MOCK_ARTWORK = {
-  id: 1,
-  title: '山水之间',
-  artistName: '李明',
-  coverUrl: 'https://picsum.photos/400/400?random=1',
-  currentPrice: 6888,
-  category: '油画',
-  widthCm: 60,
-  heightCm: 80,
-  creationYear: 2024
-}
+const { normalizeImageUrl } = require('../../utils/imageUrl')
 
 Page({
   data: {
     artwork: null,
+    artworkList: [], // 支持多商品下单
+    totalPrice: '0.00', // 总价
     address: null,
     remark: '',
     paymentMethod: 'alipay',
@@ -29,37 +19,104 @@ Page({
     wx.hideTabBar({ animation: false })
     this.goBack = () => wx.navigateBack()
     
-    // 支持从购物车传来的商品信息
-    if (options.items) {
-      try {
-        const items = JSON.parse(decodeURIComponent(options.items))
-        if (items && items.length > 0) {
-          const item = items[0]
-          this.setData({
-            artwork: {
-              id: item.id,
-              title: item.title,
-              artistName: item.artistName,
-              coverUrl: item.coverUrl,
-              currentPrice: item.price,
-              category: this.getCategoryName(item.category),
-              widthCm: item.widthCm,
-              heightCm: item.heightCm,
-              creationYear: item.creationYear
-            }
-          })
-        }
-      } catch (e) {
-        console.log('解析商品信息失败', e)
-      }
-    }
-    
-    // 如果没有商品数据，加载默认数据
-    if (!this.data.artwork) {
-      this.setData({ artwork: MOCK_ARTWORK })
+    // 从 URL 参数获取商品信息
+    if (options.artworkId) {
+      // 单个商品直接购买
+      this.loadArtwork(options.artworkId)
+    } else if (options.items) {
+      // 从购物车传来的商品信息
+      this.loadFromCartItems(options.items)
+    } else {
+      // 尝试从本地存储获取
+      this.loadFromLocalCart()
     }
     
     this.loadAddress()
+  },
+
+  // 更新总价
+  updateTotalPrice() {
+    const { artworkList } = this.data
+    let total = 0
+    artworkList.forEach(item => {
+      total += (item.currentPrice || 0) * (item.quantity || 1)
+    })
+    this.setData({
+      totalPrice: total.toLocaleString('zh-CN', { minimumFractionDigits: 2 })
+    })
+  },
+
+  // 加载单个作品详情
+  async loadArtwork(artworkId) {
+    try {
+      const res = await api.request({ url: `/artworks/${artworkId}`, method: 'GET' })
+      if (res) {
+        const formatted = this.formatArtwork(res)
+        this.setData({
+          artwork: formatted,
+          artworkList: [formatted]
+        })
+        this.updateTotalPrice()
+      }
+    } catch (e) {
+      console.error('[订单确认] 加载作品失败:', e)
+      // 尝试从本地存储获取
+      this.loadFromLocalCart()
+    }
+  },
+
+  // 从购物车传来的商品解析
+  loadFromCartItems(itemsStr) {
+    try {
+      const items = JSON.parse(decodeURIComponent(itemsStr))
+      if (items && items.length > 0) {
+        const formattedList = items.map(item => this.formatArtwork(item))
+        this.setData({
+          artworkList: formattedList,
+          artwork: formattedList[0] // 主商品显示第一个
+        })
+        this.updateTotalPrice()
+      } else {
+        this.loadFromLocalCart()
+      }
+    } catch (e) {
+      console.error('[订单确认] 解析商品信息失败', e)
+      this.loadFromLocalCart()
+    }
+  },
+
+  // 从本地存储获取购物车数据
+  loadFromLocalCart() {
+    try {
+      const localCart = wx.getStorageSync('localCart') || []
+      const selectedItems = localCart.filter(item => item.selected !== false)
+      if (selectedItems.length > 0) {
+        const formattedList = selectedItems.map(item => this.formatArtwork(item))
+        this.setData({
+          artworkList: formattedList,
+          artwork: formattedList[0]
+        })
+        this.updateTotalPrice()
+      }
+    } catch (e) {
+      console.error('[订单确认] 本地存储读取失败', e)
+    }
+  },
+
+  // 格式化作品数据
+  formatArtwork(item) {
+    return {
+      id: item.artworkId || item.id,
+      title: item.title || '未知作品',
+      artistName: item.artistName || '未知艺术家',
+      coverUrl: normalizeImageUrl(item.coverUrl, null, `art${item.artworkId || item.id}`),
+      currentPrice: item.price || item.currentPrice || 0,
+      category: this.getCategoryName(item.category),
+      widthCm: item.widthCm || '-',
+      heightCm: item.heightCm || '-',
+      creationYear: item.creationYear || '',
+      quantity: item.quantity || 1
+    }
   },
 
   getCategoryName(category) {
@@ -103,13 +160,28 @@ Page({
     this.setData({ remark: e.detail.value })
   },
 
+  // 计算总价
+  getTotalPrice() {
+    const { artworkList } = this.data
+    let total = 0
+    artworkList.forEach(item => {
+      total += (item.currentPrice || 0) * (item.quantity || 1)
+    })
+    return total
+  },
+
   async handlePay() {
     if (this.data.loading || this.data.disabled) return
 
-    const { artwork, address, remark, paymentMethod, isAnonymous } = this.data
+    const { address, remark, paymentMethod, isAnonymous, artworkList } = this.data
 
     if (!address) {
       wx.showToast({ title: '请先添加收货地址', icon: 'none' })
+      return
+    }
+
+    if (!artworkList || artworkList.length === 0) {
+      wx.showToast({ title: '请选择商品', icon: 'none' })
       return
     }
 
@@ -117,43 +189,44 @@ Page({
 
     try {
       // 1. 创建订单
-      const createRes = await request({
+      const createRes = await api.request({
         url: '/orders',
         method: 'POST',
         data: {
-          artworkId: artwork.id,
+          artworkIds: artworkList.map(a => a.id),
           addressId: address.id,
           remark: remark,
           anonymous: isAnonymous
         }
       })
 
-      const order = createRes.data
+      const order = createRes.data || createRes
       console.log('订单创建成功', order)
 
-      // 2. 发起支付
-      const payRes = await request({
+      // 2. 清理本地购物车中已下单的商品
+      this.clearOrderedItems()
+
+      // 3. 发起支付
+      const payRes = await api.request({
         url: '/payments/prepay',
         method: 'POST',
         data: {
-          orderId: order.orderId,
+          orderId: order.orderId || order.id,
           paymentMethod: paymentMethod
         }
       })
 
-      const payData = payRes.data
+      const payData = payRes.data || payRes
       console.log('预支付成功', payData)
 
-      // 3. 调起支付
+      // 4. 调起支付
       if (payData.prepayId && payData.prepayId.startsWith('simulate_')) {
-        await this.simulatePay(order.orderId)
+        await this.simulatePay(order.orderId || order.id)
       } else if (paymentMethod === 'alipay') {
-        // 支付宝支付
         wx.navigateTo({
-          url: `/pages/order/success?orderId=${order.orderId}`
+          url: `/pages/order/success?orderId=${order.orderId || order.id}`
         })
       } else {
-        // 微信支付
         await this.doWxPay(payData, order)
       }
 
@@ -168,6 +241,21 @@ Page({
     }
   },
 
+  // 清理已下单的商品
+  clearOrderedItems() {
+    try {
+      const { artworkList } = this.data
+      const localCart = wx.getStorageSync('localCart') || []
+      const artworkIds = artworkList.map(a => a.id)
+      const remainingCart = localCart.filter(item => 
+        !artworkIds.includes(item.id) && !artworkIds.includes(item.artworkId)
+      )
+      wx.setStorageSync('localCart', remainingCart)
+    } catch (e) {
+      console.error('[订单确认] 清理本地购物车失败', e)
+    }
+  },
+
   doWxPay(payData, order) {
     return new Promise((resolve, reject) => {
       wx.requestPayment({
@@ -178,7 +266,7 @@ Page({
         paySign: payData.paySign || 'mock_sign',
         success: () => {
           wx.redirectTo({
-            url: `/pages/order/success?orderId=${order.orderId}`
+            url: `/pages/order/success?orderId=${order.orderId || order.id}`
           })
           resolve()
         },
@@ -193,7 +281,7 @@ Page({
 
   async simulatePay(orderId) {
     try {
-      await request({
+      await api.request({
         url: `/payments/simulate`,
         method: 'POST',
         data: { orderId }

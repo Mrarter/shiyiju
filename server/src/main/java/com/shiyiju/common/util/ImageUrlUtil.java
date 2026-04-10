@@ -28,9 +28,9 @@ public class ImageUrlUtil {
 
     /**
      * 图片服务基础URL（支持通过环境变量配置）
-     * 默认为 http://localhost:8080，开发环境可通过 IMAGE_BASE_URL 环境变量覆盖
+     * 默认为 http://localhost:8080，开发环境真机调试可通过环境变量 IMAGE_BASE_URL 覆盖
      */
-    @Value("${image.base-url:}")
+    @Value("${image.base-url:http://192.168.1.163:8080}")
     private String imageBaseUrl;
 
     /**

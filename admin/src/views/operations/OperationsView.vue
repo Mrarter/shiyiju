@@ -86,7 +86,24 @@
         </div>
         <div class="form-field">
           <label>关联对象</label>
-          <el-input v-model="form.target" placeholder="关联的作品ID或艺术家名称等" />
+          <div class="target-input-wrapper">
+            <el-input 
+              v-model="form.target" 
+              placeholder="搜索作品ID或艺术家名称，如 ARTWORK:123"
+              @input="handleTargetInput"
+            />
+            <div class="target-suggestions" v-if="suggestions.length > 0 && showSuggestions">
+              <div 
+                v-for="item in suggestions" 
+                :key="item.value"
+                class="suggestion-item"
+                @click="selectSuggestion(item)"
+              >
+                <span class="suggestion-type">{{ item.typeLabel }}</span>
+                <span class="suggestion-text">{{ item.label }}</span>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="form-field">
           <label>类型</label>
@@ -157,6 +174,10 @@ const editingId = ref(null)
 const dialogVisible = ref(false)
 const previewVisible = ref(false)
 const previewItem = ref(null)
+const showSuggestions = ref(false)
+const suggestions = ref([])
+const suggestionLoading = ref(false)
+let searchTimer = null
 const form = reactive({
   title: '',
   type: 'BANNER',
@@ -298,6 +319,82 @@ function normalizeStatus(status) {
     停用: 'DISABLED'
   }
   return map[status] || status || 'ENABLED'
+}
+
+// 关联对象搜索
+async function handleTargetInput(value) {
+  // 清除之前的定时器
+  if (searchTimer) clearTimeout(searchTimer)
+  
+  if (!value || value.length < 1) {
+    suggestions.value = []
+    showSuggestions.value = false
+    return
+  }
+  
+  // 防抖处理
+  searchTimer = setTimeout(async () => {
+    await searchTargets(value)
+  }, 300)
+}
+
+async function searchTargets(query) {
+  suggestionLoading.value = true
+  showSuggestions.value = true
+  
+  try {
+    const results = []
+    
+    // 解析查询：如果包含冒号，说明是格式化的target
+    const colonParts = query.split(':')
+    
+    if (/^\d+$/.test(query)) {
+      // 纯数字ID，搜索作品
+      results.push({
+        value: `ARTWORK:${query}`,
+        label: `作品 #${query}`,
+        typeLabel: '作品'
+      })
+    } else if (colonParts.length === 2 && /^\d+$/.test(colonParts[1])) {
+      // 已经是 ARTWORK:123 格式
+      results.push({
+        value: query,
+        label: `作品 #${colonParts[1]}`,
+        typeLabel: '作品'
+      })
+    } else {
+      // 尝试作为作品ID搜索
+      const idMatch = query.match(/(\d+)/)
+      if (idMatch) {
+        results.push({
+          value: `ARTWORK:${idMatch[1]}`,
+          label: `作品 #${idMatch[1]}`,
+          typeLabel: '作品'
+        })
+      }
+      
+      // 添加提示信息
+      results.push({
+        value: 'TIP',
+        label: '输入作品ID可直接关联，如 ARTWORK:123',
+        typeLabel: '提示'
+      })
+    }
+    
+    suggestions.value = results
+  } catch (error) {
+    console.error('搜索关联对象失败:', error)
+    suggestions.value = []
+  } finally {
+    suggestionLoading.value = false
+  }
+}
+
+function selectSuggestion(item) {
+  if (item.value === 'TIP') return
+  form.target = item.value
+  showSuggestions.value = false
+  suggestions.value = []
 }
 
 async function submitForm() {
@@ -445,5 +542,56 @@ onMounted(async () => {
   color: var(--el-text-color-secondary);
   font-size: 12px;
   white-space: nowrap;
+}
+
+/* 关联对象搜索 */
+.target-input-wrapper {
+  flex: 1;
+  position: relative;
+}
+
+.target-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid var(--el-border-color);
+  border-radius: 4px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 4px;
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.suggestion-item:hover {
+  background: var(--el-fill-color-light);
+}
+
+.suggestion-type {
+  font-size: 12px;
+  padding: 2px 6px;
+  background: var(--el-color-primary-light-8);
+  color: var(--el-color-primary);
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.suggestion-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
 }
 </style>

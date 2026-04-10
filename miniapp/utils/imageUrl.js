@@ -5,7 +5,7 @@
 
 // 获取实际的服务器基础URL（从 app.globalData.apiBaseUrl 提取）
 function getActualServerBaseUrl() {
-  let apiBaseUrl = 'https://192.168.1.163:8443/api/v1';
+  let apiBaseUrl = 'https://euro-spoken-vocal-montgomery.trycloudflare.com';
   
   try {
     const app = getApp();
@@ -16,14 +16,9 @@ function getActualServerBaseUrl() {
     // 忽略错误，使用默认值
   }
   
-  // 从 API 地址提取基础 URL，强制使用 HTTPS
+  // 从 API 地址提取基础 URL，保留原始协议
   const match = apiBaseUrl.match(/^(https?:\/\/[^\/]+)/);
-  let baseUrl = match ? match[1] : 'https://192.168.1.163:8443';
-  // 强制使用 HTTPS
-  if (baseUrl.startsWith('http://')) {
-    baseUrl = baseUrl.replace(/^http:/, 'https:');
-  }
-  return baseUrl;
+  return match ? match[1] : 'https://euro-spoken-vocal-montgomery.trycloudflare.com';
 }
 
 /**
@@ -80,11 +75,20 @@ function normalizeImageUrl(url, placeholder, seed) {
 
   // 已经是完整的HTTP(S) URL
   if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
-    // 如果是本地图片地址（localhost 或 192.168.x.x），使用占位图
-    if (trimmed.includes('localhost') || trimmed.match(/192\.168\.\d+\.\d+/)) {
-      // 使用 seed 生成占位图
+    // 如果是 localhost/127.0.0.1 地址，替换为实际的服务器地址
+    if (trimmed.includes('localhost') || trimmed.includes('127.0.0.1')) {
+      // 提取图片路径部分，替换为实际的服务器地址
+      const pathMatch = trimmed.match(/\/uploads\/.*$/);
+      if (pathMatch) {
+        return getActualServerBaseUrl() + pathMatch[0];
+      }
+      // 如果没有路径，使用占位图
       const placeholderSeed = seed || Date.now().toString();
       return `https://picsum.photos/seed/${placeholderSeed}/400/500`;
+    }
+    // 其他 HTTP 链接转为 HTTPS（通过 nginx 代理）
+    if (trimmed.startsWith('http://')) {
+      return trimmed.replace('http://', 'https://');
     }
     return trimmed;
   }

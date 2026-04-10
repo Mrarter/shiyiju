@@ -5,7 +5,12 @@
         <div class="page-title">用户管理</div>
         <div class="page-subtitle">查看微信登录用户资料与最近活跃情况</div>
       </div>
-      <el-button @click="exportUsers">导出用户</el-button>
+      <div class="header-actions">
+        <el-button @click="goToOperations">
+          <el-icon><Promotion /></el-icon> 运营管理
+        </el-button>
+        <el-button @click="exportUsers">导出用户</el-button>
+      </div>
     </div>
 
     <div class="section-card" style="padding: 20px;">
@@ -60,11 +65,14 @@
 import { computed, onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { ElMessage } from 'element-plus'
+import { Promotion } from '@element-plus/icons-vue'
+import { useRouter } from 'vue-router'
 import { useAdminStore } from '../../stores/admin'
 import { downloadCsv } from '../../utils/download'
 import { getImageUrl } from '../../utils/imageUrl'
 
 const adminStore = useAdminStore()
+const router = useRouter()
 const { users: usersState } = storeToRefs(adminStore)
 const keyword = ref('')
 const statusFilter = ref('all')
@@ -79,6 +87,10 @@ const filteredUsers = computed(() => {
     return matchKeyword && matchStatus
   })
 })
+
+function goToOperations() {
+  router.push('/operations')
+}
 
 function exportUsers() {
   downloadCsv(

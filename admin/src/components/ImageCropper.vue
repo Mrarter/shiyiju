@@ -18,6 +18,7 @@
             <el-option :value="1" label="1:1 正方形" />
             <el-option :value="1.333" label="4:3 横图" />
             <el-option :value="1.777" label="16:9 宽屏" />
+            <el-option :value="1.875" label="7.5:4 Banner" />
             <el-option :value="0.75" label="3:4 竖图" />
           </el-select>
         </div>
@@ -45,13 +46,17 @@ const props = defineProps({
   imageUrl: {
     type: String,
     default: ''
+  },
+  aspectRatio: {
+    type: Number,
+    default: 0 // 0 = 自由形状
   }
 })
 
 const emit = defineEmits(['update:modelValue', 'confirm', 'cancel'])
 
 const canvasRef = ref(null)
-const currentAspectRatio = ref(0) // 0 = 自由形状
+const currentAspectRatio = ref(props.aspectRatio) // 使用传入的比例，默认自由形状
 
 const image = ref(null)
 const scale = ref(1)
@@ -153,12 +158,13 @@ function initCropArea() {
   const imgW = image.value.width * scale.value
   const imgH = image.value.height * scale.value
   
-  // 默认裁剪区域为图片中央区域
+  // 根据比例计算裁剪区域
   const maxW = Math.min(imgW * 0.8, canvas.width - 40)
   let cropW = maxW
   let cropH = maxW
   
   if (currentAspectRatio.value > 0) {
+    // 有固定比例时，使用比例计算
     cropH = cropW / currentAspectRatio.value
     if (cropH > imgH * 0.8) {
       cropH = imgH * 0.8
@@ -166,9 +172,13 @@ function initCropArea() {
     }
   }
   
+  // 居中裁剪区域
+  const areaX = (canvas.width - cropW) / 2
+  const areaY = (canvas.height - cropH) / 2
+  
   cropArea.value = {
-    x: (canvas.width - cropW) / 2,
-    y: (canvas.height - cropH) / 2,
+    x: areaX,
+    y: areaY,
     width: cropW,
     height: cropH
   }

@@ -34,15 +34,9 @@ public class OrderService {
 
     @Transactional
     public OrderDetailVO createOrder(Long currentUserId, CreateOrderDTO request) {
-        ArtworkSnapshotEntity artwork = orderMapper.findArtworkSnapshot(request.getArtworkId());
-        if (artwork == null) {
-            throw new BusinessException(40004, "作品不存在");
-        }
-        if (!"PUBLISHED".equals(artwork.getStatus())) {
-            throw new BusinessException(40005, "当前作品暂不可下单");
-        }
-        if (artwork.getInventoryAvailable() == null || artwork.getInventoryAvailable() < 1) {
-            throw new BusinessException(40006, "作品库存不足");
+        List<Long> artworkIds = request.resolveArtworkIds();
+        if (artworkIds.isEmpty()) {
+            throw new BusinessException(40004, "请选择要购买的作品");
         }
 
         ShippingAddressEntity address = orderMapper.findAddress(request.getAddressId(), currentUserId);
@@ -50,28 +44,60 @@ public class OrderService {
             throw new BusinessException(40007, "收货地址不存在");
         }
 
-        int updated = orderMapper.decreaseArtworkInventory(artwork.getArtworkId());
-        if (updated < 1) {
-            throw new BusinessException(40006, "作品已被抢先下单");
+        // 获取所有作品信息并验证
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        for (Long artworkId : artworkIds) {
+            ArtworkSnapshotEntity artwork = orderMapper.findArtworkSnapshot(artworkId);
+            if (artwork == null) {
+                throw new BusinessException(40004, "作品不存在: " + artworkId);
+            }
+            if (!"PUBLISHED".equals(artwork.getStatus())) {
+                throw new BusinessException(40005, "当前作品暂不可下单: " + artwork.getTitle());
+            }
+            if (artwork.getInventoryAvailable() == null || artwork.getInventoryAvailable() < 1) {
+                throw new BusinessException(40006, "作品库存不足: " + artwork.getTitle());
+            }
+            // 扣减库存
+            int updated = orderMapper.decreaseArtworkInventory(artwork.getArtworkId());
+            if (updated < 1) {
+                throw new BusinessException(40006, "作品已被抢先下单: " + artwork.getTitle());
+            }
+            totalAmount = totalAmount.add(artwork.getCurrentPrice());
         }
 
+        // 创建订单
         OrderEntity orderEntity = new OrderEntity();
         orderEntity.setOrderNo(buildOrderNo(currentUserId));
         orderEntity.setBuyerUserId(currentUserId);
-        orderEntity.setOrderType("PRIMARY");
+        orderEntity.setOrderType(artworkIds.size() > 1 ? "BUNDLE" : "PRIMARY");
         orderEntity.setOrderStatus("PENDING_PAYMENT");
         orderEntity.setPaymentStatus("UNPAID");
         orderEntity.setDeliveryType("ARTWORK");
         orderEntity.setAddressId(address.getId());
-        orderEntity.setGoodsAmount(artwork.getCurrentPrice());
+        orderEntity.setGoodsAmount(totalAmount);
         orderEntity.setFreightAmount(BigDecimal.ZERO);
         orderEntity.setDiscountAmount(BigDecimal.ZERO);
-        orderEntity.setPayAmount(artwork.getCurrentPrice());
+        orderEntity.setPayAmount(totalAmount);
         orderEntity.setRemark(normalizeRemark(request.getRemark()));
         orderMapper.insertOrder(orderEntity);
-        orderMapper.insertOrderItem(orderEntity.getOrderId(), artwork, artwork.getCoverUrl());
-        orderMapper.insertCertificate(buildCertificateNo(currentUserId), artwork.getArtworkId(), currentUserId, orderEntity.getOrderId());
-        orderMapper.insertOwnershipFlow(artwork.getArtworkId(), currentUserId, orderEntity.getOrderId());
+
+        // 插入订单项
+        String firstCoverUrl = null;
+        String firstTitle = null;
+        for (Long artworkId : artworkIds) {
+            ArtworkSnapshotEntity artwork = orderMapper.findArtworkSnapshot(artworkId);
+            orderMapper.insertOrderItem(orderEntity.getOrderId(), artwork, artwork.getCoverUrl());
+            if (firstCoverUrl == null) {
+                firstCoverUrl = artwork.getCoverUrl();
+                firstTitle = artwork.getTitle();
+            }
+            orderMapper.insertCertificate(buildCertificateNo(currentUserId), artwork.getArtworkId(), currentUserId, orderEntity.getOrderId());
+            orderMapper.insertOwnershipFlow(artwork.getArtworkId(), currentUserId, orderEntity.getOrderId());
+        }
+        
+        // 更新订单的首商品信息
+        orderMapper.updateOrderFirstItem(orderEntity.getOrderId(), firstTitle, firstCoverUrl);
+        
         return getOrderDetail(currentUserId, orderEntity.getOrderId());
     }
 

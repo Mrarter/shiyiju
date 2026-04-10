@@ -1,7 +1,11 @@
 <view class="order-page">
-  <!-- 固定返回按钮 -->
-  <view class="fixed-back-btn" bindtap="goBack">
-    <view class="back-arrow">‹</view>
+  <!-- 顶部导航 -->
+  <view class="header-nav">
+    <view class="back-btn" bindtap="goBack">
+      <text class="back-icon">‹</text>
+    </view>
+    <view class="header-title">确认订单</view>
+    <view class="header-placeholder"></view>
   </view>
 
   <!-- 地址区域 -->
@@ -14,6 +18,7 @@
       <view class="user-info">
         <view class="avatar"></view>
         <view class="name">{{address.receiverName}}</view>
+        <view class="phone">{{address.phone}}</view>
       </view>
       <view class="address-detail">{{address.province}}{{address.city}}{{address.district}}{{address.detailAddress}}</view>
     </view>
@@ -26,17 +31,23 @@
     </view>
   </view>
 
-  <!-- 商品信息 -->
+  <!-- 商品列表 -->
   <view class="section">
-    <view class="artwork-item">
-      <image class="artwork-img" src="{{artwork.coverUrl}}" mode="aspectFill" />
-      <view class="artwork-info">
-        <view class="artwork-title">{{artwork.title}} / {{artwork.category}} / {{artwork.widthCm}}×{{artwork.heightCm}}cm / {{artwork.creationYear}}</view>
-        <view class="artwork-price-wrap">
-          <view class="price">¥{{artwork.currentPrice}}.00</view>
-          <view class="quantity">x1</view>
+    <block wx:for="{{artworkList}}" wx:key="id">
+      <view class="artwork-item {{index > 0 ? 'no-top-border' : ''}}">
+        <image class="artwork-img" src="{{item.coverUrl}}" mode="aspectFill" />
+        <view class="artwork-info">
+          <view class="artwork-title">{{item.title}}</view>
+          <view class="artwork-subtitle">{{item.artistName}} / {{item.category}} / {{item.widthCm}}×{{item.heightCm}}cm</view>
+          <view class="artwork-price-wrap">
+            <view class="price">¥{{item.currentPrice}}</view>
+            <view class="quantity">x{{item.quantity}}</view>
+          </view>
         </view>
       </view>
+    </block>
+    <view wx:if="{{!artworkList || artworkList.length === 0}}" class="empty-tip">
+      暂无商品
     </view>
   </view>
 
@@ -50,7 +61,7 @@
   <view class="section price-detail">
     <view class="price-row">
       <text>商品金额</text>
-      <text>¥{{artwork.currentPrice}}.00</text>
+      <text>¥{{totalPrice}}</text>
     </view>
     <view class="price-row">
       <text>优惠券</text>
@@ -70,7 +81,7 @@
     </view>
     <view class="total-row">
       <text>合计</text>
-      <text class="total-price">¥{{artwork.currentPrice}}.00</text>
+      <text class="total-price">¥{{totalPrice}}</text>
     </view>
   </view>
 
@@ -82,19 +93,17 @@
         <view class="payment-icon alipay">支</view>
         <view class="payment-info">
           <view class="payment-name">支付宝</view>
-          <view class="payment-desc">支付宝内余额支付可以解决支付宝内银行卡支付限额</view>
+          <view class="payment-desc">支付宝内余额支付</view>
         </view>
       </view>
       <view class="radio {{paymentMethod === 'alipay' ? 'checked' : ''}}"></view>
     </view>
     <view class="payment-item {{paymentMethod === 'wechat' ? 'selected' : ''}}" bindtap="selectPayment" data-method="wechat">
       <view class="payment-left">
-        <view class="payment-icon wechat">
-          <view class="wechat-logo">✓</view>
-        </view>
+        <view class="payment-icon wechat">微</view>
         <view class="payment-info">
           <view class="payment-name">微信支付</view>
-          <view class="payment-desc">微信内零钱支付可以解决微信内银行卡支付限额</view>
+          <view class="payment-desc">微信内零钱支付</view>
         </view>
       </view>
       <view class="radio {{paymentMethod === 'wechat' ? 'checked' : ''}}"></view>
@@ -113,7 +122,7 @@
       <view class="agreement-icon">✓</view>
       <text>同意艺术品不支持 7 天无理由退货</text>
     </view>
-    <view class="agreement-desc">提示：鉴于艺术品具有特殊的性质，不支持 7 天无理由退货，您一旦勾选，提交订单付款后，即视为您同意。</view>
+    <view class="agreement-desc">提示：鉴于艺术品具有特殊的性质，不支持 7 天无理由退货。</view>
   </view>
 
   <!-- 底部占位 -->
@@ -123,9 +132,9 @@
   <view class="bottom-bar">
     <view class="total-wrap">
       <text class="total-label">合计（包邮）</text>
-      <text class="total-amount">¥{{artwork.currentPrice}}.00</text>
+      <text class="total-amount">¥{{totalPrice}}</text>
     </view>
-    <view class="submit-btn {{disabled ? 'disabled' : ''}}" bindtap="handlePay">
+    <view class="submit-btn {{disabled || !artworkList || artworkList.length === 0 ? 'disabled' : ''}}" bindtap="handlePay">
       <text wx:if="{{loading}}">提交中...</text>
       <text wx:else>提交订单</text>
     </view>

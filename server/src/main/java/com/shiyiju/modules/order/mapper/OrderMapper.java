@@ -43,4 +43,8 @@ public interface OrderMapper {
                                     @Param("status") String status,
                                     @Param("page") Integer page, 
                                     @Param("pageSize") Integer pageSize);
+
+    void updateOrderFirstItem(@Param("orderId") Long orderId, 
+                              @Param("firstTitle") String firstTitle,
+                              @Param("firstCoverUrl") String firstCoverUrl);
 }

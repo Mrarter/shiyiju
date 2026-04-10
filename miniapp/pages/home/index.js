@@ -1,5 +1,6 @@
 const api = require("../../utils/api")
 const { normalizeImageUrl, normalizeImageFields, getArtworkCoverPlaceholder, getBannerPlaceholder } = require("../../utils/imageUrl")
+const app = getApp()
 
 const PAGE_SIZE = 10
 
@@ -186,11 +187,20 @@ function normalizeBanner(item) {
   const normalizedUrl = normalizeImageUrl(coverUrl, getBannerPlaceholder(item.id))
   const hasValidImage = normalizedUrl && normalizedUrl.startsWith("http")
   const presetIdx = (item.id || 1) % presets.length
+  
+  // 解析 target 字段（格式：ARTWORK:123 或 URL:https://xxx）
+  let targetId = null
+  if (item.target && item.target.startsWith("ARTWORK:")) {
+    targetId = parseInt(item.target.replace("ARTWORK:", ""))
+  }
+  
   return {
     id: item.id,
     title: item.title || "",
     subtitle: item.subtitle || item.target || item.title || "查看详情",
     date: item.date || item.updatedAt || "",
+    target: item.target || "",
+    targetId: targetId,
     // 如果有有效图片URL就用它，否则用默认图片
     coverUrl: hasValidImage ? normalizedUrl : getBannerPlaceholder(item.id),
     coverStyle: presets[presetIdx],
@@ -227,6 +237,11 @@ Page({
     this.loadHome()
   },
 
+  // 主题更新方法
+  updateTheme(themeName) {
+    this.setData({ theme: themeName })
+  },
+
   onShow() {
     // 只刷新收藏状态，保留当前位置和列表
     this.loadFavorites()
@@ -250,14 +265,18 @@ Page({
       let banners = []
       try {
         banners = await api.request({ url: "/home/banners", method: "GET" })
+        console.log("[首页] Banner API 成功返回:", banners ? banners.length : 0, "条数据")
+        console.log("[首页] Banner 数据:", JSON.stringify(banners).slice(0, 500))
       } catch (e) {
         console.error("[首页] Banner API 失败:", e)
         banners = []
       }
       if (!banners || banners.length === 0) {
+        console.warn("[首页] Banner API 返回空，使用默认数据")
         banners = BANNERS
       }
       const normalizedBanners = banners.map((item, index) => normalizeBanner({ ...item, id: item.id || (index + 1) }))
+      console.log("[首页] 归一化后的 Banner:", JSON.stringify(normalizedBanners).slice(0, 500))
 
       // 从 API 获取作品数据
       let works = []
@@ -292,6 +311,7 @@ Page({
         hasMore: normalizedWorks.length >= PAGE_SIZE,
         page: 1
       })
+      console.log("[首页] 数据已设置，bannerItems 数量:", normalizedBanners.length)
     } catch (error) {
       // 使用本地数据
       console.error("[首页] 整体加载失败:", error)
@@ -408,6 +428,46 @@ Page({
     // 记录点击次数
     this.recordClick(artworkId)
     wx.navigateTo({ url: `/pages/artwork/detail?id=${artworkId}` })
+  },
+
+  // 快捷导航点击
+  goQuickNav(event) {
+    const type = event.currentTarget.dataset.type
+    console.log('[首页] 快捷导航:', type)
+    
+    switch (type) {
+      case 'hot':
+        // 热门藏品 - 跳转到发现页
+        wx.switchTab({ url: '/pages/discover/index' })
+        break
+      case 'rising':
+        // 正在升值 - 跳转到独家发售
+        wx.switchTab({ url: '/pages/exclusive/index' })
+        break
+      case 'artist':
+        // 推荐艺术家 - 跳转到艺术家页
+        wx.switchTab({ url: '/pages/artist/index' })
+        break
+      case 'notice':
+        // 公告 - 跳转到公告列表（使用发现页作为入口）
+        wx.navigateTo({ url: '/pages/discover/index?tab=notice' })
+        break
+      default:
+        console.warn('[首页] 未知导航类型:', type)
+    }
+  },
+
+  // Banner 图片加载失败处理
+  onBannerImageError(e) {
+    const index = e.currentTarget.dataset.index
+    const failedUrl = e.detail?.errMsg || 'unknown'
+    console.error(`[Banner] 第 ${index + 1} 张图片加载失败，错误:`, failedUrl)
+    if (index === undefined) return
+    const bannerItems = [...this.data.bannerItems]
+    const banner = bannerItems[index]
+    console.log(`[Banner] 失败的图片URL: ${banner?.coverUrl}`)
+    bannerItems[index] = { ...bannerItems[index], imageError: true }
+    this.setData({ bannerItems })
   },
 
   handleRetry() {

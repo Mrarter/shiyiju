@@ -231,4 +231,11 @@
         LIMIT #{pageSize}
         OFFSET #{pageSize} * (#{page} - 1)
     </select>
+
+    <update id="updateOrderFirstItem">
+        UPDATE trade_order
+        SET item_title = #{firstTitle},
+            cover_url = #{firstCoverUrl}
+        WHERE id = #{orderId}
+    </update>
 </mapper>

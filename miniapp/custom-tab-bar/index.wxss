@@ -1,11 +1,14 @@
+/* 自定义 TabBar - 支持亮色/暗色主题 */
+
 .tab-shell {
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
   z-index: 99;
-  background: #fff;
-  border-top: 1rpx solid #e5e5e5;
+  background: var(--tabbar-bg);
+  border-top: 1rpx solid var(--tabbar-border);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .tab-safe {
@@ -24,12 +27,14 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #999;
-  background: #fff;
+  color: var(--tabbar-text);
+  background: transparent;
+  position: relative;
+  transition: color 0.3s ease;
 }
 
 .tab-item-active {
-  color: #000;
+  color: var(--tabbar-text-active);
 }
 
 .tab-icon {
@@ -45,4 +50,24 @@
 .tab-text {
   font-size: 22rpx;
   margin-top: 2rpx;
+}
+
+/* 购物车徽章 */
+.cart-badge {
+  position: absolute;
+  top: 8rpx;
+  right: 50%;
+  transform: translateX(30rpx);
+  min-width: 32rpx;
+  height: 32rpx;
+  padding: 0 8rpx;
+  border-radius: 16rpx;
+  background: var(--color-error);
+  color: #fff;
+  font-size: 20rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }

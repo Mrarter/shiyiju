@@ -6,6 +6,9 @@
         <div class="page-subtitle">管理作品资料、价格、库存和上架状态</div>
       </div>
       <div class="header-actions">
+        <el-button @click="goToOperations">
+          <el-icon><Promotion /></el-icon> 运营管理
+        </el-button>
         <el-button @click="showBatchUploadDialog">
           <el-icon><Upload /></el-icon> 批量上传
         </el-button>
@@ -426,12 +429,14 @@
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { ElMessage } from 'element-plus'
-import { Document, Download, InfoFilled, Loading, Plus, Picture, Upload } from '@element-plus/icons-vue'
+import { Document, Download, InfoFilled, Loading, Plus, Picture, Promotion, Upload } from '@element-plus/icons-vue'
+import { useRouter } from 'vue-router'
 import { useAdminStore } from '../../stores/admin'
 import CropUploadField from '../../components/CropUploadField.vue'
 import { getImageUrl } from '../../utils/imageUrl'
 
 const adminStore = useAdminStore()
+const router = useRouter()
 const { artworks: artworksState, artists: artistsState } = storeToRefs(adminStore)
 const keyword = ref('')
 const saving = ref(false)
@@ -582,6 +587,10 @@ function resetForm() {
   form.description = ''
   form.coverUrl = ''
   form.sizePreset = 'custom'
+}
+
+function goToOperations() {
+  router.push('/operations')
 }
 
 function showDialog() {

@@ -1,0 +1,89 @@
+/* ============================================
+   暗色主题 (Dark Theme)
+   ============================================ */
+
+.theme-dark {
+  /* === 基础背景色 === */
+  --bg-primary: #0b0a08;
+  --bg-secondary: #11100d;
+  --bg-tertiary: #1a1918;
+  --bg-card: rgba(20, 17, 14, 0.94);
+  --bg-card-hover: rgba(25, 22, 19, 0.98);
+  --bg-overlay: rgba(0, 0, 0, 0.7);
+  
+  /* === 亮色背景（用于特殊区域） === */
+  --bg-light: #f7f6f3;
+  --bg-light-secondary: #ffffff;
+  
+  /* === 文字颜色 === */
+  --text-primary: #f6efe6;
+  --text-secondary: #b8b1a7;
+  --text-tertiary: #8d8579;
+  --text-disabled: #5c5854;
+  --text-inverse: #1a1918;
+  
+  /* === 边框颜色 === */
+  --border-primary: rgba(214, 176, 116, 0.16);
+  --border-secondary: rgba(214, 176, 116, 0.08);
+  --border-tertiary: rgba(214, 176, 116, 0.04);
+  --border-dark: rgba(214, 176, 116, 0.3);
+  
+  /* === 主题色（金色/艺术感） === */
+  --color-primary: #d6b074;
+  --color-primary-light: #e3c186;
+  --color-primary-dark: #c3944f;
+  --color-primary-bg: rgba(214, 176, 116, 0.12);
+  --color-primary-border: rgba(214, 176, 116, 0.28);
+  
+  /* === 功能色 === */
+  --color-success: #6ea67a;
+  --color-success-bg: rgba(110, 166, 122, 0.15);
+  --color-warning: #e4882a;
+  --color-warning-bg: rgba(228, 136, 42, 0.15);
+  --color-error: #e2604d;
+  --color-error-bg: rgba(226, 96, 77, 0.15);
+  --color-info: #5a8fd1;
+  --color-info-bg: rgba(90, 143, 209, 0.15);
+  
+  /* === 渐变背景 === */
+  --gradient-gold: linear-gradient(135deg, #e3c186, #c3944f);
+  --gradient-card: radial-gradient(circle at top right, rgba(214, 176, 116, 0.08), transparent 34%),
+    linear-gradient(180deg, rgba(20, 17, 14, 0.97) 0%, rgba(17, 16, 13, 0.98) 100%);
+  --gradient-overlay: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%);
+  
+  /* === 阴影 === */
+  --shadow-sm: 0 2rpx 8rpx rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8rpx 24rpx rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 18rpx 50rpx rgba(0, 0, 0, 0.5);
+  --shadow-card: 0 18rpx 50rpx rgba(0, 0, 0, 0.18);
+  
+  /* === 页面背景 === */
+  --page-bg: #0b0a08;
+  --page-bg-gradient: radial-gradient(circle at top right, rgba(214, 176, 116, 0.12), transparent 34%),
+    linear-gradient(180deg, #0b0a08 0%, #11100d 58%, #0e0c09 100%);
+  
+  /* === TabBar === */
+  --tabbar-bg: rgba(15, 13, 11, 0.95);
+  --tabbar-border: rgba(214, 176, 116, 0.12);
+  --tabbar-text: #8d8579;
+  --tabbar-text-active: #d6b074;
+  
+  /* === 导航栏 === */
+  --navbar-bg: rgba(11, 10, 8, 0.95);
+  --navbar-border: rgba(214, 176, 116, 0.12);
+  --navbar-text: #f6efe6;
+  
+  /* === 输入框 === */
+  --input-bg: rgba(255, 255, 255, 0.06);
+  --input-border: rgba(214, 176, 116, 0.16);
+  --input-placeholder: #5c5854;
+  
+  /* === 分隔线 === */
+  --divider: rgba(214, 176, 116, 0.08);
+  
+  /* === 蒙版 === */
+  --mask-bg: rgba(0, 0, 0, 0.7);
+  
+  /* === 状态栏文字 === */
+  --status-bar: light-content;
+}

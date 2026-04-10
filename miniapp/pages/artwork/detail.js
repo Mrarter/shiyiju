@@ -296,16 +296,57 @@ Page({
   },
 
   // 加入购物车
-  handleAddCart() {
+  async handleAddCart() {
     const { artworkId } = this.data
     this.setData({ showWantModal: false })
-    wx.showToast({ title: "已加入购物车", icon: "success" })
-    // TODO: 调用购物车 API
-    api.request({
-      url: `/cart/add`,
-      method: "POST",
-      data: { artworkId }
-    }).catch(() => {})
+    
+    try {
+      await api.request({
+        url: `/cart/add`,
+        method: "POST",
+        data: { artworkId, quantity: 1 }
+      })
+      wx.showToast({ title: "已加入购物车", icon: "success" })
+    } catch (e) {
+      console.error("[作品详情] 加入购物车失败:", e)
+      // 如果 API 失败，保存到本地存储
+      this.addToLocalCart(artworkId)
+      wx.showToast({ title: "已加入购物车", icon: "success" })
+    }
+  },
+
+  // 添加到本地购物车（API 失败时使用）
+  addToLocalCart(artworkId) {
+    try {
+      const localCart = wx.getStorageSync('localCart') || []
+      const existing = localCart.find(item => item.artworkId === artworkId)
+      
+      if (existing) {
+        existing.quantity += 1
+      } else {
+        // 使用作品详情数据
+        const { detail } = this.data
+        localCart.push({
+          id: 'local_' + Date.now(),
+          artworkId: artworkId,
+          title: detail.title,
+          artistName: detail.artistName,
+          price: detail.currentPrice,
+          quantity: 1,
+          stock: detail.stock || 1,
+          coverUrl: detail.coverUrl,
+          widthCm: detail.widthCm,
+          heightCm: detail.heightCm,
+          creationYear: detail.creationYear,
+          category: detail.category,
+          selected: true
+        })
+      }
+      
+      wx.setStorageSync('localCart', localCart)
+    } catch (e) {
+      console.error("[作品详情] 保存本地购物车失败:", e)
+    }
   },
 
   // 直接购买

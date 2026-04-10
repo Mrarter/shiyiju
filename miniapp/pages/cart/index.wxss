@@ -5,12 +5,11 @@
 
 /* 顶部导航 */
 .cart-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
   display: flex;
   align-items: center;
-  padding: 20rpx 30rpx;
+  justify-content: space-between;
+  padding: 24rpx 30rpx;
+  padding-top: calc(24rpx + env(safe-area-inset-top));
   background: #fff;
   border-bottom: 1rpx solid #eee;
 }
@@ -28,8 +27,6 @@
 }
 
 .edit-btn {
-  position: absolute;
-  right: 30rpx;
   font-size: 28rpx;
   color: #ff4d4f;
 }

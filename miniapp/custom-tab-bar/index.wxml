@@ -1,4 +1,4 @@
-<view class="tab-shell">
+<view class="tab-shell theme-{{theme}}">
   <view class="tab-safe"></view>
   <view class="tab-bar">
     <view
@@ -9,8 +9,10 @@
       data-index="{{index}}"
       bindtap="switchTab"
     >
-      <view class="tab-icon">{{item.icon}}</view>
+      <view class="tab-icon">{{selected === index ? item.activeIcon : item.icon}}</view>
       <view class="tab-text">{{item.text}}</view>
+      <!-- 购物车数量徽章 -->
+      <view wx:if="{{item.text === '购物车' && cartCount > 0}}" class="cart-badge">{{cartCount > 99 ? '99+' : cartCount}}</view>
     </view>
   </view>
 </view>

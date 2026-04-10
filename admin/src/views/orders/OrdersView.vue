@@ -5,7 +5,12 @@
         <div class="page-title">订单管理</div>
         <div class="page-subtitle">跟踪订单状态、支付状态和发货进度</div>
       </div>
-      <el-button @click="exportOrders">导出订单</el-button>
+      <div class="header-actions">
+        <el-button @click="goToOperations">
+          <el-icon><Promotion /></el-icon> 运营管理
+        </el-button>
+        <el-button @click="exportOrders">导出订单</el-button>
+      </div>
     </div>
 
     <div class="section-card" style="padding: 20px; margin-bottom: 16px;">
@@ -107,10 +112,13 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { ElMessage } from 'element-plus'
+import { Promotion } from '@element-plus/icons-vue'
+import { useRouter } from 'vue-router'
 import { useAdminStore } from '../../stores/admin'
 import { downloadCsv } from '../../utils/download'
 
 const adminStore = useAdminStore()
+const router = useRouter()
 const { orders: ordersState } = storeToRefs(adminStore)
 const keyword = ref('')
 const detailVisible = ref(false)
@@ -249,6 +257,10 @@ async function saveRemark() {
   } catch (error) {
     ElMessage.error(error.message || '备注保存失败')
   }
+}
+
+function goToOperations() {
+  router.push('/operations')
 }
 
 function exportOrders() {

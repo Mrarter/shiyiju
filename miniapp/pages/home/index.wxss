@@ -1,12 +1,15 @@
+/* 首页样式 - 支持亮色/暗色主题 */
+
 .home-page {
   min-height: 100vh;
-  background: #fff;
-  color: #000;
+  background: var(--page-bg);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .safe-top {
   height: env(safe-area-inset-top);
-  background: #fff;
+  background: var(--navbar-bg);
 }
 
 /* 顶部导航 */
@@ -15,10 +18,12 @@
   align-items: center;
   justify-content: space-between;
   padding: 16rpx 24rpx;
-  background: #fff;
+  background: var(--navbar-bg);
   position: sticky;
   top: 0;
   z-index: 100;
+  border-bottom: 1rpx solid var(--navbar-border);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .nav-left,
@@ -31,7 +36,7 @@
 .search-icon,
 .add-icon {
   font-size: 40rpx;
-  color: #000;
+  color: var(--navbar-text);
 }
 
 .add-icon {
@@ -42,7 +47,7 @@
 .nav-brand {
   font-size: 34rpx;
   font-weight: 700;
-  color: #000;
+  color: var(--navbar-text);
 }
 
 .home-wrap {
@@ -56,8 +61,7 @@
 
 .banner-swiper {
   width: 100%;
-  height: auto;
-  min-height: 420rpx;
+  height: 420rpx;
 }
 
 .banner-item {
@@ -67,12 +71,34 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f5f5f5;
+  background: var(--bg-secondary);
 }
 
 .banner-image {
   width: 100%;
+  height: 420rpx;
   display: block;
+  background: var(--gradient-gold);
+}
+
+.banner-fallback {
+  width: 100%;
+  min-height: 420rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--gradient-gold);
+}
+
+.banner-fallback-icon {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+}
+
+.banner-fallback-title {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 28rpx;
 }
 
 .banner-tag {
@@ -80,7 +106,7 @@
   top: 20rpx;
   left: 20rpx;
   padding: 8rpx 20rpx;
-  background: #ff4d4f;
+  background: var(--color-error);
   color: #fff;
   font-size: 22rpx;
   border-radius: 8rpx;
@@ -92,7 +118,7 @@
   left: 0;
   right: 0;
   padding: 24rpx;
-  background: linear-gradient(transparent, rgba(0,0,0,0.7));
+  background: var(--gradient-overlay);
 }
 
 .banner-title {
@@ -118,7 +144,7 @@
   display: flex;
   justify-content: space-around;
   padding: 20rpx 0;
-  border-bottom: 1rpx solid #f0f0f0;
+  border-bottom: 1rpx solid var(--divider);
 }
 
 .category-item {
@@ -134,12 +160,49 @@
 
 .category-name {
   font-size: 24rpx;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .category-item.active .category-name {
-  color: #000;
+  color: var(--text-primary);
   font-weight: 600;
+}
+
+/* 快捷导航 */
+.quick-nav {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 30rpx 20rpx;
+  background: var(--bg-card);
+  border-bottom: 16rpx solid var(--bg-secondary);
+  transition: background-color 0.3s ease;
+}
+
+.quick-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.quick-nav-icon {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48rpx;
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.quick-nav-text {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  font-weight: 500;
 }
 
 /* 瀑布流 */
@@ -158,10 +221,11 @@
 }
 
 .artwork-card {
-  background: #fff;
+  background: var(--bg-card);
   border-radius: 16rpx;
   overflow: hidden;
-  border: 1rpx solid #f0f0f0;
+  border: 1rpx solid var(--border-secondary);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .artwork-image-wrap {
@@ -172,6 +236,7 @@
 .artwork-image {
   width: 100%;
   display: block;
+  background: var(--bg-secondary);
 }
 
 .artwork-tag {
@@ -179,7 +244,7 @@
   top: 12rpx;
   left: 12rpx;
   padding: 4rpx 12rpx;
-  background: #ff4d4f;
+  background: var(--color-error);
   color: #fff;
   font-size: 20rpx;
   border-radius: 6rpx;
@@ -191,17 +256,17 @@
   right: 12rpx;
   width: 56rpx;
   height: 56rpx;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--bg-card);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 28rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-sm);
 }
 
 .favorite-btn.favorited {
-  background: #fff0f0;
+  background: var(--color-error-bg);
 }
 
 .artwork-info {
@@ -211,7 +276,7 @@
 .artwork-title {
   font-size: 28rpx;
   font-weight: 600;
-  color: #000;
+  color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -220,7 +285,7 @@
 .artwork-spec {
   margin-top: 6rpx;
   font-size: 22rpx;
-  color: #999;
+  color: var(--text-tertiary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -236,19 +301,19 @@
 .artwork-price {
   font-size: 32rpx;
   font-weight: 700;
-  color: #ff4d4f;
+  color: var(--color-error);
 }
 
 .artwork-original {
   font-size: 22rpx;
-  color: #ccc;
+  color: var(--text-disabled);
   text-decoration: line-through;
 }
 
 .artwork-countdown {
   margin-top: 10rpx;
   font-size: 22rpx;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .countdown-icon {
@@ -271,13 +336,13 @@
   margin-top: 32rpx;
   font-size: 36rpx;
   font-weight: 600;
-  color: #000;
+  color: var(--text-primary);
 }
 
 .empty-desc {
   margin-top: 16rpx;
   font-size: 26rpx;
-  color: #999;
+  color: var(--text-tertiary);
 }
 
 .loading-state,
@@ -288,7 +353,7 @@
   justify-content: center;
   padding: 200rpx 40rpx;
   font-size: 28rpx;
-  color: #999;
+  color: var(--text-tertiary);
 }
 
 .loading-anim {
@@ -300,8 +365,8 @@
 .loading-bar {
   width: 100%;
   height: 100%;
-  border: 4rpx solid #f0f0f0;
-  border-top-color: #ff4d4f;
+  border: 4rpx solid var(--border-primary);
+  border-top-color: var(--color-error);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -315,12 +380,12 @@
   height: 72rpx;
   margin: 20rpx auto 0;
   border-radius: 36rpx;
-  background: #000;
+  background: var(--gradient-gold);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 28rpx;
-  color: #fff;
+  color: var(--text-inverse);
 }
 
 /* 加载更多 */
@@ -339,7 +404,7 @@
   width: 16rpx;
   height: 16rpx;
   border-radius: 50%;
-  background: #ff4d4f;
+  background: var(--color-primary);
   animation: bounce 1.4s ease-in-out infinite both;
 }
 
@@ -362,12 +427,12 @@
 .no-more-line {
   width: 100rpx;
   height: 1rpx;
-  background: #e5e5e5;
+  background: var(--border-primary);
 }
 
 .no-more-text {
   font-size: 24rpx;
-  color: #ccc;
+  color: var(--text-disabled);
 }
 
 /* Fallback Art */

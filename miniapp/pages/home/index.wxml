@@ -1,4 +1,4 @@
-<view class="home-page">
+<view class="home-page theme-{{theme || 'dark'}}">
   <view class="safe-top"></view>
 
   <!-- 顶部导航 -->
@@ -15,37 +15,46 @@
   <view class="home-wrap" wx:if="{{!loading && !error}}">
     <!-- Banner 轮播 -->
     <view class="banner-section" wx:if="{{bannerItems.length > 0}}">
-      <swiper class="banner-swiper" indicator-dots="true" autoplay="true" interval="5000" duration="500">
+      <swiper class="banner-swiper" indicator-dots="{{bannerItems.length > 1}}" autoplay="{{bannerItems.length > 1}}" interval="5000" duration="500" circular="true">
         <swiper-item wx:for="{{bannerItems}}" wx:key="id">
-          <view class="banner-item {{item.coverUrl ? '' : 'fallback-bg'}}" 
-                style="{{item.coverUrl ? '' : 'background: ' + item.fallbackBg}}"
-                bindtap="goArtworkDetail" data-artwork-id="{{item.id}}">
-            <!-- 有图片URL时显示图片 -->
-            <image wx:if="{{item.coverUrl}}" src="{{item.coverUrl}}" mode="widthFix" class="banner-image"></image>
-            <!-- 无图片时显示渐变背景+发光效果 -->
-            <view wx:if="{{!item.coverUrl}}" class="fallback-art">
-              <view class="art-glow" style="background: {{item.fallbackGlow}};"></view>
-            </view>
-            <view class="banner-tag" wx:if="{{item.tag}}">{{item.tag}}</view>
-            <view class="banner-info">
-              <view class="banner-title">{{item.title}}</view>
-              <view class="banner-subtitle">{{item.subtitle}}</view>
-              <view class="banner-date">{{item.date}}</view>
-            </view>
-          </view>
+          <image 
+            src="{{item.coverUrl}}" 
+            mode="widthFix" 
+            class="banner-image"
+            bindtap="goArtworkDetail" 
+            data-artwork-id="{{item.targetId}}"
+            binderror="onBannerImageError"
+            data-index="{{index}}"
+          ></image>
         </swiper-item>
       </swiper>
     </view>
 
     <!-- 分类导航 -->
-    <view class="category-section">
-      <view class="category-item {{currentCategory === index ? 'active' : ''}}" 
-            wx:for="{{categories}}" 
-            wx:key="id" 
-            data-index="{{index}}"
-            bindtap="switchCategory">
-        <view class="category-icon">{{item.icon}}</view>
-        <view class="category-name">{{item.name}}</view>
+    <view class="quick-nav">
+      <view class="quick-nav-item" bindtap="goQuickNav" data-type="hot">
+        <view class="quick-nav-icon" style="background: linear-gradient(135deg, #ff6b6b, #ee5a5a);">
+          <text>🔥</text>
+        </view>
+        <view class="quick-nav-text">热门藏品</view>
+      </view>
+      <view class="quick-nav-item" bindtap="goQuickNav" data-type="rising">
+        <view class="quick-nav-icon" style="background: linear-gradient(135deg, #52c41a, #389e0d);">
+          <text>📈</text>
+        </view>
+        <view class="quick-nav-text">正在升值</view>
+      </view>
+      <view class="quick-nav-item" bindtap="goQuickNav" data-type="artist">
+        <view class="quick-nav-icon" style="background: linear-gradient(135deg, #722ed1, #531dab);">
+          <text>🎨</text>
+        </view>
+        <view class="quick-nav-text">推荐艺术家</view>
+      </view>
+      <view class="quick-nav-item" bindtap="goQuickNav" data-type="notice">
+        <view class="quick-nav-icon" style="background: linear-gradient(135deg, #faad14, #d48806);">
+          <text>📢</text>
+        </view>
+        <view class="quick-nav-text">公告</view>
       </view>
     </view>
 

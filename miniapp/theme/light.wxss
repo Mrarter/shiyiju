@@ -1,0 +1,87 @@
+/* ============================================
+   亮色主题 (Light Theme)
+   ============================================ */
+
+.theme-light {
+  /* === 基础背景色 === */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f7f6f3;
+  --bg-tertiary: #f0eeea;
+  --bg-card: #ffffff;
+  --bg-card-hover: #faf9f7;
+  --bg-overlay: rgba(0, 0, 0, 0.5);
+  
+  /* === 深色背景（用于特殊区域） === */
+  --bg-dark: #1a1918;
+  --bg-dark-secondary: #2a2928;
+  
+  /* === 文字颜色 === */
+  --text-primary: #1a1918;
+  --text-secondary: #6b6860;
+  --text-tertiary: #9c9890;
+  --text-disabled: #c5c2bc;
+  --text-inverse: #ffffff;
+  
+  /* === 边框颜色 === */
+  --border-primary: #e5e3df;
+  --border-secondary: #eeecea;
+  --border-tertiary: #f5f4f2;
+  --border-dark: rgba(214, 176, 116, 0.3);
+  
+  /* === 主题色（金色/艺术感） === */
+  --color-primary: #c3944f;
+  --color-primary-light: #e3c186;
+  --color-primary-dark: #a67c3d;
+  --color-primary-bg: rgba(195, 148, 79, 0.12);
+  --color-primary-border: rgba(195, 148, 79, 0.3);
+  
+  /* === 功能色 === */
+  --color-success: #4a9d5b;
+  --color-success-bg: rgba(74, 157, 91, 0.1);
+  --color-warning: #d4882a;
+  --color-warning-bg: rgba(212, 136, 42, 0.1);
+  --color-error: #d4382a;
+  --color-error-bg: rgba(212, 56, 42, 0.1);
+  --color-info: #4a7fc1;
+  --color-info-bg: rgba(74, 127, 193, 0.1);
+  
+  /* === 渐变背景 === */
+  --gradient-gold: linear-gradient(135deg, #e3c186, #c3944f);
+  --gradient-card: linear-gradient(180deg, #ffffff 0%, #faf9f7 100%);
+  --gradient-overlay: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 100%);
+  
+  /* === 阴影 === */
+  --shadow-sm: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 8rpx 24rpx rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 18rpx 50rpx rgba(0, 0, 0, 0.12);
+  --shadow-card: 0 8rpx 24rpx rgba(0, 0, 0, 0.06);
+  
+  /* === 页面背景 === */
+  --page-bg: #f7f6f3;
+  --page-bg-gradient: linear-gradient(180deg, #f7f6f3 0%, #f0eeea 100%);
+  
+  /* === TabBar === */
+  --tabbar-bg: rgba(255, 255, 255, 0.95);
+  --tabbar-border: #e5e3df;
+  --tabbar-text: #9c9890;
+  --tabbar-text-active: #c3944f;
+  
+  /* === 导航栏 === */
+  --navbar-bg: rgba(255, 255, 255, 0.95);
+  --navbar-border: #e5e3df;
+  --navbar-text: #1a1918;
+  
+  /* === 输入框 === */
+  --input-bg: #f7f6f3;
+  --input-border: #e5e3df;
+  --input-placeholder: #c5c2bc;
+  
+  /* === 分隔线 === */
+  --divider: #eeecea;
+  
+  /* === 蒙版 === */
+  --mask-bg: rgba(0, 0, 0, 0.5);
+  
+  /* === 状态栏文字 === */
+  --status-bar: dark-content;
+}

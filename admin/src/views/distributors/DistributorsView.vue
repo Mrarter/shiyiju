@@ -5,7 +5,12 @@
         <div class="page-title">艺荐官管理</div>
         <div class="page-subtitle">管理分销员、艺荐官及其团队关系</div>
       </div>
-      <el-button type="primary" @click="startCreate">新建艺荐官</el-button>
+      <div class="header-actions">
+        <el-button @click="goToOperations">
+          <el-icon><Promotion /></el-icon> 运营管理
+        </el-button>
+        <el-button type="primary" @click="startCreate">新建艺荐官</el-button>
+      </div>
     </div>
 
     <div class="section-card" style="padding: 20px; margin-bottom: 16px;">
@@ -150,11 +155,13 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
-import { ArrowRight } from '@element-plus/icons-vue'
+import { ArrowRight, Promotion } from '@element-plus/icons-vue'
+import { useRouter } from 'vue-router'
 import { http } from '../../api/http'
 import { ADMIN_API_PREFIX } from '../../config/env'
 import { getImageUrl } from '../../utils/imageUrl'
 
+const router = useRouter()
 const distributors = ref([])
 const keyword = ref('')
 const statusFilter = ref('')
@@ -201,6 +208,10 @@ function resetForm() {
   form.teamLevel = 1
   form.parentDistributorId = null
   form.status = 'ACTIVE'
+}
+
+function goToOperations() {
+  router.push('/operations')
 }
 
 function startCreate() {

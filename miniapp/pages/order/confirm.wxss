@@ -4,34 +4,51 @@
   padding-bottom: 140rpx;
 }
 
-/* 固定返回按钮 */
-.fixed-back-btn {
-  position: fixed;
+/* 顶部导航 */
+.header-nav {
+  position: sticky;
   top: 0;
-  left: 0;
-  z-index: 999;
-  width: 80rpx;
-  height: 80rpx;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 30rpx;
+  padding-top: calc(24rpx + env(safe-area-inset-top));
+  background: #fff;
+  border-bottom: 1rpx solid #eee;
+}
+
+.back-btn {
+  width: 60rpx;
+  height: 60rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-top: env(safe-area-inset-top);
 }
 
-.back-arrow {
-  font-size: 56rpx;
-  color: #fff;
+.back-icon {
+  font-size: 48rpx;
+  color: #333;
   font-weight: bold;
-  text-shadow: 0 2rpx 8rpx rgba(0,0,0,0.3);
+}
+
+.header-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.header-placeholder {
+  width: 60rpx;
 }
 
 /* 地址卡片 */
 .address-card {
   position: relative;
   background: linear-gradient(135deg, #323232 0%, #4a4a4a 100%);
-  margin: 32rpx 24rpx 24rpx;
+  margin: 24rpx;
   border-radius: 16rpx;
-  padding: 40rpx 32rpx;
+  padding: 32rpx;
   overflow: hidden;
 }
 
@@ -64,7 +81,7 @@
 .user-info {
   display: flex;
   align-items: center;
-  margin-bottom: 16rpx;
+  margin-bottom: 12rpx;
 }
 
 .avatar {
@@ -78,6 +95,12 @@
 .name {
   font-size: 32rpx;
   font-weight: 500;
+  margin-right: 16rpx;
+}
+
+.phone {
+  font-size: 28rpx;
+  color: rgba(255,255,255,0.8);
 }
 
 .address-detail {
@@ -121,35 +144,61 @@
 .artwork-item {
   display: flex;
   align-items: center;
+  padding: 16rpx 0;
+}
+
+.artwork-item.no-top-border {
+  border-top: none;
+  padding-top: 0;
+}
+
+.artwork-item + .artwork-item {
+  border-top: 1rpx solid #f0f0f0;
+  margin-top: 16rpx;
+  padding-top: 16rpx;
 }
 
 .artwork-img {
-  width: 160rpx;
-  height: 160rpx;
+  width: 140rpx;
+  height: 140rpx;
   border-radius: 12rpx;
   background: #f5f5f5;
+  flex-shrink: 0;
 }
 
 .artwork-info {
   flex: 1;
   margin-left: 20rpx;
+  overflow: hidden;
 }
 
 .artwork-title {
-  font-size: 26rpx;
+  font-size: 28rpx;
   color: #333;
   line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.artwork-subtitle {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 8rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .artwork-price-wrap {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 16rpx;
+  margin-top: 12rpx;
 }
 
 .price {
-  font-size: 32rpx;
+  font-size: 30rpx;
   font-weight: 600;
   color: #333;
 }
@@ -157,6 +206,13 @@
 .quantity {
   font-size: 26rpx;
   color: #999;
+}
+
+.empty-tip {
+  text-align: center;
+  color: #999;
+  font-size: 28rpx;
+  padding: 40rpx 0;
 }
 
 /* 买家留言 */
@@ -252,7 +308,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28rpx;
+  font-size: 26rpx;
   font-weight: bold;
   color: #fff;
   margin-right: 16rpx;
@@ -264,10 +320,6 @@
 
 .payment-icon.wechat {
   background: #07c160;
-}
-
-.wechat-logo {
-  font-size: 32rpx;
 }
 
 .payment-info {
@@ -368,14 +420,14 @@
   left: 0;
   right: 0;
   bottom: 0;
-  height: 120rpx;
   background: #fff;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 32rpx;
-  padding-bottom: env(safe-area-inset-bottom);
+  padding: 20rpx 32rpx;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
   box-shadow: 0 -2rpx 20rpx rgba(0, 0, 0, 0.05);
+  z-index: 100;
 }
 
 .total-wrap {

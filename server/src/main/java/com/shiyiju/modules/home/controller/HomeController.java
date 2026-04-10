@@ -1,6 +1,7 @@
 package com.shiyiju.modules.home.controller;
 
 import com.shiyiju.common.api.ApiResponse;
+import com.shiyiju.common.util.ImageUrlUtil;
 import com.shiyiju.modules.admin.service.AdminContentService;
 import com.shiyiju.modules.admin.vo.AdminOperationVO;
 import com.shiyiju.modules.artwork.service.ArtworkService;
@@ -19,10 +20,12 @@ public class HomeController {
 
     private final AdminContentService adminContentService;
     private final ArtworkService artworkService;
+    private final ImageUrlUtil imageUrlUtil;
 
-    public HomeController(AdminContentService adminContentService, ArtworkService artworkService) {
+    public HomeController(AdminContentService adminContentService, ArtworkService artworkService, ImageUrlUtil imageUrlUtil) {
         this.adminContentService = adminContentService;
         this.artworkService = artworkService;
+        this.imageUrlUtil = imageUrlUtil;
     }
 
     @GetMapping("/banners")
@@ -43,11 +46,12 @@ public class HomeController {
                     banner.setId(op.getId());
                     banner.setTitle(op.getTitle());
                     banner.setType(op.getType());
+                    banner.setTarget(op.getTarget());
                     banner.setStatus(op.getStatus());
                     banner.setSubtitle(op.getTarget() != null ? op.getTarget() : "查看详情");
                     banner.setDate(op.getUpdatedAt());
-                    banner.setImageUrl(op.getImageUrl());
-                    banner.setCoverUrl(op.getImageUrl());
+                    banner.setImageUrl(imageUrlUtil.normalize(op.getImageUrl()));
+                    banner.setCoverUrl(imageUrlUtil.normalize(op.getImageUrl()));
                     banner.setSortNo(op.getSortNo());
                     return banner;
                 })
